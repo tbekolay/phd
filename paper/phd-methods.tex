@@ -66,11 +66,285 @@ This system is also ???something about NEF
 
 ???figure of periphery
 
+As summarized in secition ???ref,
+there are many models of the auditory periphery
+that differ in how many phenomena they capture,
+and in their computational costs.
+For this system,
+the primary selection criteria is
+the computational cost;
+periphery models that simulate quickly
+allow for rapid iterative development
+to determine the conditions
+under which the model is successful
+under which it fails.
+We will therefore use
+a bank of Gammatone filters as the
+auditory periphery model,
+as it captures the primary phenomena
+of the auditory periphery
+and incurs the least computational cost
+of the models surveyed.
+
+???talk about the various phenomena
+and why it isn't important for this model
+
+Unlike some of the other layers, however,
+this layer is modular.
+All auditory periphery models expose
+generally the same interface;
+the input is air pressure waves,
+and the output is either action potentials
+traveling down the auditory nerve,
+or basilar membrane deflections
+which can be converted to action potentials
+using various spike generation mechanisms.
+Should we determine that Gammatone filters
+are not sufficient for extracting
+the features that we aim to collect,
+then we can try other auditory periphery models
+with minimal changes to the rest of the system.
+In doing so, we would also be able to
+determine functional roles for the
+unique phenomena captured by the
+periphery model that is able to extract particular features.
+However, we believe that many
+of the phenomena captured
+by sophisticated periphery models either
+\begin{itemize}
+\item replicate unnecessary biological detail
+  (i.e., details that come about because biological parts
+  are necessarily noisy and imperfect), or
+\item become necessary in more complicated
+  auditory environments than the ones
+  we will use for testing in this work.
+\end{itemize}
+
 \subsection{Auditory preprocessing}
+
+The auditory preprocessing layer
+takes frequency information from the auditory periphery,
+and computes generic temporal transformations.
+Each downstream feature will use a different
+subset of these transformations.
+For efficiency,
+only transformations used by at least one
+downstream feature will be
+included in the final integrated system,
+but for testing the auditory system independently,
+many transformations will be computed
+to determine the critical set of
+transformations needed by each downstream feature.
+
+It is important to be explicit about
+why the auditory preprocessing layer is necessary,
+as it exemplifies the constraints involved in
+using biologically inspired methods.
+We use temporal transformations
+so that all of the information necessary
+to determine the phoneme currently being voiced,
+or to determine any other downstream feature,
+is available at the current moment in time.
+Humans can be trained to look at
+audio spectrograms and decipher
+the utterance based on how the
+frequency information changes over time.
+Many speech recognition systems operate
+in a similar way, by looking at
+???millisecond slices of time
+and decoding phonemes with that portion
+of the spectrogram ???refs and specifics.
+In contrast, humans receive audio
+as a constant stream,
+using internal processes to remember
+parts of the recent audio past
+in order to decode linguistic
+and non-linguistic information.
+Our system also operates in
+an online real-time fashion,
+receiving a constant stream of audio input,
+and using internal processes
+to keep around the information
+needed to decode speech.
+The audio preprocessing layer
+is the primary method in which
+raw audio information from the recent past
+is made available at the current time.
+
+These transformations are expressed as
+linear time-invariant filters.
+These filters are applied to the incoming
+frequency information.
+???more about LTIs
+
+???rundown of what transformations are done
+
+???try to have a citation for each transformation
+
+???include equations
+
+A central question that we will explore
+is whether features can be decoded
+from temporal transformations
+of each frequency,
+or it is necessary for nearby frequencies
+to interact in some transformations.
+For example,
+equation~???eqref calculates
+the derivative of a signal;
+i.e., it tells us how the power associated
+with a particular frequency has changed recently.
+We could instead look at the derivative
+of the difference between two frequencies.
+???put in equation.
+This equation tells us how the relative
+power between two frequencies
+has changed recently.
+???someref indicates that
+correctly identifying bigrams
+is as essential to phonology
+as correctly identifying individual phonemes.
+Temporal transformations that
+
+This layer does not contain all possible
+temporal transformations;
+there are an infinite number of filters
+that could be applied to the incoming
+frequency information.
+The filters above were chosen
+because they appear in the literature.
+However, additional transformations
+can be added if they are needed
+by other downstream features.
+Other LTI filters could also be added
+systematically to discover useful filters
+that might form predictions of
+filters we might find in the brain.
+
+While the ability to add new LTI filters
+does not make the preprocessing layer
+as modular and interchangeable
+as the auditory periphery,
+the procedure for adding
+new temporal transformations
+is straightforward,
+making the preprocessing layer
+generic and extensible.
 
 \subsection{Features}
 
-NEF stuff
+The feature layer takes temporally transformed
+frequency information from the preprocessing layer
+and represents high-level features relevant
+to human speech.
+Specifically, we represent phonemes,
+pitch, and volume in an attempt
+to capture the features that are
+psychoacoustically probable
+and sufficient to reproduce
+natural speech through the synthesis system.
+
+Unlike the preprocessing layer,
+the transformations in the feature layer
+are computed across feedforward connections.
+The exact transformation is unique to each feature.
+
+Phonemes are the most complicated feature
+that we represent.
+We track
+the current vocalic and consonantal phoneme separately
+because these two types of phonemes
+have very different acoustic properties.
+Vowels are produced with an open vocal tract,
+and are typically voiced longer than consonants.
+For these reasons, the temporal information
+necessary to recognize vowels
+may be readily available at
+the current moment;
+however, using temporal information relatively
+distant in the past (e.g., ???20-30ms)
+may result in better performance since we can
+leverage the fact that vowels are voiced for longer.
+Another question that we can investigate in this model
+is whether diphthongs should be considered phonemes
+or a string of two phonemes.
+Diphthongs may be easier to recognize as a single unit
+by exploiting the temporal information available
+in the system;
+on the other hand, if the individual components
+of the diphthong are easy to recognize,
+then there is no need to treat them as a single unit.
+
+Consonants, on the other hand, are produced
+through constrictions of the vocal tract,
+resulting in short disturbances or stoppages in air flow
+in between two vocalic contexts.
+Temporal information is likely to be necessary
+in the case of consonants
+(i.e., the current moment's frequency information
+is unlikely to be sufficient),
+and the temporal information of interest
+is in the recent past (e.g., ???5-10ms).
+It also worth noting that ???almost
+all languages have more consonants than vowels,
+as there are more possible places to constrict
+the vocal tract than there are acoustically
+differentiable shapes for an open vocal tract.
+Because of this, we are likely to need
+more neural resources to decode consonants
+than vowels
+(either purely in terms of the number of neurons,
+or in the amount of temporal information conveyed
+by the neurons).
+
+Unlike generic LTI systems and other features,
+there is unlikely to be a concise mathematical equation
+describing how a vowel or consonant is to be recognized;
+the true function is likely to be too complicated,
+and may differ across people depending on their experience.
+Instead, for phoneme recognition
+we construct a series of labeled input-output pairs,
+and approximate the true function
+through a least-squares minimization procedure
+(see ???NEF section).
+We first test the system
+with a corpus of synthesized speech,
+which has less variability and should therefore
+be easier to decode.
+We then test the system
+with a corpus of natural speech
+???deets.
+
+% synthesized: http://festvox.org/dbs/
+% natural...: http://opendata.stackexchange.com/questions/1327/speech-audio-databases-with-phonemes-labelled
+
+Currently, we are using two discrete systems
+for vowels and consonants.
+It is not clear whether
+semivowels, semiconsonants, and glides
+should be considered vowels or consonants,
+or whether we need another system
+for detecting these phonemes.
+Alternatively, it could be the case
+that there is only one monolithic system
+that takes in a large amount of temporal information
+and can decode any phoneme.
+We do not address this issue here,
+and suggest it as an interesting future extension.
+
+pitch and volume...
+
+note: pitch and volume are relative to some baseline,
+which would be
+
+In the brain,
+and in possible future extensions of this system,
+there would be multiple feature layers
+that
+
+talk about rhythm, pacing, prosody, that kind of thing
+as being temporal and therefore not really decodable
+(feature of features -- hierarchical)
 
 Possible future in which this is learned
 
@@ -100,6 +374,23 @@ This type of feedback could be added
 to this system in future work.
 
 \subsection{Evaluation}
+
+??? Functional evaluation: can we decode downstream features?
+How well do we do compared to other systems?
+We don't have to do as well as them,
+but we have to do well enough that it's not ridiculous.
+
+??? Neural evaluation: One thing that's commonly measured
+in auditory neuroscience is the spectro-temporal receptive field
+of auditory neurons. We can make these for our downstream feature
+neurons and compare them to published STRFs and see if they look similar.
+Note that it would be easy to make neurons that can replicate STRFs,
+as we would just use the temporal transformations that matter.
+But, we make our choice of transformations based on what would
+be best to decode certain features;
+being able to also replicate STRFs gives an indication that
+we made good choices, and that this system is engineered
+in a similar way to how the system developed and evolved (maybe?)
 
 \section{Synthesis system}
 

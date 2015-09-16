@@ -10,3 +10,50 @@
 %%   must be described in Chapter 2
 %% - be honest in evaluation
 %% - admit weaknesses
+
+List of experiments (fill this in as you write other sections!!)
+
+These should maybe be included in the methods?
+
+\section{Recognition system}
+
+\subsection{Metrics}
+
+Phoneme decode error rate
+
+Pitch error rate
+
+Volume error rate
+
+\subsection{Experiments}
+
+1. Do frequency interacting transformation matter?
+
+- generate networks with N random transformations
+  in preprocessing layer and collect the metrics
+
+- systematically increase the number of interacting
+  transformations and see if it matters
+
+2. Vowels: should we use temporal information or just
+   the current moment's info?
+
+3. Vowels: do diphthongs count?
+
+- try having no categories for diphthongs and see if
+  we can get the two components of it
+
+- try having explicit diphthong categories and see
+  if we get better at it
+
+4. Consonants vs vowels:
+
+- Vary the number of features and/or neurons and see
+  how much is needed for equivalent error rates
+
+  - Should error rates be normalized by the total number
+    of possible outcomes?
+
+5. Synthesized vs natural speech:
+
+- How much easier is synthesized speech compared to natural?
