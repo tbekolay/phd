@@ -16,6 +16,14 @@
 %\usepackage{nomencl}
 \usepackage{amsmath,amssymb,amstext}
 \usepackage[pdftex]{graphicx}
+\usepackage{microtype}
+
+\usepackage{heuristica}
+\usepackage[heuristica,vvarbb,bigdelims]{newtxmath}
+\usepackage[T1]{fontenc}
+
+% Fix error using \copyright with T1 fontenc
+\renewcommand*\copyright{{\usefont{OT1}{lmr}{m}{n}\textcopyright}}
 
 % Do this last
 \usepackage[pdftex,letterpaper=true,pagebackref=false]{hyperref}
