@@ -120,6 +120,9 @@ by sophisticated periphery models either
   we will use for testing in this work.
 \end{itemize}
 
+???question: do we take the envelope here,
+or is that later?
+
 \subsection{Auditory preprocessing}
 
 The auditory preprocessing layer
@@ -332,21 +335,96 @@ and can decode any phoneme.
 We do not address this issue here,
 and suggest it as an interesting future extension.
 
-pitch and volume...
+Aside from phonemes, we also represent pitch and volume.
+Neither of these features are useful
+as an absolute quantity---most humans are poor
+at judging absolute pitch and volume ???cite---so
+we aim to represent relative pitch and volume.
+In both of these cases,
+we must determine a baseline pitch or volume,
+and a method for comparing the current
+pitch or volume to the baseline.
 
-note: pitch and volume are relative to some baseline,
-which would be
+In speech, baseline pitch is primarily determined
+by speaker identity.
+Each speaker has a baseline pitch,
+determined in part by the shape of their vocal folds,
+so it is likely that we learn
+and remember the baseline pitch
+of speakers that we interact with frequently.
+On the other hand,
+changes in baseline pitch
+(e.g., through illnesses affecting the vocal tract)
+require little to no adaptation period,
+so the mechanism through which we determine
+a speaker's baseline pitch
+is likely to be relatively simple
+and flexible.
+In this work,
+we will not posit a neural mechanism
+for determining baseline pitch,
+and will instead compute it
+from the data offline and provide it as input.
 
-In the brain,
-and in possible future extensions of this system,
-there would be multiple feature layers
-that
+Given the baseline pitch as input,
+relative pitch will be computed
+primarily through neural inhibition.
+See section ???implementation
+for how this is accomplished.
 
-talk about rhythm, pacing, prosody, that kind of thing
-as being temporal and therefore not really decodable
-(feature of features -- hierarchical)
+Unlike pitch, baseline volume
+is not speaker specific;
+it is easy to notice when a speaker
+talks louder or quieter
+than the norm.
+???baseline is the overall activity
+of a long-timescale filtered version
+of the current moment's power spectrum?
+???relative volume is that minus a
+short-timescale filtered version?
+So it's basically just a derivative?
+???not sure if we even care about volume
+to be honest...
+% http://www.sengpielaudio.com/calculator-loudness.htm
 
-Possible future in which this is learned
+We believe that these three features
+are sufficient to reproduce natural speech,
+including prosodic features implicitly
+by virtue of tracking these three features
+over the timescale of an utterance.
+Many aspects of prosody,
+such as the rhythm of an utterance,
+can be reproduced by rerunning
+the three feature trajectories through time.
+However, reproducing prosodic features
+does not mean that we are explicitly
+representing them.
+In more sophisticated systems
+connecting with linguistic models,
+these prosodic features would
+be represented explicitly
+and would therefore need to be
+determined based on temporal transformation
+from the preprocessing layer,
+and also from temporal transformations
+of the three features represented here.
+These prosodic features,
+which would be essential for determining
+important context clues
+like the emotional state of the speaker,
+would therefore be represented in
+a fourth layer, receiving input from
+temporally transformed versions of
+the features from the third layer.
+These temporal transformations
+could be computed with LIT filters
+in the same way that the preprocessing layer
+transforms frequency information.
+However, as our goal is to
+extract only the features necessary
+to reproduce natural speech,
+we leave the decoding of high-level prosodic features
+as future work.
 
 \subsection{The role of feedback}
 
@@ -380,6 +458,13 @@ How well do we do compared to other systems?
 We don't have to do as well as them,
 but we have to do well enough that it's not ridiculous.
 
+??? for phonemes: our gold standard is a set of labels
+over time with the proper phoneme.
+If the system categorizes to that label in that period,
+then it's correct. Or maybe what's more important
+is that the phonemes are all in the same order,
+and we also have some kind of timing information?
+
 ??? Neural evaluation: One thing that's commonly measured
 in auditory neuroscience is the spectro-temporal receptive field
 of auditory neurons. We can make these for our downstream feature
@@ -392,7 +477,11 @@ being able to also replicate STRFs gives an indication that
 we made good choices, and that this system is engineered
 in a similar way to how the system developed and evolved (maybe?)
 
+??? should we talk about the experiments from the results section here?
+
 \section{Synthesis system}
+
+The synthesis system...
 
 \subsection{Evaluation}
 

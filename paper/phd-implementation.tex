@@ -14,3 +14,18 @@ Many of the design decisions from Chapter~???refmethods
 were constrained in this manner;
 for example, implementing LTI systems is natural
 in the NEF since dynamics are a core principle.
+
+\section{Network diagrams}
+
+???important implementation detail:
+should auditory preprocessing be an EnsembleArray
+or an ensemble? Maybe both?
+
+??? Given the baseline pitch as input,
+relative pitch will be computed
+primarily through neural inhibition.
+All neurons whose characteristic frequency is below
+the baseline pitch will be inhibited;
+the relative pitch is then
+a smoothed version of the overall activity
+of the pitch-sensitive population.
