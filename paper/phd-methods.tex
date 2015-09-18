@@ -426,6 +426,11 @@ to reproduce natural speech,
 we leave the decoding of high-level prosodic features
 as future work.
 
+??? Possible thing to try: keep track of a global
+speed; in general, most people talk at the same pace,
+but you can tell if they are speaking in a
+marked fast or slow pace.
+
 \subsection{The role of feedback}
 
 The above system is primarily feed-forward
@@ -481,10 +486,156 @@ in a similar way to how the system developed and evolved (maybe?)
 
 \section{Synthesis system}
 
-The synthesis system...
+The synthesis system translates
+high-level features describing an utterance
+into an audio waveform.
+There are two components of the synthesis system:
+an articulatory synthesizer and a neural control system.
+
+??? figure of whole system
+
+\begin{itemize}
+\item \textbf{Articulatory synthesizer.} The articulatory synthesizer
+  generates audio waveforms
+  by simulating the airflow through a model of the human vocal tract.
+  It consists of a vocal tract model,
+  which converts control signals from the neural control system
+  into vocal tract geometries,
+  and an acoustic model,
+  which converts vocal tract geometries into acoustic signals
+  (i.e., audio waveforms).
+\item \textbf{Neural control system.} The control system
+  translates high-level features into control signals.
+  While these control signals are specific to the
+  synthesizer being controlled,
+  the control system is designed to be as generic
+  as possible such that it can be modified to control
+  any articulatory synthesizer.
+\end{itemize}
+
+??? might want to make this more specific after writing
+the background section
+
+\subsection{Articulatory synthesizer}
+
+\subsection{Neural control system}
+
+As summarized in ???secref,
+the ???brain parts
+are responsible for effecting
+muscle movements that
+vibrate the glottis,
+deform the vocal tract,
+and send air through it,
+creating pressure waves
+that we perceive as speech.
+The neural control system
+performs the same function as ???brain parts
+in the synthesis system.
+While we cannot be certain
+what features the human brain
+uses to generate control signals,
+our model assumes that the
+high level features of interest
+are a string of phonemes,
+a continuous relative pitch signal,
+and a continuous relative volume signal.
+
+At its core, the neural control system
+deals with two types of mappings.
+One type of mapping is a simple
+input-output relationship
+that can be described as a mathematical function,
+similar to many of the mappings
+done in the recognition system.
+The second type of mapping is a temporal mapping.
+Unlike the recognition system,
+in which the goal was to
+transform existing temporal information,
+in the temporal mappings in the control system,
+we aim to generate temporal information
+from discrete inputs.
+Essentially, we are mapping from
+an input to a continuous sequence of outputs.
+The output sequence has finite length,
+but could repeat indefinitely.
+
+In order to temporally control
+the input string of phonemes,
+it is initially represented
+as a static symbol-like representation,
+which we will call a $\text{WORD}$
+even though not all strings of phonemes
+will necessarily correspond
+to a word in the vocabulary of a language.
+The $\text{WORD}$ maps to a
+sequence of phonemes,
+which we will call
+$\text{PHONE}(t)$,
+where $t$ is time.
+
+$$\text{WORD} \mapsto \text{PHONE}(t)$$
+
+That is, for each word, we learn
+what sequence of phonemes make up that word,
+and when those phonemes begin.
+Keeping track of when phonemes begin
+is necessary because
+each phoneme is also a temporal mapping,
+from the phone to
+a sequence of articulator movements
+that will cause the articulatory synthesizer
+to voice the target word.
+
+$$\text{PHONE}(t) \mapsto \text{ART}(t)$$
+
+The amount of time ...
+
+??? or, maybe we should do this by
+a function of WORD and current PHONE
+that gives the next PHONE
+
+??? we could just map directly from word
+to articular movement -- that'd be easier.
+But that implausible, you'd have to
+essentially relearn how to voice each phone
+for each word. that's not right, so we
+have the intermediate step to make it
+possible to share the phone -> art
+function across all instances of that phone
+in all words.
+
+In the neural control system,
+we use functions to map from
+articular
+
+
+??? The transitions that we currently do through
+BG should be transferred to highly learned
+cortical sequences eventually.
+We might expect that the
 
 \subsection{Evaluation}
 
 \section{Integrated speech system}
+
+Essentially, integrating the two systems
+involves adapting the output of the recognition system
+into a form that can be used by the synthesis system.
+While both systems deal with the same features,
+there are critical differences
+which preclude a simple connection between the two.
+???more
+
+Important to note: they can't run simultaneously.
+These cannot be hooked up in a supervised learning
+situation where they feed into each other
+directly because there are too many delays.
+???more
+
+??? things that need to be handled:
+trajectory generation;
+some kind of memory;
+think more about this...
 
 \subsection{Evaluation}

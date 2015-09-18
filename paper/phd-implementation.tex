@@ -4,7 +4,7 @@
 
 %% - not every thesis has or needs an implementation
 
-\section{Gammatone filters}
+\section{Gammatone filter bank}
 
 \section{Neural Engineering Framework}
 
@@ -14,6 +14,19 @@ Many of the design decisions from Chapter~???refmethods
 were constrained in this manner;
 for example, implementing LTI systems is natural
 in the NEF since dynamics are a core principle.
+
+\section{Semantic Pointer Architecture}
+
+SPA gives us a method to do symbol-like processing
+with spiking neural networks created
+with the principles of the NEF.
+???we don't use much of it,
+but we do use it to represent phonemes.
+The intention here is to later hook up
+this system with other SPA networks
+that would do linguistic processing
+that can map down to the level of
+producing strings of phonemes.
 
 \section{Network diagrams}
 
@@ -29,3 +42,7 @@ the baseline pitch will be inhibited;
 the relative pitch is then
 a smoothed version of the overall activity
 of the pitch-sensitive population.
+
+\subsection{Phoneme-specific oscillators}
+
+\subsection{Generic oscillators}
