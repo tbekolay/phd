@@ -28,6 +28,45 @@ that would do linguistic processing
 that can map down to the level of
 producing strings of phonemes.
 
+\subsection{Word encodings}
+
+Let's use the SPA to encode words,
+or any arbitrary string of phonemes.
+Consider the word BAT.
+
+$$\text{WORD} = \text{PH1} \circledast \text{B}
+  \oplus \text{PH2} \circledast \text{A}
+  \oplus \text{PH3} \circledast \text{T}$$
+
+Then, we can decode the phone that we want
+by binding with the inverse of the
+phone that we're on.
+So, for the first phone:
+
+$$\text{B} \approx \text{WORD} \circledast \text{PH1}^{-1}$$
+
+This result would then be sent to a cleanup memory.
+Unlike other cleanup memories, however,
+the outputs of the cleanup would be oscillators.
+These would generate the trajectory of articulators
+for each phoneme.
+
+As always, timing is the difficult thing here.
+Since these are oscillators, we really want to
+just give them a kick, so the cleanup shouldn't
+be cleaning up all the time, just when
+we query for the next phoneme.
+The kick should also advance the query
+to the next phone,
+so that the next kick gets the next phone.
+
+We'd need to build in some structure to the SPs
+representing phone positions.
+
+$$\text{PH2} = \text{PH1} \circledast \text{NEXTPH}$$
+
+And so on.
+
 \section{Network diagrams}
 
 ???important implementation detail:
@@ -42,7 +81,3 @@ the baseline pitch will be inhibited;
 the relative pitch is then
 a smoothed version of the overall activity
 of the pitch-sensitive population.
-
-\subsection{Phoneme-specific oscillators}
-
-\subsection{Generic oscillators}

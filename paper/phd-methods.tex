@@ -518,7 +518,64 @@ the background section
 
 \subsection{Articulatory synthesizer}
 
+As summarized in ???secref,
+articulatory synthesizers are composed
+of a vocal tract model and an acoustic model.
+While state-of-the art synthesizers aim to
+maximize speech intelligibility,
+our primary focus is on control,
+so computational efficiency
+and interoperability are
+key characteristics for choosing a synthesizer.
+
+Interoperability refers to the ability
+to incorporate the synthesizer
+in the main simulation loop,
+which in our case is driven by
+the Nengo neural simulator
+implemented in Python
+(see ???nengosec).
+Using the Nengo simulator places
+two key interoperability restrictions.
+First, the synthesizer must
+be able to run ``online'';
+that is, the synthesizer should maintain
+some internal state which updates
+based on control parameters
+that are updated on each timestep.
+Online synthesis contrasts with
+batch synthesis, in which
+the entire control parameter trajectory
+must be known \textit{a priori}.
+Second, the synthesizer must
+be accessible through the Python
+programming language in a performant manner.
+While any synthesizer can communicate
+with Python through some means
+(e.g., foreign function interface
+or operating system sockets),
+some communication protocols incur
+significant computational costs.
+
+None of the synthesizers summarized in
+section ???secref
+stood out as the best candidate
+in terms of efficiency and interoperability.
+We also hypothesized that better knowledge
+of synthesizer internals would
+result in better control methods.
+For these reasons,
+we chose to implement our own
+simple articulatory synthesizer focusing on
+efficiency and interoperability with Nengo.
+
+??? vocal tract model
+
+??? acoustic model -- wait until later
+
 \subsection{Neural control system}
+
+??? Rewrite after we make a few sims
 
 As summarized in ???secref,
 the ???brain parts
@@ -541,7 +598,7 @@ are a string of phonemes,
 a continuous relative pitch signal,
 and a continuous relative volume signal.
 
-At its core, the neural control system
+??? At its core, the neural control system
 deals with two types of mappings.
 One type of mapping is a simple
 input-output relationship
@@ -560,7 +617,7 @@ an input to a continuous sequence of outputs.
 The output sequence has finite length,
 but could repeat indefinitely.
 
-In order to temporally control
+??? In order to temporally control
 the input string of phonemes,
 it is initially represented
 as a static symbol-like representation,
@@ -574,9 +631,9 @@ which we will call
 $\text{PHONE}(t)$,
 where $t$ is time.
 
-$$\text{WORD} \mapsto \text{PHONE}(t)$$
+??? $$\text{WORD} \mapsto \text{PHONE}(t)$$
 
-That is, for each word, we learn
+??? That is, for each word, we learn
 what sequence of phonemes make up that word,
 and when those phonemes begin.
 Keeping track of when phonemes begin
@@ -587,9 +644,9 @@ a sequence of articulator movements
 that will cause the articulatory synthesizer
 to voice the target word.
 
-$$\text{PHONE}(t) \mapsto \text{ART}(t)$$
+??? $$\text{PHONE}(t) \mapsto \text{ART}(t)$$
 
-The amount of time ...
+??? The amount of time ...
 
 ??? or, maybe we should do this by
 a function of WORD and current PHONE
@@ -605,7 +662,7 @@ possible to share the phone -> art
 function across all instances of that phone
 in all words.
 
-In the neural control system,
+??? In the neural control system,
 we use functions to map from
 articular
 
