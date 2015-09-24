@@ -695,4 +695,177 @@ trajectory generation;
 some kind of memory;
 think more about this...
 
+The integrated speech system
+will be used for two purposes.
+
+\begin{itemize}
+\item \textbf{Conversational shadowing.} In conversational shadowing,
+  a speaker repeats the words that a speech partner says.
+  The system incorporates minor linguistic and prosodic transformations,
+  as commonly occur in human conversation.
+\item \textbf{Bootstrapped syllable learning.}
+  The recognition and synthesis systems
+  will be used in concert to learn how to voice a syllable
+  that the synthesis system has no prior knowledge of.
+\end{itemize}
+
+\subsection{Conversational shadowing}
+
+Conversation shadowing... ???brief intro.
+
+While we use conversational shadowing
+as a way to show that the recognition
+and synthesis systems can interact
+without requiring detailed linguistic structures
+that are outside the scope of this thesis,
+it is important to note that conversational shadowing
+naturally occurs as people acquire their native language.
+??? cite Murphey 2001, background
+
+In our conversational shadowing system,
+we implement two types of conversational shadowing.
+The first is direct parroting, in which
+the system attempts to reproduce
+an incoming utterance as closely as possible.
+The second is question inversion, in which
+the system repeats the incoming utterance,
+but poses incoming statements as questions,
+and responds to incoming questions as statements.
+While question inversion is primarily
+a prosodic change,
+we also make simple syllable substitutions
+in order to show that these substitutions are possible,
+and to make the system's utterances more natural.
+For example, we replace instances of the syllables
+/??i'm/ at the beginning of an utterance
+with the syllables /???you're/,
+such that utterances like
+``I'm going to the store''
+generate the response
+``you're going to the store?''
+
+Both of these are forms of complete shadowing;
+selective forms of shadowing require linguistic knowledge
+to pick out relevant portions of an utterance,
+so we do not implement them here,
+though we believe that they
+do not require any modifications
+to the recognition and synthesis systems.
+
+The primary goal of this system is to show that
+the encoding schemes used by
+the recognition and synthesis systems
+are both compatible and flexible.
+Compatibility means that it is possible
+to send the encodings used in the recognition system
+to the synthesis system such that
+recognized utterances can be voiced.
+Compatibility is a minimum requirement
+for any integrated speech system.
+Flexibility means that it is possible
+to transform the encodings
+in the connection between
+the recognition and synthesis systems
+such that recognized utterances
+can be responded to with different utterances.
+Humans use the extreme case of flexibility
+in all conversations;
+incoming utterances are processed
+and completely different utterances
+are voiced as a result.
+In our case, we use a reduced form
+of flexibility such that the incoming utterance
+is transformed in a natural way
+but contains similar linguistic content
+as the incoming utterance.
+
+We believe that our semantic pointer encodings
+allow for far greater flexibility
+than existing integrated systems.
+???more
+
+???maybe an example of each type of shadowing
+
+\subsection{Bootstrapped syllable learning}
+
+As opposed to conversational shadowing,
+which highlights the high-level strengths
+of the integrated speech system,
+syllable learning highlights
+the low-level strengths of this system.
+Syllable learning involves
+learning a novel set of gestures
+and associated articulator trajectories
+that will voice a syllable
+that is encountered for the first time.
+
+We call our syllable learning system ``bootstrapped''
+because we assume that our system
+has an existing repertoire of syllables
+that it is already able to voice.
+These existing syllables will be
+used in learning the new syllable.
+Bootstrapped syllable learning contrasts with
+the type of syllable learning
+done as an infant and toddler,
+which uses reinforced speech babbling
+to learn novel syllables.
+While we believe that learning syllables
+from babbling is an important research direction
+that can be explored in this system,
+it has also been explored in many other systems
+(???cite Diva etc),
+and so we have chosen to leave this type of learning
+for future work.
+
+The bootstrapped syllable learning system
+learns new syllables in three steps.
+
+\begin{enumerate}
+\item Initialize the new syllable from the most
+  similar existing syllable.
+  For example, when learning to voice
+  the syllable /ba/, the system should
+  start from the syllable /fa/ if it is known.
+\item Swap compatible speech gestures.
+  For example, vowel producing gestures
+  would be compatible, allowing for modifying
+  a /ba/ to a /bu/, and so on.
+  The choice of which gesture to swap and
+  how to swap it will be informed by
+  ???figure out.
+\item Fine-tune the voiced syllable
+  until it can be recognized as the
+  syllable to be learned.
+  ???more
+\end{enumerate}
+
+These steps require several systems
+that have already been implemented
+in the recognition and synthesis systems separately;
+for example, the ability to compare
+voiced syllables to those already known
+is one of the primary goals of the recognition system itself,
+so it can be leveraged when trying to learn new syllables.
+However, these steps also point to new systems
+that must be implemented.
+First, the system requires a method
+to transfer a syllable-producing function
+from one ensemble to another.
+Second, some knowledge of which gestures
+are compatible must be built into the system.
+Finally, ???fine-tuning.
+
+It has been shown that in second-language learning,
+slowing down the syllable can have
+a significant increase in learning effectiveness
+???cite.
+We believe that our system emulates
+how a native speaker of one language
+would learn to voice novel syllables in a second language.
+Therefore, we predict that slowing down
+the speed at which the syllables are heard
+and uttered will improve ???learning speed
+and / or quality of learned syllable.
+
 \subsection{Evaluation}
