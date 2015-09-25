@@ -1,22 +1,113 @@
 \chapter{Background}
 
-\section{Human speech}
+??? this thesis draws upon and makes contributions
+to what would traditionally be thought of a disparate fields:
+phonetics and phonology from linguistics,
+psychoacoustics from psychology,
+knowledge representation
+and artificial neural networks from computer science,
+spiking neural networks and
+synaptic plasticity rules from computational neuroscience,
+dynamical systems and control theory
+from systems design engineering,
+concretely implemented in software
+using principles from software engineering.
+As such, not all relevant background can
+be given equal coverage.
+In this chapter, we assume
+that the reader's background
+in in computer science or engineering.
+We therefore spend more time
+reviewing background in linguistics
+and neuroscience as they fall outside
+of the domain of computer science and engineering,
+and so can be considered the problem domain
+that we will apply our assumed knowledge to.
+???yikes reword
+
+\section{Problem domain: human speech}
+
+Human speech is studied in many disciplines
+using a variety of scientific methods.
+In this thesis, we limit our coverage of human speech
+to the disciplines of psychoacoustics,
+phonetics and phonology,
+and auditory biology.
+
+Psychoacoustics provides a quantitative account
+of how the human auditory system
+responds to incoming air pressure levels.
+As such, it provides a method to verify
+that our model responds to sounds
+as humans do.
+A primary assumption behind this work
+is that the human auditory system
+has evolved to be adept at processing speech;
+psychoacoustics describes many of the ways
+in which the human auditory system
+manipulates sound,
+which we aim to reproduce.???ugh this needs work
+
+Phonetics and phonology
+provide insight into the basic units of speech.
+While a full conversational system
+would draw upon all areas of linguistics,
+we believe that phonetics and phonology
+provides the most relevant insights
+when assessing speech from the level of
+incoming air pressure levels.
+
+Auditory neurobiology describes both
+the and physical substrate organization
+of the system that we aim to emulate.
+We do no aim to fully replicate
+biological neurons,
+but by using a simple approximation
+of biological neurons,
+we constrain our algorithmic choices
+to those that could be implemented
+in a biological system.
+Similarly, by examining the organization
+of the auditory brain structures,
+we constrain the space of possible
+network topologies
+to those that match
+a network that we know to be successful.
+
+\subsection{Psychoacoustics}
+
+\subsection{Phonetics and phonology}
 
 Make sure to mention monophthong v. diphthong
 
 ??? Also talk briefly about conversational shadowing
 
-\section{Auditory periphery modeling}
+\subsection{Auditory neurobiology}
+
+\section{Prior modeling approaches}
+
+In making early steps toward
+an integrated speech recognition and synthesis system,
+we are applying techniques
+in artificial intelligence and control theory
+to the speech domain reviewed in the previous section.
+There is a long history of applying these techniques
+to this domain;
+in this section we review prior modeling efforts
+and contrast them with the model we will describe
+in future chapters.
+
+\subsection{Auditory periphery modeling}
 
 ??? figure like izhikevic, with auditory model + efficiency?
 
 ??? summary table with phenomena captured, etc
 
-\section{Automatic speech recognition}
+\subsection{Automatic speech recognition}
 
-\section{Speech synthesis}
+\subsection{Speech synthesis}
 
-\subsection{Articulatory speech synthesis}
+\subsubsection{Articulatory speech synthesis}
 
 ??? summary table with different vocal tract models
 
@@ -28,7 +119,7 @@ Include programming language in this
 
 ??? include online vs batch in table
 
-\section{Speech motor control}
+\subsection{Speech motor control}
 
 ??? note that many art. synths consider this part of their
 synthesizer (control model).
@@ -45,11 +136,15 @@ But with SPA stuff on top.
 yet connected the Saltzman task dynamics stuff
 to the brain; that'll be one of our contributions
 
-\section{Integrated recognition and synthesis systems}
+\subsection{Integrated recognition and synthesis systems}
 
 ??? Review DIVA model
 
-\section{Vector symbolic architectures}
+\section{
+
+\subsection{Vector symbolic architectures}
+
+??? make links to knowledge representation in CS
 
 ??? give general background for the math in methods?
 
