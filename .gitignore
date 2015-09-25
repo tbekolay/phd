@@ -28,3 +28,6 @@ paper/phd.pdf
 
 # Emacs stuff
 paper/auto/
+
+# Jupyter stuff
+.ipynb_checkpoints/
