@@ -76,25 +76,16 @@ a network that we know to be successful.
 
 \subsection{Phonetics and phonology}
 
-from Roach text:
-
 - phonetics: describing the sounds we use in speaking.
   Relating to the way we produce them and the way they sound.
   phonology: more abstract parts of sounds; look at restrictions
   and regularities in a language by studying syllables;
-  suprasegmental parts (things that extend over several segments,
-  i.e., phonemes).
-
-- phonemes: smallest unit of speech; helpful analogy:
-  what can be changed (like letters in an alphabet) such that
-  the meaning is the same / different. A and a are the same,
-  essentially, just like two similar voicings of a phoneme
-  are the same.
-
-  - pick a way to write phonemes (probably IPA, in [square brackets])
-
+  suprasegmental parts (i.e., prosody:
+  things that extend over several segments (phonemes)).
   - phonemic transcription: just the phonemes. Phonetic transcription:
     includes diacritics and other marks to differentiate allophones.
+
+  - pick a way to write phonemes (probably IPA, in [square brackets])
 
 - vowels: aa, ii, uu extremes, blend together for other vowels
 
@@ -173,7 +164,201 @@ from Roach text:
   about how this might occur, but in general, we'll leave stress
   at this simplistic level and not concern ourselves with it.
 
-- Elision?
+- Rhythm: Stress-timing: English is stress timed?
+  Evidence isn't strong.
+  French and others are syllable-timed.
+  Foot: a unit of rhythm. Starts with stressed syllable, includes
+  all other syllables until the next stress.
+
+- Pronunciation is way different in connected speech versus
+  careful pronunciation in isolation. E.g.,
+  Assimilation: phonemes in a syllable change due to the phoneme
+  directly after or before.
+  Elision: Sometimes sounds disappear; deleted phonemes.
+
+- Intonation: Mostly pitch based. Relative pitch of course, we're
+  looking for contrasts. And we're only interested in pitch
+  changes under the speaker's control.
+  Tone: the overall pitch behavior of an utterance.
+  Rarely use level tone for one-syllable utterances.
+  Falling tone for definite, final utterances;
+  rising tone for questioning.
+  (Obs: not really any rules about how to use tone;
+  mostly learned through experience, kind of like phonemes
+  I guess?) There are tone languages also.
+  Fall-rise tone is common (e.g., reluctant agreement),
+  rise-fall less common (strong approval, disapproval, surprise).
+  Anything else is not commonly found.
+  Note: ordinary speech usually occurs in the lower part
+  of the speaker's pitch range. Emphatic falling tone
+  starts higher, doesn't go lower.
+
+- Tone-unit: the length of a tone sequence. (form)
+  Shortest would be one syllable. But, often the hierarchy is:
+  utterance -> one or more tone-units -> one or more feet ->
+  one or more syllables -> one or more phonemes
+  (note: we would like a few hierarchy levels, but we can say
+  that building additional hierarchy levels is just more of
+  the same and therefore not necessary in this thesis).
+  Tonic syllable is necessary in tone-unit (like vowel in a syllable).
+  Tone-unit is: pre-head -> head -> tonic syllable -> tail.
+  All but tonic syllable are optional.
+  Pitch change usually happens on tonic syllable.
+  On rise/fall, tail continues the rise/fall.
+  Difficult to segment tone-units.
+
+- Function of intonation: 1. Expression of emotions and attitudes.
+  2. Produces effect of prominence on stressed syllables.
+  3. Exaggerates grammar and syntactic structure for listener.
+  4. Clues listener into new and given information.
+
+- Components of intonation: sequential, prosodic, paralinguistic.
+  Sequential is the sequence of pre-head, head, tonic syllable, tail,
+  pauses, and tone-unit boundaries. Prosodic include the
+  width of pitch range, key, loudness, speed, and voice quality.
+  ``Constrasts among prosodic components should be seen as relative
+  to these `background' speaker characteristics.''
+  Paralinguistic is body language.
+
+- Autosegmental intonation: all intonation is just
+  H (high tone) or L (low tone). A fall is HL; rise is LH.
+  Stressed (accented) syllables have a * following them.
+  \% marks major tone-unit boundaries.
+  E.g., it's time to leave -> H* H*L\%.
+
+???brief intro, explain the difference
+between phonetics and phonology
+% http://www.phon.ox.ac.uk/jcoleman/PHONOLOGY1.htm
+???include phonemic vs phonetic transcription
+
+Our treatment of phonetics and phonology
+focuses on the hierarchical levels
+in human linguistic expression,
+paying particular attention to two
+sets of characteristics in each level
+and in each mapping between two levels:
+temporal patterns and constraints,
+and the existence of rule-like regularities.
+For example,
+if our model were to deal with sentences,
+it would be important to know that,
+temporally, sentences occur sequentially,
+and cannot co-occur.
+There are grammatical rules
+about what words can be in a sentence,
+and in what order they can be arranged,
+but there are few rules placing constraints
+between sentences---any sentence \textit{could}
+follow any other sentence,
+though there may be semantic issues.
+Similar constraints exist at
+the lower levels of language that
+phonetics and phonology examine,
+and these constraints will
+inform the structure of the model
+we present in Chapter~???ref.
+
+The specific hierarchy that we will
+present in this section is pictured
+in Figure~???ref.
+We will arbitrarily begin at
+the lowest (rightmost???) level and work upwards
+(though a presentation starting at
+the highest level would be equally valid).
+For clarity, we will use English for examples,
+except when demonstrating that a particular
+quality differs across languages.\footnote{
+  When not explicitly cited,
+  the information in Section~???ref
+  should be considered
+  basic phonetics and phonology
+  that would be covered in an
+  introductory undergraduate level
+  class or textbook
+  (I used ???refRoach as a general reference).}
+
+??? talk about gestures here first,
+as part of articulatory phonology,
+cite Bernd.
+
+The smallest linguistically relevant unit
+is the phoneme, which describes
+a short sound produced by one or more
+vocal tract gestures
+on the order of tens of milliseconds.
+Phonemes are noted by their ability
+to change the meaning of some word
+when swapped in speech;
+for example, the only difference between
+the word ``bad'' and ``mad'' is the
+consonant sound at the beginning,
+and therefore those two consonant sounds
+are each separate phonemes.
+Even though different individuals
+voice each phoneme differently,
+the important quality is that
+the particular sound is recognized
+as a particular phoneme
+in the context of an utterance.
+A helpful analogy can be made between
+phonemes in speech
+and alphabetical letters in writing.
+With no knowledge of English,
+seeing the sentence,
+``A bird has a wing,''
+one might think that ``A'' and ``a''
+are different letters.
+However, with enough examples,
+one could surmise that in every situation
+where ``A'' is used, it appears at the
+start of a sequence of letters,
+and it could have instead
+been replaced by ``a''
+had it not appeared at the start of the sequence.
+Therefore, ``A'' and ``a'' represent
+the same underlying ``letter.''
+Similarly, despite individual differences
+in the pitch, speed, volume, and quality
+of how one voices a particular phoneme,
+that phoneme is still considered the same
+if it plays the same role
+in a linguistically relevant sequence of phonemes.
+
+Generally, there are two types of phonemes:
+vowels and consonants.
+Vowels are longer sounds
+made when the vocal tract is mostly open.
+Consonants are shorter sounds
+made when some part of the vocal tract
+is constricted or transiently closed.
+In almost all languages,
+there are more consonant phonemes
+than there are vowel phonemes,
+though pronunciation varies significantly
+between dialects,
+and transcribing the full set of
+phonemes in a language is
+not a purely objective exercise.
+For example, while most dialects
+of English recognize 24 consonant phonemes,
+General American English has been transcribed
+as having 16 vowel phonemes ???citeWikipedia?,
+while Received Pronunciation English
+has been transcribed as having 25 vowel phonemes
+???citeWells1982.
+
+???vowels
+
+???consonants
+
+???talk about IPA % https://www.tug.org/TUGboat/tb17-2/tb51rei.pdf
+
+??? Generative phonology?
+
+??? Note: constraints and rules aren't necessarily all going to
+be taken into account. However, we do want to be sufficiently
+flexible or inflexible such that were we to take into account
+all rules, we would still scale to biological limits.
 
 \subsection{Psychoacoustics}
 
@@ -239,7 +424,7 @@ to the brain; that'll be one of our contributions
 
 ??? Review DIVA model
 
-\section{
+\section{Methods used? Maybe move?}
 
 \subsection{Vector symbolic architectures}
 
