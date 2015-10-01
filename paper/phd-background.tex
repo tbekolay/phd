@@ -74,6 +74,10 @@ network topologies
 to those that match
 a network that we know to be successful.
 
+\subsection{Ear physiology}
+
+???brief intro; needed for subsequent sections
+
 \subsection{Phonetics and phonology}
 
 ???brief intro, explain the difference
@@ -615,10 +619,33 @@ be taken into account. However, we do want to be sufficiently
 flexible or inflexible such that were we to take into account
 all rules, we would still scale to biological limits.
 
+Finally, one note about
+the absence of ``words'' in our treatment
+of phonetics and phonology.
+While words are clearly an important concept
+that we will use colloquially in this thesis,
+they are a linguistic construct
+rather than a phonological one.
+However, as directly applied
+to speech recognition and synthesis,
+words are more readily recognized
+than sequences of syllables with no meaning.
+Fortunately, the pioneering work
+of ???allen94 which cites an old work???
+gives a direct relationship between
+the recognition rates of nonsense syllables and words.
+Therefore, since we have not included
+higher-level linguistic effects in this model,
+the recognition results we achieve
+can be considered as the recognition
+of nonsense syllables,
+and adjusted for linguistic context effect
+accordingly (see Section~??? for details).
+
 \subsection{Psychoacoustics}
 
 ??? We'll use psychoacoustics as a means of testing auditory
-periphery models...
+periphery models...?
 
 Everest book:
 
@@ -651,7 +678,34 @@ Everest book:
   fig 3-19. There's more echo stuff, but we don't care.
 
 - Auditory masking
+  ??? Moore 1987
+  Sounds make otherwise audible sounds inaudible.
+  Across freq ranges; a 1 kHz sound can mask a quieter 1.1 kHz sound,
+  but in general frequencies are independent
+  (frequency resolution / frequency selectivity).
+  If they're close enough to be perceived together,
+  they're in the same critical bandwidth.
+  Can mask sound immediately preceeding masker (backward masking)
+  or immediate following (forward masking).
   % https://en.wikipedia.org/wiki/Auditory_masking
+
+Kollmeier, Brand \& Meyer 2008: best intro
+
+- ``Psychoacoustics is the scientific discipline that
+  measures and models the relation between physical
+  acoustic quantities (e.g., the intensity of a sinusoidal
+  stimulus specified by sound pressure level, frequency,
+  and duration) and their respective subjective impression
+  (e.g., loudness, pitch, and perceived temporal extent).''
+
+- total loudness: read pg. 64 closely;
+  need a 200ms integrator to calculate loudness
+
+- Explain ERB (equivalent rectangular bandwidth)
+  and critical band
+
+- p. 67, Kollmeier: expliain modulation filterbank,
+  as this seems like it is an important part of the model...
 
 It's unclear if these weird psychoacoustical effects
 are beneficial or detrimental to speech perception.
