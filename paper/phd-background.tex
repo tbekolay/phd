@@ -367,9 +367,35 @@ as follows.
 \item The \textbf{hard palate} is the hard surface
   at the roof of the mouth. It cannot move, but serves
   as a constriction target for the tongue.
-\item The \textbf{alveolar ridge}
-  % http://www.personal.rdg.ac.uk/~llsroach/phon2/artic-basics.htm
+\item The \textbf{alveolar ridge} is the area between
+  the hard palate and the top front teeth. Like the hard palate,
+  it serves as a constriction target for the tongue.
+\item The upper and lower \textbf{teeth} are at the front of the mouth.
+  While they primarily serve as a constriction target,
+  the lower teeth are under muscular control,
+  though few sounds utilize the motion of the lower teeth.
+\item The \textbf{tongue} is a large, flexible, muscular structure
+  that can reach several different constriction targets.
+  The tongue is often divided into the tip, blade, dorsum, and root,
+  though there are no clear dividing lines between these areas.
+\item The \textbf{lips} are another important flexible, muscular
+  articulator that is involved in many speech sounds.
+  The lips can move toward other articulators to constrict airflow,
+  or can become rounded to change the overall quality of a sound.
 \end{enumerate}
+
+Other parts of the vocal tract are important to speech;
+for example, some sounds require air
+to pass through the nasal cavity.
+However, air is routed to the nasal cavity
+through constrictions of the seven articulators above;
+there are few little linguistically relevant
+movements that can be done with the nose.
+Exact definitions of the articulators
+do vary between phoneticians,
+and play an important role
+we later describe articulatory speech synthesizers
+in Section~???.
 
 \subsection{Phonetics and phonology}
 
@@ -449,16 +475,137 @@ quality differs across languages.\footnote{
 
 \subsubsection{Vocal tract gestures}
 
-??? talk about gestures here first,
-as part of articulatory phonology,
-cite Bernd.
+According to many articulatory phoneticians,
+the fundamental unit of speech production
+is the ``gesture,''
+which describes some movement
+of the articulators in the vocal tract
+??? Browman \& Goldstein.
+Gestures are pre-linguistic,
+in that a vocal tract gesture itself
+does not necessarily produce
+a linguistically interesting sound;
+a set of possibly overlapping
+vocal tract gesture can produce a phoneme,
+which is linguistically relevant.
+There is evidence that children
+learning to say their first words
+often use the correct gestures,
+but take time to order them correctly
+to produce the desired utterance,
+indicating that gestures develop
+before language,
+and are leveraged when
+developing language
+???refBrowmanGoldstein.
 
-- larynx (vocal folds, glottis): big deal! differentiate between
-  voiced and voiceless phonemes. Can be varied a lot
-  to change air pressure, etc. Can vary:
-  intensity (speaking vs shouting),
-  frequency (low vs high pitch),
-  quality (e.g., harsh, breathy, murmured, creaky)
+Gestures are stereotypical movements
+of sets of articulators in the vocal tract.
+Each gesture has its own temporal dynamics;
+that is, a gesture is a function defined
+over space (what muscles are contracted)
+and time (when contractions occur).
+In general, a gesture can be thought of
+as a point attractor
+in which the position
+of one or more vocal tract
+articulators is parameterized.
+A minimal gesture is parameterized by
+the set of articulators engaged
+by that gesture,
+and the degree to which
+the articulators are constricted;
+for example,
+widening and narrowing the velic aperture
+is a gesture consisting of
+the articulator involved
+(the velum)
+and degree to which it is constricted
+(low degree for narrow, high degree for wide).
+Other gestures require constriction location
+and constriction shape parameters
+to disambiguate them from other similar gestures;
+for example, the tongue tip
+is involved in gestures
+that depend on location
+(e.g., constriction at
+the teeth, alveolar ridge, or hard palate)
+and shape
+(e.g., tongue tip can be straight
+or curved backwards).
+All gestures are also affected by
+global parameters affecting all gestures,
+most notably ``stiffness,''
+which defines how quickly
+the gesture attempts to reach
+the point of attraction.
+
+Gestures are rarely discussed in isolation
+as phonemes only occur when certain
+sets of gestures overlap
+or occur in tight succession.
+Therefore, gestures are often
+grouped into gestural scores
+(see Figure~???)
+which embody the spatiotemporal
+coordination of several gestures
+to produce a linguistically
+relevant sound.
+The vertical axis of a gestural score
+is the articulator set,
+as although one articulator
+can produce multiple gestures,
+it can only produce one gesture
+at a time.
+The horizontal axis of
+a gestural score represents time,
+though the time axis may be
+stretched depending on
+the global parameter, stiffness.
+Gestural scores can also
+be visualized as a graph,
+as in Figure~???,
+which highlights that
+certain gestures must co-occur
+or have tight temporal couplings
+such that one gesture
+must start as another gesture ends.
+
+??? Fig: gestural score
+
+As will be discussed in detail
+in Section~???, there is a mapping
+between gestures and vocal tract articulators;
+in human speech, the mapping links
+gestures and vocal tract muscle activations.
+In models of human speech,
+the mapping depends on what articulators
+are available in the articulatory synthesizer,
+and how those articulators can be manipulated.
+Unfortunately, few models make a clear distinction
+between the set of gestures
+and the mapping from gestures
+to articulator trajectories,
+resulting in there being
+no agreed upon set of vocal tract gestures
+in human speech.
+Similarly, several approaches to
+temporal sequencing of gestures
+have resulted in different
+definitions of gesture sets,
+with different graph structures as
+the one shown in Figure~???.
+We will discuss our interpretation
+of gestures and gesture sets
+in Section~???.
+% Development of better human vocal tract models
+% will help researchers
+% determine a complete set of
+% vocal tract gestures.
+
+??? In a sense, vocal tract gestures
+can be thought of a subset of all
+motor synergies ???cite
 
 \subsubsection{Phonemes}
 
@@ -957,6 +1104,8 @@ in future chapters.
 ??? figure like izhikevic, with auditory model + efficiency?
 
 ??? summary table with phenomena captured, etc
+
+??? Mention artificial neuromorphic cochleas
 
 \subsection{Automatic speech recognition}
 
