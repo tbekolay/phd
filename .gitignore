@@ -23,6 +23,14 @@
 *.out
 *.synctex.gz
 
+# For Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# For doit
+.doit.db
+
 # Outputs
 paper/phd.pdf
 
