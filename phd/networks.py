@@ -97,11 +97,12 @@ def periphery(freqs, sound, filterbank, neurons_per_freq=12, fs=50000.,
 
     # Cochlear neurons projecting down auditory nerve
     an = nengo.networks.EnsembleArray(neurons_per_freq, freqs.size,
-                                      intercepts=nengo.dists.Uniform(0.4, 0.8),
+                                      intercepts=nengo.dists.Uniform(0.2, 0.8),
                                       encoders=nengo.dists.Choice([[1]]))
     if zhang_synapse:
         nengo.Connection(ihc, an.input, transform=0.1, synapse=None)
     else:
+        # TODO different filters may give different magnitude output?
         nengo.Connection(ihc, an.input)
     return ihc, an
 
