@@ -80,7 +80,18 @@ of the auditory brain structures,
 we constrain the space of possible
 network topologies
 to those that match
-a network that we know to be successful.
+a network that we know
+to be successful.\footnote{One notable omission
+  from our discussion
+  of the human auditory system
+  is the integration of information
+  coming from both ears.
+  There are binaural effects at many levels,
+  and while a full human auditory model
+  would incorporate these effects,
+  at this stage of research
+  we only aim to build
+  a monaural speech system.}
 
 \subsection{Ear physiology}
 
@@ -402,13 +413,193 @@ by auditory regions of the brain.
 
 \subsection{Neurobiology}
 
-??? Tonotopic organization
+Brain structures in the primate auditory system
+are organized in several parallel
+hierarchical pathways.
+Information from the auditory periphery
+arrives at the brainstem???more.
+That information is relayed to the cortex
+through the medial geniculate nucleus (MGn)
+in the thalamus.
+The MGn sends information to a part
+of cortex in the temporal lobe
+called the core.
+In the context of auditory cortex,
+the core is a small portion of cortex
+in Heschl's gyrus (???)
+(???size in mm2)
+that serves as the first stage
+in the mostly feedforward hierarchy
+of auditory cortical areas.
+The core appears to be made up of
+three subareas, ???A1, R, and RT.
+The core is surrounded by a set of areas
+called the belt,
+which primarily receives input from
+the core.
+As such, there are ???three
+distinct areas in the belt,
+???.
+The belt provides input
+to the parabelt,
+which is made up of ???.
+See Figure~??? for a summary of
+the neuroanatomical structures and connections
+in the auditory hierarchy.
 
-??? P. 78 of Kollmeier: evidence of amplitude modulation senstivity
-in the auditory brain
+??? perhaps a modified version of the block diagram from Haas?
 
-- p. 67, Kollmeier: expliain modulation filterbank,
-  as this seems like it is an important part of the model...
+The parabelt provides input
+to several areas,
+including brain areas
+associated with language
+in the superior temporal gyrus,
+and frontal cortex which is associated
+with working memory and executive function.
+Historically, the most
+salient linguistic area
+in the superior temporal gyrus
+was Wernicke's area (Brodmann area 22),
+as lesions in this area result in
+a type of aphasia in which
+speech can be produced fluently,
+but lacks meaning.
+However, more recent hypotheses
+concerning how auditory information
+becomes discrete linguistic information
+assigns roles to much larger portions
+of the superior temporal gyrus
+and the superior temporal sulcus.
+We will discuss this in more detail
+in Section~???.
+
+While we do not yet know how auditory information
+is transformed through the connections
+described above,
+we get some clues by investigating
+how various auditory brain areas
+respond to sounds with different
+spatial and temporal properties.
+The first clue
+(which was used to determine the boundaries
+between auditory cortical regions)
+is that all of the areas
+up to the parabelt are
+tonotopically organized;
+that is, each neuron in these areas
+responds preferentially to
+a part of frequency spectrum,
+and cells close to one another
+are likely to be sensitive
+to the same frequency band.
+In general, lower level regions
+like the MGn and core
+are more tightly tuned
+to a smaller part of the frequency spectrum
+(sometimes even more tightly tuned
+than the auditory filters in the cochlea),
+while higher level regions
+like the parabelt
+are more broadly tuned
+to larger parts of the frequency spectrum.
+???more, cites
+See Figure~??? for visualizations
+of the tonotopic organization
+of primary auditory cortical regions.
+
+??? tonotopic organization figure
+
+Neurons at various levels in the auditory hierarchy
+respond to their selected frequency range
+with different temporal characteristics.
+In general, we can express the temporal
+relationship between the incoming
+frequency spectrum and the resulting
+neural activity with a causal filter.
+Considering that we also
+have referred to the spatial tuning
+of cells as a filter,
+many auditory researchers
+summarize the spatial and temporal
+tuning properties of auditory neurons
+using a single filter,
+based on the
+Spectral-Temporal Receptive Field (STRF).
+STRFs summarize how a neuron responds
+to incoming stimuli both spatially
+and temporally ???cite Aertsen 1981.
+Unfortunately, despite many decades
+of determining STRFs in
+primate ???cite and human auditory cortex ???cite
+the exact temporal properties of
+each area are not known.
+In general, STRFs have been found that
+show delays of 5--50 ms.
+While ringing can be observed
+in some STRFs, leading some
+(e.g., ???Kollmeier gabor paper)
+to hypothesize Gabor-like filters;
+however, the primary response comes
+after a particular delay
+(see ???kaas; semple and scott for reviews).
+
+It should be noted
+that the information gleaned from
+spectro-temporal tuning curves
+still describes a linear relationship
+between the incoming frequency spectrum
+and how a particular neuron responds.
+???Tian Rauschecker 2004
+suggest that belt neurons
+in rhesus monkeys respond nonlinearly
+to frequency-modulated sweep stimuli,
+but ???Kowalski et al. 1995
+found that cat A1 responses were linear.
+It is, however, difficult to evaluate
+the responses of cells
+as traditionally the STRF
+is determined using simple stimuli
+like white noise;
+but, see ???Theunissen 2000
+for a method using complex sounds
+and ???Griffiths et al for ?.
+??? Escabi \& Schreiner 2002
+found nonlinear responses
+in approximately 40\%
+of the midbrain inferior colliculus
+neurons they recorded,
+suggesting that nonlinearities
+are widespread
+throughout the auditory hierarchy.
+Regardless, it is clear that
+nonlinearities are more prevalent
+the higher up you go in the auditory hierarchy,
+though the types of nonlinearities
+at each processin level are still unclear;
+we aim to provide some insight into
+nonlinearities needed in the auditory system
+in the model presented in this thesis.
+
+In sum, we interpret
+the auditory neurobiological literature
+to support a model in which
+the MGn and other lower brain areas
+transmit frequency information
+and delayed frequency information
+to the core through direct connections,
+and connections through intermediate
+recurrently connected ensembles.
+The core transmits nonlinearly transformed
+frequency information to the belt,
+which pools the responses from
+a wider band of frequencies than the core.
+The parabelt performs a similar transformation
+and broadening of frequency selectivity.
+Finally, the representations from the parabelt
+are used by higher-level regions to
+do extract discrete
+acoustically and linguistically
+important information.
 
 \section{Human speech production}
 
@@ -1229,6 +1420,15 @@ accordingly (see Section~??? for details).
 
 ??? Broca's area and whatnot
 
+\subsection{Sensorimotor integration}
+
+??? the integrated part that we care about
+
+\subsubsection{Neurobiology}
+
+??? Arcuate Fasciculus, connects wernicke's to broca's;
+not present or very small in non-human primates.
+
 \section{Prior modeling approaches}
 
 In making early steps toward
@@ -1242,13 +1442,23 @@ in this section we review prior modeling efforts
 and contrast them with the model we will describe
 in future chapters.
 
-\subsection{Auditory periphery modeling}
+\subsection{Auditory periphery models}
 
 ??? figure like izhikevic, with auditory model + efficiency?
 
 ??? summary table with phenomena captured, etc
 
 ??? Mention artificial neuromorphic cochleas
+
+\subsection{Auditory neurobiology models}
+
+??? P. 78 of Kollmeier: evidence of amplitude modulation senstivity
+in the auditory brain
+
+- p. 67, Kollmeier: expliain modulation filterbank,
+  as this seems like it is an important part of the model...
+
+- link that to spectro-temporal receptive fields
 
 \subsection{Automatic speech recognition}
 
