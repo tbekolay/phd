@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 
 def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
@@ -56,17 +57,17 @@ def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 
-def cochleogram(data, freqs, time=None, cmap=plt.cm.RdBu):
+def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
     if data.min() >= 0.0:
         cmap = plt.cm.Blues
     elif not np.allclose(data.max() + data.min(), 0, atol=1e-5):
         midpoint = np.abs(data.min()) / (data.max() - data.min())
         cmap = shiftedcmap(cmap, midpoint=midpoint)
 
-    duration = time[-1] if time is not None else data.duration / br.ms
-    plt.imshow(data.T, aspect='auto', origin='lower left', cmap=cmap,
-               extent=(0, duration, freqs[0], freqs[-1]))
+    plt.pcolormesh(time, freqs, data.T, cmap=cmap)
     plt.yscale('log')
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (ms)')
+    plt.axis('tight')
+    sns.despine()
     plt.colorbar()
