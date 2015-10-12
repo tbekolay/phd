@@ -19,6 +19,45 @@ class FuncProcess(nengo.processes.Process):
         return self.func
 
 
+class ArrayProcess(nengo.processes.Process):
+    """Psych! Not a process, just going through a vector.
+
+    I guess it's a bit fancier because we can loop
+    or stop it after it's done... still though.
+    """
+    def __init__(self, array, at_end='loop'):
+        self.array = array
+        # Possible at_end values:
+        #   loop: start again from the start
+        #   stop: output silence (0) after sound
+        assert at_end in ('loop', 'stop')
+        self.at_end = at_end
+        super(ArrayProcess, self).__init__()
+
+    def make_step(self, size_in, size_out, dt, rng):
+        assert size_in == 0
+        assert size_out == (1 if self.array.ndim == 1 else self.array.shape[1])
+
+        rate = 1. / dt
+
+        if self.at_end == 'loop':
+
+            def step_arrayloop(t):
+                idx = int(t * rate) % self.array.shape[0]
+                return self.array[idx]
+            return step_arrayloop
+
+        elif self.at_end == 'stop':
+
+            def step_arraystop(t):
+                idx = int(t * rate)
+                if idx > self.array.shape[0]:
+                    return 0.
+                else:
+                    return self.array[idx]
+            return step_arraystop
+
+
 class Tone(FuncProcess):
     """A pure tone."""
     def __init__(self, freq_in_hz, rms=0.5):
