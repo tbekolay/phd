@@ -4,8 +4,7 @@ import brian.hears as bh
 import nengo
 import numpy as np
 from brian.hears.filtering.tan_carney import ZhangSynapseRate
-from nengo.utils.compat import is_number, range
-from scipy.signal import resample
+from nengo.utils.compat import range
 
 from .filters import exp_delay, LTI
 
@@ -73,7 +72,7 @@ class AuditoryFilterBank(nengo.processes.Process):
         if self.zhang_synapse:
             syn = ZhangSynapseRate(ihc, self.freqs)
             s_mon = br.RecentStateMonitor(
-                syn, 's', record=True, clock=syn.clock, duration=dt * br.second)
+                syn, 's', record=True, clock=syn.clock, duration=dt*br.second)
             net = br.Network(syn, s_mon)
 
             def step_synapse(t):
@@ -81,7 +80,8 @@ class AuditoryFilterBank(nengo.processes.Process):
                 return s_mon.values[-1]
             return step_synapse
         else:
-            def step_filterbank(t, startend=np.array([0, duration], dtype=int)):
+            def step_filterbank(
+                    t, startend=np.array([0, duration], dtype=int)):
                 result = ihc.buffer_fetch(startend[0], startend[1])
                 startend += duration
                 return result[-1]
@@ -175,7 +175,6 @@ def deconvolution(n_neurons, tf, delay, degree=4, **lti_kwargs):
     p, q = np.polymul(edp, den), np.polymul(edq, num)
     inp, out = lti(n_neurons, LTI.from_tf(p, q), **lti_kwargs)
     return inp, out, degree
-
 
 
 def derivative(n_neurons, tau, delay, **deconv_kwargs):

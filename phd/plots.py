@@ -26,7 +26,7 @@ def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
            Defaults to 1.0 (no upper ofset). Should be between
            `midpoint` and 1.0.
 
-    From http://stackoverflow.com/questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib
+    From http://stackoverflow.com/questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib  # noqa
     """
     cdict = {
         'red': [],

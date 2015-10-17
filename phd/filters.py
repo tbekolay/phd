@@ -2,7 +2,7 @@ import brian as br
 import brian.hears as bh
 import nengo
 import numpy as np
-from nengo.utils.filter_design import zpk2ss, tf2ss, ss2tf, cont2discrete
+from nengo.utils.filter_design import zpk2ss, tf2ss, cont2discrete
 from scipy.linalg import solve_lyapunov
 from scipy.misc import factorial, pade
 

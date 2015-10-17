@@ -1,6 +1,5 @@
 import nengo
-import numpy as np
-from nengo.utils.compat import is_iterable, range
+from nengo.utils.compat import range
 from nengo.utils.network import with_self
 
 from .networks import derivative, periphery
@@ -101,7 +100,7 @@ class SpeechRecognition(nengo.Network):
             assert delay in self.derivatives, delay
 
         dims = self.freqs.size
-        total_dims =  dims * (len(delays) + 1)
+        total_dims = dims * (len(delays) + 1)
         phoneme_in = nengo.Ensemble(neurons_per_d * total_dims,
                                     dimensions=total_dims)
         nengo.Connection(self.an.output, phoneme_in[:dims])

@@ -1,6 +1,5 @@
 from glob import glob
 import os
-import sys
 
 import doit
 from doit.action import CmdAction
