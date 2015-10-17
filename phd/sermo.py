@@ -5,6 +5,15 @@ from nengo.utils.network import with_self
 from .networks import derivative, periphery
 
 
+class Sermo(object):
+    def __init__(self, recognition=True, execution=True):
+        self.recognition = recognition
+        self.execution = execution
+
+    def build(self):
+        pass
+
+
 class SpeechRecognition(nengo.Network):
     def __init__(self, *args, **kwargs):
         super(SpeechRecognition, self).__init__(*args, **kwargs)
