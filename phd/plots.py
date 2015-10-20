@@ -1,7 +1,7 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap
 
 
 def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
@@ -51,7 +51,7 @@ def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
         cdict['blue'].append((si, b, b))
         cdict['alpha'].append((si, a, a))
 
-    newcmap = matplotlib.colors.LinearSegmentedColormap(name, cdict)
+    newcmap = LinearSegmentedColormap(name, cdict)
     plt.register_cmap(cmap=newcmap)
 
     return newcmap

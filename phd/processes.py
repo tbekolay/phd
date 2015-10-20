@@ -1,8 +1,90 @@
+import brian as br
+import brian.hears as bh
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np
+from brian.hears.filtering.tan_carney import ZhangSynapseRate
 from scipy.io.wavfile import read as readwav
 from scipy.signal import resample
+
+
+class NengoSound(bh.BaseSound):
+    def __init__(self, step_f, nchannels, samplerate):
+        self.step_f = step_f
+        self.nchannels = nchannels
+        self.samplerate = samplerate
+        self.t = 0.0
+        self.dt = 1. / self.samplerate
+
+    def buffer_init(self):
+        pass
+
+    def buffer_fetch(self, start, end):
+        return self.buffer_fetch_next(end - start)
+
+    def buffer_fetch_next(self, samples):
+        out = np.empty((samples, self.nchannels))
+        for i in range(samples):
+            self.t += self.dt
+            out[i] = self.step_f(self.t)
+        return out
+
+
+class AuditoryFilterBank(nengo.processes.Process):
+    def __init__(self, freqs, sound_process, filterbank, samplerate,
+                 middle_ear=False, zhang_synapse=False):
+        self.freqs = freqs
+        self.sound_process = sound_process
+        self.filterbank = filterbank
+        self.samplerate = samplerate
+        self.middle_ear = middle_ear
+        self.zhang_synapse = zhang_synapse
+
+    @staticmethod
+    def bm2ihc(x):
+        """Half wave rectify and compress it with a 1/3 power law."""
+        return 3 * np.clip(x, 0, np.inf) ** (1. / 3.)
+
+    def make_step(self, size_in, size_out, dt, rng):
+        assert size_in == 0
+        assert size_out == self.freqs.size
+
+        # If samplerate isn't specified, we'll assume dt
+        samplerate = 1. / dt if self.samplerate is None else self.samplerate
+        sound_dt = 1. / samplerate
+
+        # Set up the sound
+        step_f = self.sound_process.make_step(0, 1, sound_dt, rng)
+        ns = NengoSound(step_f, 1, samplerate)
+
+        if self.middle_ear:
+            ns = bh.MiddleEar(ns, gain=1)
+
+        self.filterbank.source = ns
+
+        duration = int(dt / sound_dt)
+        self.filterbank.buffersize = duration
+        ihc = bh.FunctionFilterbank(self.filterbank, self.bm2ihc)
+        # Fails if we don't do this...
+        ihc.cached_buffer_end = 0
+
+        if self.zhang_synapse:
+            syn = ZhangSynapseRate(ihc, self.freqs)
+            s_mon = br.RecentStateMonitor(
+                syn, 's', record=True, clock=syn.clock, duration=dt*br.second)
+            net = br.Network(syn, s_mon)
+
+            def step_synapse(t):
+                net.run(dt * br.second)
+                return s_mon.values[-1]
+            return step_synapse
+        else:
+            def step_filterbank(
+                    t, startend=np.array([0, duration], dtype=int)):
+                result = ihc.buffer_fetch(startend[0], startend[1])
+                startend += duration
+                return result[-1]
+            return step_filterbank
 
 
 class FuncProcess(nengo.processes.Process):
