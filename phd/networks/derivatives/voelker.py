@@ -62,6 +62,8 @@ def Voelker(delay, dimensions,
 
     with net:
         actual_output = nengo.Node(size_in=dimensions)
-        nengo.Connection(net.output, actual_output, synapse=tau_highpass)
+        # Scale by 1 / delay, to match Tripp networks
+        nengo.Connection(net.output, actual_output,
+                         synapse=tau_highpass, transform=1. / delay)
         net.output = actual_output
     return net
