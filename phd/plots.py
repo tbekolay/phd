@@ -71,3 +71,4 @@ def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
     plt.axis('tight')
     sns.despine()
     plt.colorbar()
+    plt.tight_layout()

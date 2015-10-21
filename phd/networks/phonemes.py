@@ -1,7 +1,7 @@
 import nengo
 
 
-def PhonemeDetector(neurons_per_d, eval_points, targets, delays=None):
+def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
     """A naive implementation of phoneme detection.
 
     We compress all our frequency and temporal information into
@@ -9,7 +9,8 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, delays=None):
     and one for consonants, with a short time constant)
     and decode.
     """
-    assert self.has_periphery
+    if net is None:
+        net = nengo.Network("Phoneme detector")
 
     if delays is None:
         delays = sorted(list(self.derivatives))
@@ -33,7 +34,7 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, delays=None):
 
 
 def HierarchicalPhonemeDetector(neurons_per_d, eval_points, targets,
-                                delays=None, pool=4):
+                                delays=None, pooling=4):
     """A hierarchical implementation of phoneme detection.
 
     We first make some intermediate layers that compress data from

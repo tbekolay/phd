@@ -186,7 +186,7 @@ class WavFile(nengo.processes.Process):
         rate = 1. / dt
 
         orig_rate, orig = readwav(self.path)
-        new_size = orig.size * (rate / orig_rate)
+        new_size = int(orig.size * (rate / orig_rate))
         wave = resample(orig, new_size)
         wave -= wave.mean()
 
