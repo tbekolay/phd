@@ -1,11 +1,12 @@
 import nengo
 import numpy as np
+from nengo.networks import EnsembleArray
 from nengo.utils.filter_design import tf2ss
 
 from .lti import ab_norm, exp_delay, LTI, lti2sim, multidim_lti, scale_lti
 
 
-def lti(n_neurons, dimensions, ltisys, synapse=nengo.Lowpass(0.05),
+def lti(n_neurons, dimensions, ltisys, synapse=nengo.Lowpass(0.005),
         controlled=False, dt=0.001, radii=None, radius=1.0, net=None):
     if net is None:
         net = nengo.Network("Derivative (Voelker)")
@@ -22,19 +23,20 @@ def lti(n_neurons, dimensions, ltisys, synapse=nengo.Lowpass(0.05),
     size_out = ltisys.c.shape[0]
 
     with net:
-        net.input = nengo.Node(size_in=size_in, label="input")
-        net.output = nengo.Node(size_in=size_out, label="output")
-        net.state = nengo.networks.EnsembleArray(n_neurons, size_state)
+        in_ea = EnsembleArray(n_neurons, n_ensembles=size_in)
+        out_ea = EnsembleArray(n_neurons, n_ensembles=size_out)
+        net.state = EnsembleArray(n_neurons, n_ensembles=size_state)
 
-        # TODO: Node connections! Consider making ensembles.
         nengo.Connection(net.state.output, net.state.input,
                          transform=ltisys.a, synapse=synapse)
-        nengo.Connection(net.input, net.state.input,
+        nengo.Connection(in_ea.output, net.state.input,
                          transform=ltisys.b, synapse=synapse)
-        nengo.Connection(net.state.output, net.output,
-                         transform=ltisys.c, synapse=None)
-        nengo.Connection(net.input, net.output,
-                         transform=ltisys.d, synapse=None)
+        nengo.Connection(net.state.output, out_ea.input,
+                         transform=ltisys.c, synapse=synapse)
+        nengo.Connection(in_ea.output, out_ea.input,
+                         transform=ltisys.d, synapse=synapse)
+        net.input = in_ea.input
+        net.output = out_ea.output
     return net
 
 
