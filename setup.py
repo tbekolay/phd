@@ -40,6 +40,7 @@ setup(
         "numpy",
         "matplotlib",
         "nengo",
+        "pysoundfile",
         "seaborn",
     ],
 )
