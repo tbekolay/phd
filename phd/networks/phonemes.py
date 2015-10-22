@@ -1,6 +1,16 @@
 import nengo
 
 
+def connect_detector(net, delays, in_obj):
+    dims = net.periphery.freqs.size
+    total_dims = dims * (len(delays) + 1)
+
+    nengo.Connection(net.periphery.an.output, in_obj[:dims])
+    for i, delay in enumerate(delays):
+        nengo.Connection(net.derivatives[delay].output,
+                         in_obj[(i+1)*dims:(i+2)*dims])
+
+
 def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
     """A naive implementation of phoneme detection.
 

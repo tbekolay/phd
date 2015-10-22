@@ -190,7 +190,7 @@ class WavFile(nengo.processes.Process):
         wave = resample(orig, new_size)
         wave -= wave.mean()
 
-        # Normalize wave to desired rms)
+        # Normalize wave to desired rms
         wave_rms = npext.rms(wave)
         wave *= (self.rms / wave_rms)
 

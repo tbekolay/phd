@@ -5,4 +5,5 @@ but let's not get head of ourselves. This will do.
 """
 
 cache_dir = "/home/tbekolay/Code/phd/cache"
+n_processes = 8
 timit_root = "/home/tbekolay/Dropbox/reading-auditory/data/timit"
