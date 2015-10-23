@@ -4,10 +4,9 @@ from nengo.utils.compat import iteritems, itervalues
 from .networks import (
     AuditoryPeriphery,
     Derivative,
-    HierarchicalPhonemeDetector,
     PhonemeDetector,
 )
-from . import params
+from . import params, timit
 
 
 class PeripheryParams(object):
@@ -34,10 +33,13 @@ class IntegratorParams(object):
 
 class PhonemeDetectorParams(object):
     name = params.StringParam(default="detector")
-    pooling = params.IntParam(default=None)
+    derivatives = params.ListParam(default=[])
+    phonemes = params.ListParam(default=[])
+    rms = params.NumberParam(default=0.5)
+    max_simtime = params.NumberParam(default=5.0)
+    sample_every = params.NumberParam(default=0.001)
     neurons_per_d = params.IntParam(default=30)
-    delays = params.ListParam(default=[])
-    integrators = params.ListParam(default=[])
+    pooling = params.IntParam(default=None)
 
 
 class RecognitionParams(object):
@@ -96,8 +98,9 @@ class Sermo(object):
         self.integration = (IntegrationParams() if execution and recognition
                             else None)
 
-    def build(self):
+    def build(self, training=False):
         net = nengo.Network()
+        net.training = training
         if self.recognition is not None:
             self.build_recognition(net)
         if self.execution is not None:
@@ -141,12 +144,24 @@ class Sermo(object):
     def build_detectors(self, net):
         net.detectors = {}
 
-        for param in itervalues(self.recognition.detectors):
-            if param.pooling is not None:
-                detector = HierarchicalPhonemeDetector(**kwargs(param))
-            else:
-                detector = PhonemeDetector(**kwargs(param))
+        dims = net.periphery.freqs.size
 
+        for param in itervalues(self.recognition.detectors):
+            total_dims = dims * (len(param.derivatives) + 1)
+            training = timit.TrainingData(self, param)
+            if not net.training:
+                assert training.generated, "Generate training data first"
+                eval_points, targets = training.get()
+            else:
+                eval_points, targets = total_dims, dims
+            detector = PhonemeDetector(
+                param.neurons_per_d, eval_points, targets)
+            net.detectors[param.name] = detector
+
+            nengo.Connection(net.periphery.an.output, detector.input[:dims])
+            for i, delay in enumerate(param.derivatives):
+                nengo.Connection(net.derivatives[delay].output,
+                                 detector.input[(i+1)*dims:(i+2)*dims])
 
     def build_execution(self, net):
         pass

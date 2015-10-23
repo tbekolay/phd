@@ -10,7 +10,6 @@ import soundfile as sf
 from nengo.cache import Fingerprint
 
 from . import config
-from .networks.phonemes import connect_detector
 from .processes import ArrayProcess
 
 consonants = [
@@ -169,54 +168,56 @@ def extract_all_audio(phonemes, rms=0.5, frames_before=0):
     return audio
 
 
-def generate_eval_points(model, derivatives, audio,
-                         max_simtime=5.0, sample_every=0.001):
+def ph_eval_points(model, detector, sound):
+    net = model.build(training=True)
+    # Put in our own sound and fs in the built network
+    net.periphery.sound_process = sound
+    net.periphery.fb.sound_process = sound
+    net.periphery.fs = fs
+    net.periphery.fb.samplerate = fs
+    with net:
+        pr = nengo.Probe(net.detectors[detector.name].input,
+                         synapse=0.01, sample_every=detector.sample_every)
+    sim = nengo.Simulator(net, dt=dt)
+    sim.run(min(dt * sound.array.size, detector.max_simtime))
+    return sim.data[pr]
+
+
+def generate_eval_points(model, detector, audio):
     """Simulate Sermo with the extracted audio."""
-    assert np.allclose(sample_every / dt, int(sample_every / dt)), (
-        "sample_every must be a multiple of dt (%s)" % dt)
+    assert np.allclose(
+        detector.sample_every / dt, int(detector.sample_every / dt)), (
+            "sample_every must be a multiple of dt (%s)" % dt)
 
     eval_points = []
     dims = model.recognition.periphery.freqs.size
-    size_in = dims * (len(derivatives) + 1)
+    size_in = dims * (len(detector.derivatives) + 1)
 
     # Phonemes must be sorted to match targets!
     phonemes = sorted(list(audio))
+    # Phonemes must be sorted to match targets!
+    phonemes = sorted(list(audio))
 
-    # TODO: Parallelize this
     for i, phoneme in enumerate(phonemes):
         sound = ArrayProcess(np.concatenate(audio[phoneme]).ravel())
-        net = model.build()
-        # Put in our own sound and fs in the built network
-        net.periphery.sound_process = sound
-        net.periphery.fb.sound_process = sound
-        net.periphery.fs = fs
-        net.periphery.fb.samplerate = fs
-        with net:
-            # Aggregate all the data needed
-            ph_inputs = nengo.Node(size_in=size_in)
-            connect_detector(net, derivatives, ph_inputs)
-            pr = nengo.Probe(ph_inputs,
-                             synapse=0.01, sample_every=sample_every)
-        sim = nengo.Simulator(net, dt=dt)
-        sim.run(min(dt * sound.array.size, max_simtime))
-        eval_points.append(sim.data[pr])
+        eval_points.append(ph_eval_points(model, detector, sound))
 
     return np.concatenate(eval_points)
 
 
-def generate_targets(audio,
-                     max_simtime=5.0, sample_every=0.001, frames_before=0):
-    targets = []
-    sample_rate = 1. / sample_every
+def generate_targets(audio, detector, frames_before):
+    sample_rate = 1. / detector.sample_every
     assert np.allclose(fs / sample_rate, int(fs / sample_rate)), (
         "Sample rate must be a multiple of fs (%s)" % fs)
     step = int(fs / sample_rate)
-    steps_before = frames_before // step
+    steps_before = int(frames_before // step)
 
     # Phonemes must be sorted to match eval_points!
+    targets = []
     phonemes = sorted(list(audio))
-    n_phonemes = len(phonemes)
-    max_samples = int(max_simtime // sample_every) + 1
+    n_phonemes = len(detector.phonemes)
+    # TODO this or sound.size // step is wrong sometimes
+    max_samples = int(detector.max_simtime // detector.sample_every) + 1
 
     for i, phoneme in enumerate(phonemes):
         ph_targets = []
@@ -233,22 +234,21 @@ def generate_targets(audio,
 
     return np.concatenate(targets, axis=1)
 
+
 class TrainingData(object):
-    def __init__(self, model, derivatives, phonemes,
-                 rms=0.5, max_simtime=5.0, sample_every=0.001):
+    def __init__(self, model, detector):
         self.model = model
-        self.derivatives = derivatives
-        self.phonemes = phonemes
-        self.rms = rms
-        self.max_simtime = max_simtime
-        self.sample_every = sample_every
-        self.frames_before = int(fs * max(derivatives))
+        self.detector = detector
 
     @staticmethod
     def clear_cache():
         for fn in os.listdir(config.cache_dir):
             if fn.endswith(".npz"):
                 os.remove(os.path.join(config.cache_dir, fn))
+
+    @property
+    def frames_before(self):
+        return int(fs * max(self.detector.derivatives))
 
     @property
     def generated(self):
@@ -261,27 +261,26 @@ class TrainingData(object):
         audio = self.generate_audio()
         eval_points = self.generate_eval_points(audio)
         targets = self.generate_targets(audio)
-
         np.savez(file=self.cache_file(),
                  audio=audio,
                  eval_points=eval_points,
                  targets=targets)
 
     def generate_audio(self):
-        return extract_all_audio(phonemes=self.phonemes,
-                                 rms=self.rms,
+        return extract_all_audio(phonemes=self.detector.phonemes,
+                                 rms=self.detector.rms,
                                  frames_before=self.frames_before)
 
     def generate_eval_points(self, audio):
         return generate_eval_points(model=self.model,
-                                    derivatives=self.derivatives,
-                                    audio=audio,
-                                    max_simtime=self.max_simtime,
-                                    sample_every=self.sample_every)
+                                    detector=self.detector,
+                                    audio=audio)
 
     def generate_targets(self, audio):
-        return generate_targets(
-            audio, self.max_simtime, self.sample_every, self.frames_before)
+        return generate_targets(audio=audio,
+                                max_simtime=self.detector.max_simtime,
+                                sample_every=self.detector.sample_every,
+                                frames_before=self.frames_before)
 
     def cache_key(self):
         """Compute a key for the hash.
@@ -291,11 +290,7 @@ class TrainingData(object):
         """
         h = hashlib.sha1()
         h.update(str(Fingerprint(self.model)))
-        h.update(str(Fingerprint(self.derivatives)))
-        h.update(str(Fingerprint(self.phonemes)))
-        h.update(str(Fingerprint(self.sample_every)))
-        h.update(str(Fingerprint(self.rms)))
-        h.update(str(Fingerprint(self.frames_before)))
+        h.update(str(Fingerprint(self.detector)))
         return h.hexdigest()
 
     def cache_file(self):

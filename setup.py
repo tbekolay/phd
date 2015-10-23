@@ -40,7 +40,9 @@ setup(
         "numpy",
         "matplotlib",
         "nengo",
+        "pandas",
         "pysoundfile",
+        "scikit-learn",
         "seaborn",
     ],
 )

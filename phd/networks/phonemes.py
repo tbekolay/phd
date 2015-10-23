@@ -1,14 +1,6 @@
 import nengo
-
-
-def connect_detector(net, delays, in_obj):
-    dims = net.periphery.freqs.size
-    total_dims = dims * (len(delays) + 1)
-
-    nengo.Connection(net.periphery.an.output, in_obj[:dims])
-    for i, delay in enumerate(delays):
-        nengo.Connection(net.derivatives[delay].output,
-                         in_obj[(i+1)*dims:(i+2)*dims])
+from nengo.utils.compat import is_array
+from nengo.utils.connection import target_function
 
 
 def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
@@ -22,75 +14,76 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
     if net is None:
         net = nengo.Network("Phoneme detector")
 
-    if delays is None:
-        delays = sorted(list(self.derivatives))
-    for delay in delays:
-        assert delay in self.derivatives, delay
+    if is_array(eval_points) and is_array(targets):
+        training = False
+        in_dims = eval_points.shape[1]
+        out_dims = targets.shape[1]
+    else:
+        training = True
+        in_dims = eval_points
+        out_dims = targets
 
-    dims = self.freqs.size
-    total_dims = dims * (len(delays) + 1)
-    phoneme_in = nengo.Ensemble(neurons_per_d * total_dims,
-                                dimensions=total_dims)
-    nengo.Connection(self.an.output, phoneme_in[:dims])
-    for i, delay in enumerate(delays):
-        nengo.Connection(self.derivatives[delay],
-                         phoneme_in[(i+1)*dims:(i+2)*dims])
-    out_dims = targets.shape[1]
-    phoneme_out = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
-    nengo.Connection(phoneme_in, phoneme_out,
-                     **nengo.utils.connection.target_function(
-                         eval_points, targets))
-    return phoneme_in, phoneme_out
+    with net:
+        net.input = nengo.Ensemble(neurons_per_d * in_dims, in_dims)
+        if not training:
+            net.output = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
+            nengo.Connection(net.input,
+                             net.output,
+                             solver=nengo.solvers.LstsqMultNoise(),
+                             **target_function(eval_points, targets))
+
+    return net
 
 
-def HierarchicalPhonemeDetector(neurons_per_d, eval_points, targets,
-                                delays=None, pooling=4):
-    """A hierarchical implementation of phoneme detection.
+# def SumPoolPhonemeDetector(
+#         neurons_per_d, dimensions, eval_points, targets, pooling=3):
+#     """A hierarchical implementation of phoneme detection.
 
-    We first make some intermediate layers that compress data from
-    a few nearby frequencies; then, we use those compressed
-    representations for phoneme detection.
-    """
-    assert self.has_periphery
+#     We first make some intermediate layers that compress data from
+#     a few nearby frequencies; then, we use those compressed
+#     representations for phoneme detection.
+#     """
+#     assert dimensions % pooling == 0, "Pooling must divide dimensions evenly"
 
-    if delays is None:
-        delays = sorted(list(self.derivatives))
-    for delay in delays:
-        assert delay in self.derivatives, delay
+#     pooled_dims = self.freqs.size // pool
+#     total_dims = pooled_dims * (len(delays) + 1)
 
-    assert self.freqs.size % pool == 0
+#     # Pool raw AN responses
+#     an_pooled = nengo.Ensemble(neurons_per_d * pooled_dims,
+#                                dimensions=pooled_dims,
+#                                radius=pool)
+#     for i in range(pool):
+#         # print np.arange(self.freqs.size)[i::pool] to see what's happening
+#         nengo.Connection(self.an.output[i::pool], an_pooled)
 
-    pooled_dims = self.freqs.size // pool
-    total_dims = pooled_dims * (len(delays) + 1)
+#     # Pool deriv responses
+#     d_pools = []
+#     for i, delay in enumerate(delays):
+#         deriv_pool = nengo.Ensemble(neurons_per_d * pooled_dims,
+#                                     dimensions=pooled_dims,
+#                                     radius=pool)
+#         for i in range(pool):
+#             nengo.Connection(self.derivatives[delay][i::pool], deriv_pool)
+#         d_pools.append(deriv_pool)
 
-    # Pool raw AN responses
-    an_pooled = nengo.Ensemble(neurons_per_d * pooled_dims,
-                               dimensions=pooled_dims,
-                               radius=pool)
-    for i in range(pool):
-        # print np.arange(self.freqs.size)[i::pool] to see what's happening
-        nengo.Connection(self.an.output[i::pool], an_pooled)
+#     phoneme_in = nengo.Ensemble(neurons_per_d * total_dims,
+#                                 dimensions=total_dims,
+#                                 radius=pool)
+#     nengo.Connection(an_pooled, phoneme_in[:pooled_dims])
+#     for i, deriv_pool in enumerate(d_pools):
+#         nengo.Connection(deriv_pool,
+#                          phoneme_in[(i+1)*pooled_dims:(i+2)*pooled_dims])
+#     out_dims = targets.shape[1]
+#     phoneme_out = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
+#     nengo.Connection(phoneme_in, phoneme_out,
+#                      **nengo.utils.connection.target_function(
+#                          eval_points, targets))
+#     return phoneme_in, phoneme_out
 
-    # Pool deriv responses
-    d_pools = []
-    for i, delay in enumerate(delays):
-        deriv_pool = nengo.Ensemble(neurons_per_d * pooled_dims,
-                                    dimensions=pooled_dims,
-                                    radius=pool)
-        for i in range(pool):
-            nengo.Connection(self.derivatives[delay][i::pool], deriv_pool)
-        d_pools.append(deriv_pool)
 
-    phoneme_in = nengo.Ensemble(neurons_per_d * total_dims,
-                                dimensions=total_dims,
-                                radius=pool)
-    nengo.Connection(an_pooled, phoneme_in[:pooled_dims])
-    for i, deriv_pool in enumerate(d_pools):
-        nengo.Connection(deriv_pool,
-                         phoneme_in[(i+1)*pooled_dims:(i+2)*pooled_dims])
-    out_dims = targets.shape[1]
-    phoneme_out = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
-    nengo.Connection(phoneme_in, phoneme_out,
-                     **nengo.utils.connection.target_function(
-                         eval_points, targets))
-    return phoneme_in, phoneme_out
+# def ProdPoolPhonemeDetector():
+#     pass
+
+
+# def OverlapPhonemeDetector():
+#     pass
