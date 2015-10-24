@@ -1,5 +1,6 @@
 import brian as br
 import brian.hears as bh
+import dill
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np
@@ -57,14 +58,17 @@ class AuditoryFilterBank(nengo.processes.Process):
         step_f = self.sound_process.make_step(0, 1, sound_dt, rng)
         ns = NengoSound(step_f, 1, samplerate)
 
+        # Make a deep copy of the filterbank so hashes stay the same
+        filterbank = dill.loads(dill.dumps(self.filterbank))
+
         if self.middle_ear:
             ns = bh.MiddleEar(ns, gain=1)
 
-        self.filterbank.source = ns
+        filterbank.source = ns
 
         duration = int(dt / sound_dt)
-        self.filterbank.buffersize = duration
-        ihc = bh.FunctionFilterbank(self.filterbank, self.bm2ihc)
+        filterbank.buffersize = duration
+        ihc = bh.FunctionFilterbank(filterbank, self.bm2ihc)
         # Fails if we don't do this...
         ihc.cached_buffer_end = 0
 

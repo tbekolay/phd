@@ -3,45 +3,50 @@ import os
 import shutil
 import tarfile
 
+import dill
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np
 import soundfile as sf
-from nengo.cache import Fingerprint
 
 from . import config
 from .processes import ArrayProcess
 
-consonants = [
-    'b', 'd', 'g', 'p', 't', 'k', 'dx', 'q',
-    'jh', 'ch',
-    's', 'sh', 'z', 'zh', 'f', 'th', 'v', 'dh',
-    'm', 'n', 'ng', 'em', 'en', 'eng', 'nx',
-    'l', 'r', 'w', 'y', 'hh', 'hv', 'el'
-]
+consonants = ['b', 'd', 'g', 'p', 't', 'k', 'dx', 'q',
+              'jh', 'ch',
+              's', 'sh', 'z', 'zh', 'f', 'th', 'v', 'dh',
+              'm', 'n', 'ng', 'em', 'en', 'eng', 'nx',
+              'l', 'r', 'w', 'y', 'hh', 'hv', 'el']
 
-# "the closure intervals of stops which are distinguished from the stop release"
-closures = {
-    'bcl': 'b',
-    'dcl': 'd',
-    'gcl': 'g',
-    'pcl': 'p',
-    'tck': 't',
-    'kcl': 'k',
-    'dcl': 'jh',
-    'tcl': 'ch',
-}
+# closure intervals of stops are distinguished from the stop release
 
-vowels = [
-    'iy', 'ih', 'eh', 'ey',
-    'ae', 'aa', 'aw', 'ay', 'ah', 'ao',
-    'oy', 'ow', 'uh', 'uw', 'ux',
-    'er', 'ax', 'ix', 'axr', 'ax-h',
-]
+if config.count_closures:
+    # Option 1: map the closure to the phoneme
+    closures = {'bcl': 'b',
+                'dcl': 'd',
+                'gcl': 'g',
+                'pcl': 'p',
+                'tck': 't',
+                'kcl': 'k',
+                'dcl': 'jh',
+                'tcl': 'ch'}
+else:
+    # Option 2: closure intervals are ignored, considered pauses
+    closures = {'bcl': 'pau',
+                'dcl': 'pau',
+                'gcl': 'pau',
+                'pcl': 'pau',
+                'tck': 'pau',
+                'kcl': 'pau',
+                'dcl': 'pau',
+                'tcl': 'pau'}
 
-ignores = [
-    'pau', 'epi', 'h#', '1', '2',
-]
+vowels = ['iy', 'ih', 'eh', 'ey',
+          'ae', 'aa', 'aw', 'ay', 'ah', 'ao',
+          'oy', 'ow', 'uh', 'uw', 'ux',
+          'er', 'ax', 'ix', 'axr', 'ax-h']
+
+ignores = ['pau', 'epi', 'h#', '1', '2']
 
 fs = 16000  # TIMIT is always 16 kHz
 dt = 1. / fs
@@ -115,8 +120,9 @@ class Utterance(object):
         return "%s.PHN" % self.path
 
 
-def extract_audio(utterance, phonemes, rms=0.5, frames_before=0):
+def extract_audio(utterance, phonemes, rms=0.5, t_before=0.):
     """Extract instances of the passed phonemes in the utterance."""
+    frames_before = int(t_before / dt)
     ret = {phn: [] for phn in phonemes}
     data, _fs = sf.read(utterance.wav)
     assert _fs == fs, "fs (%s) != 16000" % _fs
@@ -135,15 +141,8 @@ def extract_audio(utterance, phonemes, rms=0.5, frames_before=0):
     return ret
 
 
-def extract_all_audio(phonemes, rms=0.5, frames_before=0):
+def extract_all_audio(phonemes, rms=0.5, t_before=0.):
     """Generate the audio sequences that will be used."""
-    # Try a few ways to limit it...
-    # 1. Just get all data
-    # 2. Get all data and then only take N samples per phoneme
-    # 3. Randomly sample utterances, keep going until N samples per phoneme
-    # 4. Randomly sample utterances, keep going until M samples total
-
-    # Let's get all data for now (in the training corpus)
     audio = {phn: [] for phn in phonemes}
 
     def add_to_audio(extracted):
@@ -164,75 +163,70 @@ def extract_all_audio(phonemes, rms=0.5, frames_before=0):
                     add_to_audio(extract_audio(utterance,
                                                phonemes,
                                                rms,
-                                               frames_before))
+                                               t_before))
     return audio
 
 
-def ph_eval_points(model, detector, sound):
+def ph_traindata(model, detector, sound, target):
     net = model.build(training=True)
+
     # Put in our own sound and fs in the built network
     net.periphery.sound_process = sound
     net.periphery.fb.sound_process = sound
     net.periphery.fs = fs
     net.periphery.fb.samplerate = fs
     with net:
-        pr = nengo.Probe(net.detectors[detector.name].input,
+        # --- Get eval_points
+        pr = nengo.Probe(net.detectors[detector.name].phoneme_in,
                          synapse=0.01, sample_every=detector.sample_every)
+
+        # --- Get targets
+        # Cache small computations
+        t_before = detector.t_before
+        zeros = np.zeros_like(target)
+
+        def target_f(t):
+            if t > t_before:
+                return target
+            else:
+                return zeros
+        target_n = nengo.Node(target_f)
+        target_p = nengo.Probe(target_n,
+                               synapse=None,
+                               sample_every=detector.sample_every)
+
     sim = nengo.Simulator(net, dt=dt)
-    sim.run(min(dt * sound.array.size, detector.max_simtime))
-    return sim.data[pr]
+    sim.run(dt * sound.array.size, progress_bar=False)
+    return sim.data[pr], sim.data[target_p]
 
 
-def generate_eval_points(model, detector, audio):
+def generate_traindata(model, detector, audio):
     """Simulate Sermo with the extracted audio."""
     assert np.allclose(
         detector.sample_every / dt, int(detector.sample_every / dt)), (
             "sample_every must be a multiple of dt (%s)" % dt)
 
     eval_points = []
-    dims = model.recognition.periphery.freqs.size
-    size_in = dims * (len(detector.derivatives) + 1)
-
-    # Phonemes must be sorted to match targets!
-    phonemes = sorted(list(audio))
-    # Phonemes must be sorted to match targets!
-    phonemes = sorted(list(audio))
-
-    for i, phoneme in enumerate(phonemes):
-        sound = ArrayProcess(np.concatenate(audio[phoneme]).ravel())
-        eval_points.append(ph_eval_points(model, detector, sound))
-
-    return np.concatenate(eval_points)
-
-
-def generate_targets(audio, detector, frames_before):
-    sample_rate = 1. / detector.sample_every
-    assert np.allclose(fs / sample_rate, int(fs / sample_rate)), (
-        "Sample rate must be a multiple of fs (%s)" % fs)
-    step = int(fs / sample_rate)
-    steps_before = int(frames_before // step)
-
-    # Phonemes must be sorted to match eval_points!
     targets = []
+
+    # Phonemes must be sorted to match targets!
     phonemes = sorted(list(audio))
-    n_phonemes = len(detector.phonemes)
-    # TODO this or sound.size // step is wrong sometimes
-    max_samples = int(detector.max_simtime // detector.sample_every) + 1
-
     for i, phoneme in enumerate(phonemes):
-        ph_targets = []
+        simtime = 0.0  # Limit the amount of sim time per phoneme
         for sound in audio[phoneme]:
-            target = np.zeros((n_phonemes, int(sound.size // step)))
-            target[i, steps_before:] = 1
-            ph_targets.append(target)
+            sound_proc = ArrayProcess(sound.ravel())
+            ph_target = np.zeros(len(phonemes))
+            ph_target[i] = 1.0
 
-        # Each phoneme is limited to max_simtime
-        ph_targets = np.concatenate(ph_targets, axis=1)
-        if ph_targets.shape[1] > max_samples:
-            ph_targets = ph_targets[:, :max_samples]
-        targets.append(ph_targets)
+            ep, targ = ph_traindata(model, detector, sound_proc, ph_target)
+            eval_points.append(ep)
+            targets.append(targ)
+            simtime += sound.size * dt
+            if simtime > detector.max_simtime:
+                print "'%s' done" % phoneme
+                break
 
-    return np.concatenate(targets, axis=1)
+    return np.concatenate(eval_points), np.concatenate(targets)
 
 
 class TrainingData(object):
@@ -247,10 +241,6 @@ class TrainingData(object):
                 os.remove(os.path.join(config.cache_dir, fn))
 
     @property
-    def frames_before(self):
-        return int(fs * max(self.detector.derivatives))
-
-    @property
     def generated(self):
         return os.path.exists(self.cache_file())
 
@@ -259,8 +249,7 @@ class TrainingData(object):
             return
 
         audio = self.generate_audio()
-        eval_points = self.generate_eval_points(audio)
-        targets = self.generate_targets(audio)
+        eval_points, targets = self.generate_traindata(audio)
         np.savez(file=self.cache_file(),
                  audio=audio,
                  eval_points=eval_points,
@@ -269,18 +258,12 @@ class TrainingData(object):
     def generate_audio(self):
         return extract_all_audio(phonemes=self.detector.phonemes,
                                  rms=self.detector.rms,
-                                 frames_before=self.frames_before)
+                                 t_before=self.detector.t_before)
 
-    def generate_eval_points(self, audio):
-        return generate_eval_points(model=self.model,
-                                    detector=self.detector,
-                                    audio=audio)
-
-    def generate_targets(self, audio):
-        return generate_targets(audio=audio,
-                                max_simtime=self.detector.max_simtime,
-                                sample_every=self.detector.sample_every,
-                                frames_before=self.frames_before)
+    def generate_traindata(self, audio):
+        return generate_traindata(model=self.model,
+                                  detector=self.detector,
+                                  audio=audio)
 
     def cache_key(self):
         """Compute a key for the hash.
@@ -289,8 +272,8 @@ class TrainingData(object):
         SHA1, as is done in Nengo, seems sufficient.
         """
         h = hashlib.sha1()
-        h.update(str(Fingerprint(self.model)))
-        h.update(str(Fingerprint(self.detector)))
+        h.update(dill.dumps(self.model))
+        h.update(dill.dumps(self.detector))
         return h.hexdigest()
 
     def cache_file(self):

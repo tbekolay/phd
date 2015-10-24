@@ -35,6 +35,7 @@ setup(
     },
     install_requires=[
         "brian",
+        "dill",
         "doit",
         "jupyter",
         "numpy",

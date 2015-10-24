@@ -1,4 +1,4 @@
 from .auditory_periphery import AuditoryPeriphery
-from .derivative import Derivative
-from .integrator import Integrator
-from .phonemes import PhonemeDetector
+from .derivatives import TrippFF, TrippInt, Voelker
+from .phonemes import (
+    PhonemeDetector, ProdPoolPhonemeDetector, SumPoolPhonemeDetector)

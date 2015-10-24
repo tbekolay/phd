@@ -1,4 +1,6 @@
 import nengo
+import numpy as np
+from nengo.networks import EnsembleArray
 from nengo.utils.compat import is_array
 from nengo.utils.connection import target_function
 
@@ -7,9 +9,7 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
     """A naive implementation of phoneme detection.
 
     We compress all our frequency and temporal information into
-    a single ensemble (one for vowels, with a long time constant,
-    and one for consonants, with a short time constant)
-    and decode.
+    a single ensemble and decode.
     """
     if net is None:
         net = nengo.Network("Phoneme detector")
@@ -25,9 +25,10 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
 
     with net:
         net.input = nengo.Ensemble(neurons_per_d * in_dims, in_dims)
+        net.phoneme_in = net.input
         if not training:
             net.output = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
-            nengo.Connection(net.input,
+            nengo.Connection(net.phoneme_in,
                              net.output,
                              solver=nengo.solvers.LstsqMultNoise(),
                              **target_function(eval_points, targets))
@@ -35,55 +36,88 @@ def PhonemeDetector(neurons_per_d, eval_points, targets, net=None):
     return net
 
 
-# def SumPoolPhonemeDetector(
-#         neurons_per_d, dimensions, eval_points, targets, pooling=3):
-#     """A hierarchical implementation of phoneme detection.
+def SumPoolPhonemeDetector(neurons_per_d, eval_points, targets,
+                           pooling=3, net=None):
+    """A phoneme detector that sums data from nearby freqs."""
+    if net is None:
+        net = nengo.Network("SumPool Phoneme detector")
 
-#     We first make some intermediate layers that compress data from
-#     a few nearby frequencies; then, we use those compressed
-#     representations for phoneme detection.
-#     """
-#     assert dimensions % pooling == 0, "Pooling must divide dimensions evenly"
+    if is_array(eval_points) and is_array(targets):
+        training = False
+        in_dims = eval_points.shape[1]
+        total_in = in_dims * pooling
+        out_dims = targets.shape[1]
+    else:
+        training = True
+        total_in = eval_points
+        assert total_in % pooling == 0, (
+            "Pooling must divide in_dims_freqs evenly")
+        in_dims = int(total_in // pooling)
+        out_dims = targets
 
-#     pooled_dims = self.freqs.size // pool
-#     total_dims = pooled_dims * (len(delays) + 1)
+    with net:
+        # Pool AN / deriv inputs
+        net.input = nengo.Node(size_in=total_in)
+        net.phoneme_in = nengo.Ensemble(neurons_per_d * in_dims,
+                                        dimensions=in_dims,
+                                        radius=pooling)
 
-#     # Pool raw AN responses
-#     an_pooled = nengo.Ensemble(neurons_per_d * pooled_dims,
-#                                dimensions=pooled_dims,
-#                                radius=pool)
-#     for i in range(pool):
-#         # print np.arange(self.freqs.size)[i::pool] to see what's happening
-#         nengo.Connection(self.an.output[i::pool], an_pooled)
+        for i in range(pooling):
+            # print np.arange(total_in)[i::pooling] to see what's happening
+            nengo.Connection(net.input[i::pooling], net.phoneme_in)
 
-#     # Pool deriv responses
-#     d_pools = []
-#     for i, delay in enumerate(delays):
-#         deriv_pool = nengo.Ensemble(neurons_per_d * pooled_dims,
-#                                     dimensions=pooled_dims,
-#                                     radius=pool)
-#         for i in range(pool):
-#             nengo.Connection(self.derivatives[delay][i::pool], deriv_pool)
-#         d_pools.append(deriv_pool)
+        if not training:
+            net.output = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
+            nengo.Connection(net.phoneme_in,
+                             net.output,
+                             solver=nengo.solvers.LstsqMultNoise(),
+                             **target_function(eval_points, targets))
 
-#     phoneme_in = nengo.Ensemble(neurons_per_d * total_dims,
-#                                 dimensions=total_dims,
-#                                 radius=pool)
-#     nengo.Connection(an_pooled, phoneme_in[:pooled_dims])
-#     for i, deriv_pool in enumerate(d_pools):
-#         nengo.Connection(deriv_pool,
-#                          phoneme_in[(i+1)*pooled_dims:(i+2)*pooled_dims])
-#     out_dims = targets.shape[1]
-#     phoneme_out = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
-#     nengo.Connection(phoneme_in, phoneme_out,
-#                      **nengo.utils.connection.target_function(
-#                          eval_points, targets))
-#     return phoneme_in, phoneme_out
+    return net
 
 
-# def ProdPoolPhonemeDetector():
-#     pass
+def ProdPoolPhonemeDetector(neurons_per_d, eval_points, targets,
+                            pooling=3, scale=1.5, net=None):
+    """A phoneme detector that multiplies data from nearby freqs."""
+    if net is None:
+        net = nengo.Network("ProdPool Phoneme detector")
+
+    if is_array(eval_points) and is_array(targets):
+        training = False
+        in_dims = eval_points.shape[1]
+        out_dims = targets.shape[1]
+    else:
+        training = True
+        in_dims = eval_points
+        out_dims = targets
+
+    with net:
+        # Pool AN / deriv inputs
+
+        # TODO: Confirm radius works here...
+        ea_in = EnsembleArray(neurons_per_d * pooling,
+                              n_ensembles=in_dims,
+                              ens_dimensions=pooling,
+                              radius=1. / np.sqrt(3))
+        prod = ea_in.add_output('prod', function=lambda x: x[0] * x[1] * x[2])
+        net.input = ea_in.input
+
+        net.phoneme_in = nengo.Ensemble(neurons_per_d * in_dims,
+                                        dimensions=in_dims)
+        nengo.Connection(prod, net.phoneme_in)
+
+        if not training:
+            net.output = nengo.Ensemble(neurons_per_d * out_dims, out_dims)
+            nengo.Connection(net.phoneme_in,
+                             net.output,
+                             solver=nengo.solvers.LstsqMultNoise(),
+                             **target_function(eval_points, targets))
+
+    return net
 
 
-# def OverlapPhonemeDetector():
-#     pass
+# TODO: SumTilePhonemeDetector
+#       Sort of like SumPool but more of moving window over all freqs,
+#       so phoneme_in is pretty close to the size on input.
+# TODO: ProdTilePhonemeDetector
+#       Like ProdPool but tiles like SumTile.

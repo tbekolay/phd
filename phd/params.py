@@ -1,5 +1,5 @@
 import brian.hears as bh
-from nengo.params import (
+from nengo.params import (  # noqa: F401
     BoolParam,
     DictParam,
     IntParam,
@@ -9,7 +9,7 @@ from nengo.params import (
     Parameter,
     StringParam,
 )
-from nengo.processes import ProcessParam
+from nengo.processes import ProcessParam  # noqa: F401
 
 
 class ListParam(Parameter):

@@ -1,15 +1,51 @@
 import nengo
+from nengo.networks import EnsembleArray
 from nengo.utils.compat import iteritems, itervalues
 
-from .networks import (
+from .networks import (  # noqa: F401
     AuditoryPeriphery,
-    Derivative,
     PhonemeDetector,
+    ProdPoolPhonemeDetector,
+    SumPoolPhonemeDetector,
+    TrippFF,
+    TrippInt,
+    Voelker,
 )
 from . import params, timit
 
 
-class PeripheryParams(object):
+class ParamsObject(object):
+    @property
+    def net(self):
+        name = self.__class__.__name__
+        assert name.endswith("Params"), "Class improperly named"
+        return globals()[name[:-len("Params")]]
+
+    def kwargs(self):
+        args = {}
+        klass = self.__class__
+        for attr in dir(klass):
+            if params.is_param(getattr(klass, attr)):
+                args[attr] = getattr(self, attr)
+        return args
+
+    def __setattr__(self, key, value):
+        """Make sure our names are correct."""
+        assert hasattr(self, key), "Can only set params that exist"
+        super(ParamsObject, self).__setattr__(key, value)
+
+    def __getstate__(self):
+        """Needed for pickling."""
+        # Use ParamsObject specifically in case subclass shadows it
+        return ParamsObject.kwargs(self)
+
+    def __setstate__(self, state):
+        """Needed for pickling."""
+        for attr, val in iteritems(state):
+            setattr(self, attr, val)
+
+
+class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=None, shape=('*',))
     sound_process = params.ProcessParam(default=None)
     auditory_filter = params.BrianFilterParam(default=None)
@@ -19,27 +55,67 @@ class PeripheryParams(object):
     zhang_synapse = params.BoolParam(default=False)
 
 
-class DerivativeParams(object):
+class DerivativeParams(ParamsObject):
     delay = params.NumberParam(default=None)
     n_neurons = params.IntParam(default=30)
-    klass = params.StringParam(default='Voelker')
-    args = params.DictParam(default=None)
 
 
-class IntegratorParams(object):
+class TrippFFParams(DerivativeParams):
+    tau = params.NumberParam(default=0.005)
+
+
+class TripIntParams(DerivativeParams):
+    pass
+
+
+class VoelkerParams(DerivativeParams):
+    tau = params.NumberParam(default=0.005)
+    tau_highpass = params.NumberParam(default=0.05)
+
+
+class IntegratorParams(ParamsObject):
     tau = params.NumberParam(default=None)
     n_neurons = params.IntParam(default=30)
 
 
-class PhonemeDetectorParams(object):
+class PhonemeDetectorParams(ParamsObject):
     name = params.StringParam(default="detector")
     derivatives = params.ListParam(default=[])
     phonemes = params.ListParam(default=[])
     rms = params.NumberParam(default=0.5)
-    max_simtime = params.NumberParam(default=5.0)
+    max_simtime = params.NumberParam(default=1.0)
     sample_every = params.NumberParam(default=0.001)
     neurons_per_d = params.IntParam(default=30)
-    pooling = params.IntParam(default=None)
+
+    @property
+    def t_before(self):
+        """Amount of time to preplay the audio when generating traning data."""
+        start_transient = 0.005
+        return max(self.derivatives) + start_transient
+
+    def kwargs(self):
+        """Have to return a subset of args; some are just used for training."""
+        return {'neurons_per_d': self.neurons_per_d}
+
+
+class SumPoolPhonemeDetectorParams(PhonemeDetectorParams):
+    pooling = params.IntParam(default=3)
+
+    def kwargs(self):
+        """Have to return a subset of args; some are just used for training."""
+        return {'neurons_per_d': self.neurons_per_d,
+                'pooling': self.pooling}
+
+
+class ProdPoolPhonemeDetectorParams(PhonemeDetectorParams):
+    pooling = params.IntParam(default=3)
+    scale = params.NumberParam(default=1.5)
+
+    def kwargs(self):
+        """Have to return a subset of args; some are just used for training."""
+        return {'neurons_per_d': self.neurons_per_d,
+                'pooling': self.pooling,
+                'scale': self.scale}
 
 
 class RecognitionParams(object):
@@ -49,9 +125,13 @@ class RecognitionParams(object):
         self.integrators = {}
         self.detectors = {}
 
-    def add_derivative(self, **kwargs):
+    @property
+    def dimensions(self):
+        return self.periphery.freqs.size
+
+    def add_derivative(self, klass, **kwargs):
         assert 'delay' in kwargs, "Must define delay"
-        deriv = DerivativeParams()
+        deriv = globals()["%sParams" % klass]()
         for attr, val in iteritems(kwargs):
             setattr(deriv, attr, val)
         self.derivatives[deriv.delay] = deriv
@@ -65,22 +145,13 @@ class RecognitionParams(object):
         self.integrators[integ.tau] = integ
         return integ
 
-    def add_phoneme_detector(self, **kwargs):
-        detector = PhonemeDetectorParams()
+    def add_phoneme_detector(self, hierarchical="", **kwargs):
+        detector = globals()["%sPhonemeDetectorParams" % hierarchical]()
         for attr, val in iteritems(kwargs):
             setattr(detector, attr, val)
         assert detector.name not in self.detectors, "Name already used"
         self.detectors[detector.name] = detector
         return detector
-
-
-def kwargs(param_obj):
-    args = {}
-    klass = param_obj.__class__
-    for attr in dir(klass):
-        if params.is_param(getattr(klass, attr)):
-            args[attr] = getattr(param_obj, attr)
-    return args
 
 
 class ExecutionParams(object):
@@ -120,31 +191,32 @@ class Sermo(object):
             self.build_detectors(net)
 
     def build_periphery(self, net):
-        net.periphery = AuditoryPeriphery(**kwargs(self.recognition.periphery))
+        net.periphery = AuditoryPeriphery(
+            **self.recognition.periphery.kwargs())
 
     def build_derivatives(self, net):
         net.derivatives = {}
+        dims = self.recognition.dimensions
+
         for param in itervalues(self.recognition.derivatives):
-            deriv = Derivative(dimensions=net.periphery.freqs.size,
-                               **kwargs(param))
+            deriv = param.net(dimensions=dims, **param.kwargs())
             nengo.Connection(net.periphery.an.output, deriv.input)
             net.derivatives[param.delay] = deriv
 
     def build_integrators(self, net):
         """Not really integrators, just a long time constant on input."""
         net.integrators = {}
+        dims = self.recognition.dimensions
 
         for param in itervalues(self.recognition.integrators):
-            integrator = nengo.networks.EnsembleArray(
-                param.n_neurons, net.periphery.freqs.size)
-            net.integrators[param.tau] = integrator.output
+            integrator = EnsembleArray(param.n_neurons, n_ensembles=dims)
+            net.integrators[param.tau] = integrator
             nengo.Connection(net.periphery.an.output, integrator.input,
                              synapse=nengo.Lowpass(param.tau))
 
     def build_detectors(self, net):
         net.detectors = {}
-
-        dims = net.periphery.freqs.size
+        dims = self.recognition.dimensions
 
         for param in itervalues(self.recognition.detectors):
             total_dims = dims * (len(param.derivatives) + 1)
@@ -154,11 +226,14 @@ class Sermo(object):
                 eval_points, targets = training.get()
             else:
                 eval_points, targets = total_dims, dims
-            detector = PhonemeDetector(
-                param.neurons_per_d, eval_points, targets)
+            kwargs = param.kwargs()
+            kwargs['eval_points'] = eval_points
+            kwargs['targets'] = targets
+            detector = param.net(**kwargs)
             net.detectors[param.name] = detector
 
-            nengo.Connection(net.periphery.an.output, detector.input[:dims])
+            nengo.Connection(net.periphery.an.output,
+                             detector.input[:dims])
             for i, delay in enumerate(param.derivatives):
                 nengo.Connection(net.derivatives[delay].output,
                                  detector.input[(i+1)*dims:(i+2)*dims])
