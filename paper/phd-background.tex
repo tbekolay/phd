@@ -1599,79 +1599,229 @@ in a neural model of the speech system.
 \subsection{Sensorimotor integration}
 
 Unlike speech recognition and production,
-the integration of the two aspects of speech
-cannot be easily interrogated through
-psychological or linguistic means;
-integration between the two depends
-solely on how the brain
-represents and transforms
-auditory, acoustic and linguistic information.
-At some point in the brain,
-auditory information and
-higher-level linguistic features
-extracted from that auditory information
-are transformed into representations
-that drive the motor hierarchy
-to produce speech;
-there is also likely to be
-reciprocal interactions
-such that the two systems
-improve each other over time.
+speech-specific sensorimotor integration
+is difficult to interrogate through
+traditional psychological or linguistic means,
+as it is most directly observable
+during development and other forms of learning.
+We briefly review leading theories
+of how we develop and learn speech,
+then look at neurobiological studies
+of sensorimotor integration.
+
+\subsubsection{Development and learning}
+
+There are two findings in the
+speech development literature
+that are relevant to our model.
+The first is that in
+early developmental phases,
+sensorimotor learning
+takes place rapidly
+and in ways that are difficult
+to achieve later in development;
+these phases are sometimes referred
+to as ``critical'' or ``sensitive'' periods.
+Babies up to around a year of age
+have a sensitivity for phonemes;
+they become increasingly sensitive
+to the phonemes that they hear regularly,
+and increasingly less sensitive
+to phonemes that they hear rarely or never
+??? ref 979.full.pdf.\footnote{
+  Interestingly, it has been shown that
+  remaining sensitive to phoneme
+  that are not regularly encountered
+  is predictive of poor language performance
+  at two years of age ??? ref 979.full.pdf.}
+Up until puberty,
+children have a sensitivity for
+acquiring language in general;
+after puberty, formal instruction
+is less effective,
+and speaking foreign languages
+without an accent is more difficult
+??? ref something from Converging mech...pdf
+This finding suggests that
+parts of our model
+that include learning
+through changes in synaptic connection weights
+may have qualitative or large quantitative
+differences at different developmental stages.
+
+The second finding is that
+auditory learning
+and speech understanding precede
+speech production.
+While this may seem obvious,
+analogies between how humans acquire speech
+and how birds acquire songs suggests that
+the vocal babbling of children
+may be directed toward the goal of
+matching speech templates learned
+through auditory input
+??? ref something from Conv...pdf.
+This finding suggests that
+we develop a repository of speech templates
+that we attempt to match when
+learning to produce speech.
+
+Despite the prominent role of sensorimotor integration
+in development,
+it is not the case that this system
+plays no role in the adult speech system.
+One influential study by Houde and Jordan ???
+investigated sensorimotor learning
+by manipulating adult speech
+through a device that recorded
+a subject's voicing a syllable,
+adjusted the sound such that the syllable's vowel sound
+was adjusted in a predictable way,
+and played the adjusted sound back through headphones.
+Subjects were able to compensate
+for the adjustment such that
+subsequently uttered syllables
+more closely matched the desired syllable,
+and that adjustment generalized
+to other syllables that had not yet
+been tested.
+
+\subsubsection{Neurobiology}
+
+Unlike recognition and production,
+in which we have a sensor and actuator to measure,
+sensorimotor neurobiology
+can only be investigated
+in neural recordings from cortical areas.
 While we do not yet
 have a full understanding of
 how the brain's speech recognition
 and production systems are organized
 and interact,
-many experiments have give us clues
-as to how the information is transformed,
-and in what parts of the brain those
-transformation occur.
+two influential theories have provided
+a fruitful framework for many studies.
 
-One of the most comprehensive theories
-is the dual-stream model of speech processing,
+The first theory
+is the dual-stream model of speech processing
 proposed by ??? hickok and poeppel.
 This model is conceptually similar
 to the dual-stream model of visual processing,
 in which the ventral stream
 is involved in object recognition
-and the dorsal stream is involved in
-object localization.
+and the dorsal stream is involved
+in guiding actions.\footnote{The dual-stream
+  model for visual processing has traditionally
+  been though of as the ventral ``what'' pathway,
+  and the dorsal ``where'' pathway,
+  assigning the dorsal stream
+  the role of determining object locations
+  ???cite.
+  However, more recent studies have made
+  strong links between dorsal stream
+  activity and motor actions ???cite, Hickok2007 72,73
+  more.}
 In the speech processing case,
 the ventral stream
 is involved in lexical processing
-(the meaning behind incoming sounds),
+(i.e., the meanings of incoming sounds),
 and the dorsal stream
 is involved in sensorimotor action mapping.
+In our model, we only include
+the dorsal pathway,
+but developing an
+interacting ventral pathway
+would be a logical extension of our model.
 
-??? transformations: nature12935.pdf; good intro
+Hickok and Poeppel ???cite
+suggest that the dorsal stream
+is strongly involved in
+speech development,
+as development requires auditory feedback
+to guide the creation and fine-tuning
+of motor pathways to effect speech;
+the role of the dorsal pathway may
+be reduced over time as motor pathways
+reliably produce recognizable speech
+???cite Hickok2007 81-83?.
+Anatomically, the dorsal stream begins with
+the dorsal superior temporal gyrus (STG; i.e., Wernicke's area)
+and the superior temporal sulcus (STS),
+which both project to
+a parietal-temporal boundary area in the Sylvian fissure
+(called area Spt).
+They propose that the Spt is a sensorimotor interface,
+which also takes in input from other sensory modalities
+(i.e., visual and somatosensory information).
+Spt then projects to higher-level articulatory areas,
+including the posterior inferior frontal gyrus (pIFG; i.e., Broca's area),
+premotor cortex (PM) and the anterior insula.
+As was discussed in sections~??? and ???,
+the STG has clear roles in auditory processing,
+and the anterior insula has clear roles in
+motor processing;
+area Spt, therefore, is a strong candidate
+for where sensorimotor integration might occur.
+
+Hickock, Okada and Serences ???
+provide human fMRI evidence that
+area Spt is significantly active
+during both sensory and motor aspects
+of a speech task.
+However, Cogan et al 2014 ???
+performed electrocorticography
+in human epilepsy patients
+and found electrodes that activated
+for both sensory and motor aspects
+of a speech task across all areas
+of the dorsal stream
+(including STG, middle temporal gyrus, PM,
+and inferior frontal gyrus).
+Clearly, there is a large overlap
+between the information required for
+sensory processing and the information required
+for motor processing.
+
+The second influential theory
+in speech neurobiology is the
+motor theory of speech perception.
+The central tenet of this theory
+is that perceiving speech
+is perceiving vocal tract gestures
+??? cite 3.nihms-136...pdf.\footnote{
+  The motor theory of speech perception has a long history
+  and has made some claims that are not supported by evidence.
+  We will ignore these claims, and focus only on
+  the central ideas which have empirical support.}
+This makes a hypothesis about
+the internal representations of speech,
+and is therefore difficult
+to interrogate directly,
+but several experiments appear
+to support this hypothesis.
+First, we are able to integrate
+gestural information from multiple modalities;
+the direct perception of gestures
+influences how we perceive the sound.
+A well-known demonstration of
+this phenomenon is the McGurk effect
+???cite things from 3.nihm...,
+in which the same audio waveform
+in perceived as representing a different syllable
+when accompanied by a video
+showing the lip gesture that produces
+the audio waveform.\footnote{
+  The McGurk effect can be experienced firsthand through
+  a video demonstration at
+  \url{https://www.youtube.com/watch?v=G-lN8vWm3m0}.}
+Second,
 
 ??? neuron2010.pdf: central auditory representation!
-
-??? the integrated part that we care about
-
-??? there's lots here...
-
-??? Flinker et al.
-showed through Granger causality analysis
-that Broca's
-
-??? Curcic-blake et al, reduced information flow between
-wernicke and broca and interhemisphere contributes to
-schizophrenia and auditory hallucinations
-??? sbs107.pdf : auditory-verbal hallucinations may be due to
-faulty connectivity between wernicke / broca
-
-??? Arcuate Fasciculus, connects wernicke's to broca's;
-not present or very small in non-human primates.
-??? first: historical perspective, nihms-128093.pdf
-
-??? science-1998...pdf : prism shifting, like visual
-
-??? STG stuff: nihmns231455.pdf, 1006.full.pdf
 
 ??? mirror neurons? Probably not, but what people call mirror
 neurons probably corresponds to the actual transformation
 happening here. nature2008.pdf
+
+??? transformations: nature12935.pdf; good intro
 
 \section{Prior modeling approaches}
 
@@ -1705,6 +1855,12 @@ in the auditory brain
 - link that to spectro-temporal receptive fields
 
 \subsection{Automatic speech recognition}
+
+??? note that one important weakness of these models
+is that they are not flexible; the top-down influence
+of language modeling says that they must recognize words,
+whereas nonsense CVC can still be recognized well
+(though not as well as real words).
 
 \subsection{Articulatory speech synthesis}
 
