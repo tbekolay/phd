@@ -5,7 +5,7 @@ from nengo.utils.compat import iteritems, itervalues
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
     PhonemeDetector,
-    ProdPoolPhonemeDetector,
+    ProdTilePhonemeDetector,
     SumPoolPhonemeDetector,
     TrippFF,
     TrippInt,
@@ -107,14 +107,15 @@ class SumPoolPhonemeDetectorParams(PhonemeDetectorParams):
                 'pooling': self.pooling}
 
 
-class ProdPoolPhonemeDetectorParams(PhonemeDetectorParams):
-    pooling = params.IntParam(default=3)
-    scale = params.NumberParam(default=1.5)
+class ProdTilePhonemeDetectorParams(PhonemeDetectorParams):
+    spread = params.IntParam(default=1)
+    center = params.IntParam(default=0)
+    scale = params.NumberParam(default=2.0)
 
     def kwargs(self):
         """Have to return a subset of args; some are just used for training."""
         return {'neurons_per_d': self.neurons_per_d,
-                'pooling': self.pooling,
+                'spread': self.spread,
                 'scale': self.scale}
 
 
@@ -225,10 +226,11 @@ class Sermo(object):
                 assert training.generated, "Generate training data first"
                 eval_points, targets = training.get()
             else:
-                eval_points, targets = total_dims, dims
+                eval_points, targets = dims, len(param.phonemes)
             kwargs = param.kwargs()
             kwargs['eval_points'] = eval_points
             kwargs['targets'] = targets
+            kwargs['size_in'] = total_dims
             detector = param.net(**kwargs)
             net.detectors[param.name] = detector
 
