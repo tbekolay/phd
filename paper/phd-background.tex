@@ -1975,11 +1975,223 @@ But with SPA stuff on top.
 yet connected the Saltzman task dynamics stuff
 to the brain; that'll be one of our contributions
 
-\subsection{Integrated recognition and synthesis systems}
+\subsection{Integrated recognition and production systems}
 
-??? Review DIVA model
+For the purposes of this thesis,
+we consider a system to be integrated
+if speech recognition and production
+share internal representations
+(i.e., representations other than
+the incoming audio waveform or text),
+and are connected such that
+the output of one system
+can be used to improve
+the performance of the other system.
+By this definition,
+the most widely used
+speech recognition and production systems
+are not considered integrated
+even though they can be used
+in a conversational manner;
+virtual agents like Apple's Siri
+can both recognize and produce speech,
+but recognized speech is converted
+to text before speech synthesis occurs,
+and the speech production system
+cannot be modified over time
+as it relies on a large corpus
+of recorded speech.
 
-??? kroeger2009b.pdf
+The most well known integrated system
+in called DIVA
+(Direction Into Velocities of Articulators;
+see Figure~???) ???cite.
+DIVA consists of an articulator synthesizer,
+and several interconnected artificial neural networks
+that drive the articulatory synthesizer
+and process auditory and somatosensory feedback
+in order to improve future synthesized speech.
+DIVA is not pre-programmed with a repository
+of programs to effect various sounds;
+instead, it mimics human speech development
+by learning to control the synthesizer
+through an initial babbling phase
+in which random articulator movements
+are associated with auditory
+and somatosensory feedback.
+DIVA has been used to explain
+speech production phenomena
+like motor equivalence, contextual variability,
+and anticipatory and carryover coarticulation
+(??? cites from Guenther et la brian.pdf intro).
+Additionally, all of the neural networks
+in the model have been mapped
+to brain regions that are hypothesized
+to perform similar functions
+as the neural networks in the model.
+
+??? DIVA figure
+
+DIVA is a productive research tool
+for studying speech development.
+However, I do not believe that DIVA
+in its current form
+can scale to maintaining conversations
+with adult vocabularies.
+Currently, DIVA is focused on speech production,
+so while it can incorporate acoustic feedback
+to learn better speech production,
+there is no clear path
+to incorporate speech recognition
+and higher-level linguistic capabilities.
+Additionally, DIVA currently represents
+stored speech plans with one artificial
+neuron per speech plan,
+where a speech plan can correspond to
+a single phoneme, a syllable, or one or more words.
+In ??? Guenther_et_al_Brain_Lang.pdf,
+they note that ``it is expected that
+premotor cortex sound maps in the brain
+involve distributed representations
+of each speech sound.''
+Using such distributed representations,
+as we do in our model,
+would require several changes to DIVA's
+structure and learning algorithms.
+While these changes are possible,
+they would represent a significant
+modification that may affect
+empirical results obtained
+with the current version of DIVA.
+
+In addition to using highly localist representations,
+DIVA has other biological plausibility issues.
+It represents auditory feedback using the first
+three formant frequencies,
+but does not provide an account of
+how the brain might extract those
+frequencies from the incoming air pressure levels.
+The artificial neural networks
+consist of homogeneous neurons
+with non-spiking linear activation functions,
+though the learning procedure
+uses a local Hebbian learning rule.
+Auditory and somatosensory feedback
+is provided to the model with no delay,
+making the learning procedure
+much easier than a learning procedure
+that must deal with delayed feedback,
+as happens in the real world.
+
+??? citeauthor kroger2009b proposed
+a large integrated model
+similar to DIVA in that
+it is composed of
+several artificial neural networks
+and learns to produce syllables
+through a babbling stage
+in which feedback from
+auditory and somatosensory systems
+tunes the weights between
+neural populations
+(???cite; see Figure~???).
+The primary improvements in
+Kr\"{o}ger's model compared to DIVA
+are the introduction of a phonetic map,
+and a motor planning network.
+
+??? kroger figure
+
+In DIVA, auditory and somatosensory feedback
+is directly associated with a cell
+in the speech sound map,
+meaning that each sound must be learned separately.
+This approach does not generalize across
+similar sounds, nor will it scale
+to large vocabularies of speech sounds.
+Kr\"{o}ger's model overcomes this limitation
+by explicitly decoding phonetic information
+from auditory feedback.
+It then uses that phonetic information
+to generate explicit motor plans.
+Motor plans act as parameterizations
+of the possible vocal tract gesture scores
+that can be produced by the model;
+each motor plan is defined by
+five parameters which define
+the vocalic state,
+the gesture-performing articulator,
+and the location of articulation.
+These five parameters are used
+to generate vocal tract gestures,
+which are then mapped onto
+movements of articulators
+in a three-dimensional vocal tract model.
+
+In Kr\"{o}ger's neurocomputational model,
+phonetic information is extracted
+in an unsupervised manner
+using self-organizing maps
+(???cite Kohonen),
+which cause
+local clusters of neurons
+in the phonetic map become active
+when incoming auditory information
+(in the form of the first three formants)
+is similar to certain patterns
+seen during training.
+The maps are able to
+discriminate between three vowel phonemes
+and three consonant phonemes;
+it is not clear whether
+maps trained in this way
+can scale to discriminating
+between the number of phonemes
+in a realistic language (over 40).
+However, it is clear that an approach
+which uses a finite set of intermediate representations
+(i.e., phonemes)
+between auditory input
+and learned motor sequences
+will scale better than DIVA's approach
+that does not use an intermediate representation.
+
+In contrast to these two models,
+the model that we present
+in the subsequent chapters does not focus on
+modeling speech development,\footnote{
+  The methods used by DIVA and Kr\"{o}ger's
+  neurocomputational model to emulate
+  speech development could be adapted
+  and added to our model.
+  However, since these problem have existing
+  solutions in these two models,
+  we have focused on other aspects
+  of speech recognition and production
+  as being of greater scientific interest.}
+and instead implements
+portions of the human speech system
+not modeled by these two models,
+and aims to be more biologically realistic.
+Biological realism is achieved
+by more sophisticated neural network models
+that use distributed representations
+that can scale to the level
+of adult vocabularies,
+and by using a human auditory model
+to process incoming sounds
+rather than preprocessing the sound
+to obtain the first three formants.
+In addition, while Kr\"{o}ger model
+improves on the DIVA model by
+introducing phoneme representations,
+we follow the motor theory
+of speech representation by
+explicitly decoding vocal tract gestures
+from incoming sound,
+which makes integration between
+the perception and production aspects
+of the model more straightforward.
 
 %% ~8-20 pages
 
