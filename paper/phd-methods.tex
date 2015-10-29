@@ -23,15 +23,52 @@ than the existing state of the art.
 ??? make a little checklist here of what our end goal
 is to motivate the four sections we're looking at
 
-\section{Dynamical systems in neural networks}
+\section{Distributed representations in neural networks}
 
-\section{Symbol-like processing in neural networks}
+Issue: localist ANN representations. Solution: NEF
 
-\subsection{Vector symbolic architectures}
+NEF stuff; emphasize that unlike other models,
+here representations are distributed,
+which makes transformation harder,
+so we have that.
+Then also as a bonus we get dynamics.
+
+\section{Symbol-like processing with real-valued vectors}
+
+Issue: there are a finite number of syllables
+(especially frequent syllables) but there are an infinite
+number of syllable strings (e.g., words, sentences).
+Need some way to represent temporal information
+with discrete symbols.
+Solution: SPA
+
+The previous section gives us a method to represent
+and manipulate ANN activations (i.e., numerical vectors)
+with distributed, possibly spiking, neurons.
 
 ??? make links to knowledge representation in CS
 
 ??? give general background for the math in methods?
+
+\section{Biologically plausible online learning}
+
+Issue: NEF gives a way to solve for connection weights,
+but what about functions we don't apriori,
+or learning situations?
+Solution: PES
+
+PES for syllable learning
+
+\section{Biologically implausible offline learning}
+
+Issue: PES should be able to learn everything,
+but takes a very long time to do so.
+Solution: RNNs with GRU (or LSTM, but GRU seems good for now)
+
+Ideally, a method to do an analogous thing with PES
+will be possible, but that's for future work.
+
+%%% ??? move rest to implementation section?
 
 \section{Recognition system}
 
