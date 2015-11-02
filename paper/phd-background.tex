@@ -1928,7 +1928,233 @@ in future chapters.
 
 ??? Mention artificial neuromorphic cochleas
 
-\subsection{Auditory neurobiology models}
+\subsection{Automatic speech recognition}
+
+Automatic speech recognition (ASR) has been
+an active field of research
+in artificial intelligence since 1952,
+when ??? Davis Biddulph Balashek bell-labs.pdf
+presented a system for recognizing
+spoken digits by a single individual
+with accuracy above 97\%.
+This system was implemented
+with special purpose hardware,
+matching the spectral properties of
+the sound to known spectral patterns.
+From these humble beginning,
+modern speech recognition systems
+can transcribe speech
+in realistic environments
+with accuracy high enough
+to be deployed commercially.
+Two significant advancements
+have enabled progress in ASR.
+
+The first significant advancement
+was the development of
+Hidden Markov Models (HMMs)
+and related techniques
+for speech recognition.
+Briefly,
+HMM-based speech recognition models
+attempt to find the word sequence
+with maximum probability given
+an audio waveform.
+They do this through
+a pipeline in which
+short time-slices of the audio waveform
+(called ``frames'')
+are analyzed to yield lower dimensional
+feature vectors
+through signal processing techniques.
+A sequence of feature vectors
+is then decoded into words
+using an HMM-based acoustic model
+that uses sub-phonemic states
+to emit phoneme labels,
+which are then composed into words
+using large corpora of
+lexical and linguistic information
+(see Figure~??? and ??? mjfg_NOW.pdf
+and ??? hmm tutorial for reviews).
+
+??? something like fig 2.1 of mjfg_now.pdf
+
+HMM-based systems
+were among the first systems
+successful enough to be
+used commercially
+(see ??? p94-huang.pdf).
+In 1989, ??? lee and hon
+achieved a word accuracy rate of
+66.08\% on a subset of the
+TIMIT speech corpus.
+Four years later,
+??? lamel and gauvain
+used a more sophisticated HMM-based system
+to achieve 72.9\% word accuracy on
+all of the TIMIT speech corpus.
+Improvements from then until
+the mid-2000s were modest
+(see ??? InTech...pdf).
+
+From around 2006, a series of learning algorithms
+and network structures in artificial neural networks (ANNs)
+that are now referred to as ``deep neural networks'' (DNNs)
+were applied to
+the domain of automatic speech recognition
+with considerable success
+both in academic research
+and in commercial application.
+By 2013, Google reported
+(??? Vanhoucke presentation?)
+phoneme classification error rates on TIMIT
+(a more difficult task than
+the word classification task previous mentioned)
+of 17.7\%,
+significantly better than the most sophisticated
+HMM-based model's error rate of 27.3\%.
+??? probably cite more
+
+The architecture of DNN-based systems
+is simpler than that of HMM-based systems
+(see Figure~??? and ??? for a review).
+Instead of distinct steps in which
+acoustic features are extracted
+and combined using an acoustic model,
+DNNs map directly from the
+feature vector input representation
+to the output representation of choice
+(typically phonemes or word vectors).
+This simpler architecture may be
+responsible for much of DNN's success,
+as its internal representations
+are not locked to individual phonemes;
+acoustic realizations
+of phonemes can vary depending on
+the preceding and subsequent context.
+However, the simpler architecture
+does not necessarily mean that
+using DNNs is straightforward;
+the effort in developing ASR models
+with DNNs shifted from
+developing complicated architectures
+to developing complicated learning algorithms
+that have many parameters
+which must be carefully tuned.
+
+??? something like slide 8 of Vanhoucke2013
+
+One additional benefit of DNN-based approaches
+is that they have analogies to
+how human recognize speech.
+DNNs leverage simple computational units
+(artificial neurons),
+which operate in parallel
+and communicate through unidirectional
+weighted connections.
+While the computations done by these neurons
+and the learning algorithms that adjust
+the connection weights
+may not be directly implementable
+under certain biological constraints,
+mappings between DNNs
+and biologically plausible spiking neural networks
+are currently being developed
+??? cite Hunsberger.
+
+\subsubsection{Automatic speech recognition with production information}
+
+In terms of higher-level biological organization,
+almost all speech recognition DNNs to date
+can be mapped most directly
+to the ventral stream of the human speech system
+(see Section~???),
+as they attempt to decode
+lexical information in order to
+transcribe speech to text.
+In this thesis, we aim to model
+the dorsal stream of the human speech system,
+which we hypothesize follows the
+motor theory of speech recognition,
+meaning that it uses vocal tract gestures
+as the basic unit of representation.
+
+Several labs have investigated
+using measurements
+related to speech production
+as part of a speech recognition system
+(see ??? 00.King...pdf for a review).
+The primary advantage of this approach
+is that speech production information
+is not locked to each phoneme,
+so it is not as sensitive to the
+differing acoustic realizations
+of the same phoneme.
+The existence of large datasets
+with continuous acoustic
+and articulator position recordings
+(e.g., ??? x-ray database, ??? mngu0)
+has spurred development of
+systems that use both
+acoustic and articulatory information
+as input to an ASR system.
+??? Zlokarnik (1995) from 00.King...pdf
+used continuous acoustic and articulatory
+information with an HMM-based system
+and reduced word error rates
+by more 60\% (relative).
+??? Eide (2011) from 00.King...pdf
+augmented the feature vector
+in a standard HMM system
+articulatory features and
+reduced word error rates
+by 34\% (relative).
+While similar studies have been done
+with traditional artificial neural networks
+(e.g., ??? Kirchoff)
+and dynamic Bayesian networks
+(e.g., ??? Stephenson 2000, 2004),
+we are not aware of
+any DNN-based systems using
+continuous articulatory
+information in an ASR task.
+
+However, DNNs have been used for
+a related task,
+acoustic-articulatory speech inversion.
+Here, articulatory information
+is decoded from acoustic information;
+that is, the input of the network
+is still an acoustic feature vector,
+but the desired output
+is articulator positions.
+??? articulator_inversion.pdf
+obtained a root mean square error
+of 0.95 mm on the MNGU0 dataset,
+which is 0.04 mm better than prior
+efforts using Guassian mixture models
+??? ISO90544.pdf.
+The extracted articulatory information
+could be used by another ASR system
+to lower phone or word error rates.
+
+These results
+use continuous articulator positions.
+Work has also been done using
+vocal tract gestures,
+which are discrete representations
+of articulatory information.
+
+??? NEXT: summarize those papers
+
+\subsubsection{Automatic speech recognition with auditory periphery models}
+
+Another aspect of modern ASR
+that does not match biology
+is the use of ideal frequency analysis
+to generate the feature vectors
+which serve as the input to ASR systems.
 
 ??? P. 78 of Kollmeier: evidence of amplitude modulation senstivity
 in the auditory brain
@@ -1938,15 +2164,11 @@ in the auditory brain
 
 - link that to spectro-temporal receptive fields
 
-\subsection{Automatic speech recognition}
+??? biologically inspired stuff
 
-??? note that one important weakness of these models
-is that they are not flexible; the top-down influence
-of language modeling says that they must recognize words,
-whereas nonsense CVC can still be recognized well
-(though not as well as real words).
+\subsection{Speech synthesis}
 
-\subsection{Articulatory speech synthesis}
+\subsubsection{Articulatory speech synthesis}
 
 ??? summary table with different vocal tract models
 
@@ -1958,7 +2180,7 @@ Include programming language in this
 
 ??? include online vs batch in table
 
-\subsection{Speech motor control}
+\subsubsection{Speech motor control}
 
 ??? note that many art. synths consider this part of their
 synthesizer (control model).
