@@ -3,6 +3,7 @@ from nengo.utils.compat import iteritems
 
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
+    Cepstra
 )
 from . import params
 
@@ -48,9 +49,14 @@ class PeripheryParams(ParamsObject):
     zhang_synapse = params.BoolParam(default=False)
 
 
+class CepstraParams(ParamsObject):
+    size_out = params.IntParam(default=13)
+
+
 class RecognitionParams(object):
     def __init__(self):
         self.periphery = PeripheryParams()
+        self.cepstra = CepstraParams()
 
     @property
     def dimensions(self):
@@ -85,12 +91,18 @@ class Sermo(object):
 
     def build_recognition(self, net):
         with net:
-            # Periphery
             self.build_periphery(net)
+            self.build_cepstra(net)
 
     def build_periphery(self, net):
         net.periphery = AuditoryPeriphery(
             **self.recognition.periphery.kwargs())
+
+    def build_cepstra(self, net):
+        net.cepstra = Cepstra(size_in=net.periphery.freqs.size,
+                              **self.recognition.cepstra.kwargs())
+        nengo.Connection(net.periphery.an.output,
+                         net.cepstra.input)
 
     def build_execution(self, net):
         pass
