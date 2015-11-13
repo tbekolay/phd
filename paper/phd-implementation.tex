@@ -1,83 +1,42 @@
 \chapter{Implementation}
 
-%% ~15-30 pages
+\section{Neural Cepstral Coefficients}
 
-%% - not every thesis has or needs an implementation
+Go from audio signal to feature vector, in neurons.
 
-\section{Gammatone filter bank}
+\subsection{Network diagram}
 
-\section{Neural Engineering Framework}
+\subsection{Evaluation}
 
-The NEF forces us to make certain decisions
-in a biologically plausible way.
-Many of the design decisions from Chapter~???refmethods
-were constrained in this manner;
-for example, implementing LTI systems is natural
-in the NEF since dynamics are a core principle.
+\section{Syllable recognition}
 
-\section{Semantic Pointer Architecture}
+Go from a vocal tract gesture score
+to a syllable semantic pointer, in neurons.
 
-SPA gives us a method to do symbol-like processing
-with spiking neural networks created
-with the principles of the NEF.
-???we don't use much of it,
-but we do use it to represent phonemes.
-The intention here is to later hook up
-this system with other SPA networks
-that would do linguistic processing
-that can map down to the level of
-producing strings of phonemes.
+\subsection{Network diagram}
 
-\subsection{Word encodings}
+\subsection{Evaluation}
 
-Let's use the SPA to encode words,
-or any arbitrary string of phonemes.
-Consider the word BAT.
+\section{Syllable production}
 
-$$\text{WORD} = \text{PH1} \circledast \text{B}
-  \oplus \text{PH2} \circledast \text{A}
-  \oplus \text{PH3} \circledast \text{T}$$
+Go from a syllable semantic pointer
+to audio signal, in neurons.
 
-Then, we can decode the phone that we want
-by binding with the inverse of the
-phone that we're on.
-So, for the first phone:
+??? Do some fine tuning?
 
-$$\text{B} \approx \text{WORD} \circledast \text{PH1}^{-1}$$
+\subsection{Network diagram}
 
-This result would then be sent to a cleanup memory.
-Unlike other cleanup memories, however,
-the outputs of the cleanup would be oscillators.
-These would generate the trajectory of articulators
-for each phoneme.
+\subsection{Evaluation}
 
-As always, timing is the difficult thing here.
-Since these are oscillators, we really want to
-just give them a kick, so the cleanup shouldn't
-be cleaning up all the time, just when
-we query for the next phoneme.
-The kick should also advance the query
-to the next phone,
-so that the next kick gets the next phone.
+\section{Syllable consolidation}
 
-We'd need to build in some structure to the SPs
-representing phone positions.
+Go from vocal tract gesture score
+to audio signal, in neurons.
 
-$$\text{PH2} = \text{PH1} \circledast \text{NEXTPH}$$
+Learn a syllable recognition
+and a syllable production
+network from this.
 
-And so on.
+\subsection{Network diagram}
 
-\section{Network diagrams}
-
-???important implementation detail:
-should auditory preprocessing be an EnsembleArray
-or an ensemble? Maybe both?
-
-??? Given the baseline pitch as input,
-relative pitch will be computed
-primarily through neural inhibition.
-All neurons whose characteristic frequency is below
-the baseline pitch will be inhibited;
-the relative pitch is then
-a smoothed version of the overall activity
-of the pitch-sensitive population.
+\subsection{Evaluation}

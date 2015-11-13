@@ -1,0 +1,507 @@
+\chapter{Previous work}
+
+In making early steps toward
+an integrated speech recognition and synthesis system,
+we are applying techniques
+in artificial intelligence and control theory
+to the speech domain reviewed in the previous section.
+There is a long history of applying these techniques
+to this domain;
+in this section we review prior modeling efforts
+and contrast them with the model we will describe
+in future chapters.
+
+\section{Auditory periphery models}
+
+??? figure like izhikevic, with auditory model + efficiency?
+
+??? summary table with phenomena captured, etc
+
+??? Mention artificial neuromorphic cochleas
+
+\section{Automatic speech recognition}
+
+Automatic speech recognition (ASR) has been
+an active field of research
+in artificial intelligence since 1952,
+when ??? Davis Biddulph Balashek bell-labs.pdf
+presented a system for recognizing
+spoken digits by a single individual
+with accuracy above 97\%.
+This system was implemented
+with special purpose hardware,
+matching the spectral properties of
+the sound to known spectral patterns.
+From these humble beginning,
+modern speech recognition systems
+can transcribe speech
+in realistic environments
+with accuracy high enough
+to be deployed commercially.
+Two significant advancements
+have enabled progress in ASR.
+
+The first significant advancement
+was the development of
+Hidden Markov Models (HMMs)
+and related techniques
+for speech recognition.
+Briefly,
+HMM-based speech recognition models
+attempt to find the word sequence
+with maximum probability given
+an audio waveform.
+They do this through
+a pipeline in which
+short time-slices of the audio waveform
+(called ``frames'')
+are analyzed to yield lower dimensional
+feature vectors
+through signal processing techniques.
+A sequence of feature vectors
+is then decoded into words
+using an HMM-based acoustic model
+that uses sub-phonemic states
+to emit phoneme labels,
+which are then composed into words
+using large corpora of
+lexical and linguistic information
+(see Figure~??? and ??? mjfg_NOW.pdf
+and ??? hmm tutorial for reviews).
+
+??? something like fig 2.1 of mjfg_now.pdf
+
+HMM-based systems
+were among the first systems
+successful enough to be
+used commercially
+(see ??? p94-huang.pdf).
+In 1989, ??? lee and hon
+achieved a word accuracy rate of
+66.08\% on a subset of the
+TIMIT speech corpus.
+Four years later,
+??? lamel and gauvain
+used a more sophisticated HMM-based system
+to achieve 72.9\% word accuracy on
+all of the TIMIT speech corpus.
+Improvements from then until
+the mid-2000s were modest
+(see ??? InTech...pdf).
+
+From around 2006, a series of learning algorithms
+and network structures in artificial neural networks (ANNs)
+that are now referred to as ``deep neural networks'' (DNNs)
+were applied to
+the domain of automatic speech recognition
+with considerable success
+both in academic research
+and in commercial application.
+By 2013, Google reported
+(??? Vanhoucke presentation?)
+phoneme classification error rates on TIMIT
+(a more difficult task than
+the word classification task previous mentioned)
+of 17.7\%,
+significantly better than the most sophisticated
+HMM-based model's error rate of 27.3\%.
+??? probably cite more
+
+The architecture of DNN-based systems
+is simpler than that of HMM-based systems
+(see Figure~??? and ??? for a review).
+Instead of distinct steps in which
+acoustic features are extracted
+and combined using an acoustic model,
+DNNs map directly from the
+feature vector input representation
+to the output representation of choice
+(typically phonemes or word vectors).
+This simpler architecture may be
+responsible for much of DNN's success,
+as its internal representations
+are not locked to individual phonemes;
+acoustic realizations
+of phonemes can vary depending on
+the preceding and subsequent context.
+However, the simpler architecture
+does not necessarily mean that
+using DNNs is straightforward;
+the effort in developing ASR models
+with DNNs shifted from
+developing complicated architectures
+to developing complicated learning algorithms
+that have many parameters
+which must be carefully tuned.
+
+??? something like slide 8 of Vanhoucke2013
+
+One additional benefit of DNN-based approaches
+is that they have analogies to
+how human recognize speech.
+DNNs leverage simple computational units
+(artificial neurons),
+which operate in parallel
+and communicate through unidirectional
+weighted connections.
+While the computations done by these neurons
+and the learning algorithms that adjust
+the connection weights
+may not be directly implementable
+under certain biological constraints,
+mappings between DNNs
+and biologically plausible spiking neural networks
+are currently being developed
+??? cite Hunsberger.
+
+\subsection{Automatic speech recognition with production information}
+
+In terms of higher-level biological organization,
+almost all speech recognition DNNs to date
+can be mapped most directly
+to the ventral stream of the human speech system
+(see Section~???),
+as they attempt to decode
+lexical information in order to
+transcribe speech to text.
+In this thesis, we aim to model
+the dorsal stream of the human speech system,
+which we hypothesize follows the
+motor theory of speech recognition,
+meaning that it uses vocal tract gestures
+as the basic unit of representation.
+
+Several labs have investigated
+using measurements
+related to speech production
+as part of a speech recognition system
+(see ??? 00.King...pdf for a review).
+The primary advantage of this approach
+is that speech production information
+is not locked to each phoneme,
+so it is not as sensitive to the
+differing acoustic realizations
+of the same phoneme.
+The existence of large datasets
+with continuous acoustic
+and articulator position recordings
+(e.g., ??? x-ray database, ??? mngu0)
+has spurred development of
+systems that use both
+acoustic and articulatory information
+as input to an ASR system.
+??? Zlokarnik (1995) from 00.King...pdf
+used continuous acoustic and articulatory
+information with an HMM-based system
+and reduced word error rates
+by more 60\% (relative).
+??? Eide (2011) from 00.King...pdf
+augmented the feature vector
+in a standard HMM system
+articulatory features and
+reduced word error rates
+by 34\% (relative).
+While similar studies have been done
+with traditional artificial neural networks
+(e.g., ??? Kirchoff)
+and dynamic Bayesian networks
+(e.g., ??? Stephenson 2000, 2004),
+we are not aware of
+any DNN-based systems using
+continuous articulatory
+information in an ASR task.
+
+However, DNNs have been used for
+a related task,
+acoustic-articulatory speech inversion.
+Here, articulatory information
+is decoded from acoustic information;
+that is, the input of the network
+is still an acoustic feature vector,
+but the desired output
+is articulator positions.
+??? articulator_inversion.pdf
+obtained a root mean square error
+of 0.95 mm on the MNGU0 dataset,
+which is 0.04 mm better than prior
+efforts using Guassian mixture models
+??? ISO90544.pdf.
+The extracted articulatory information
+could be used by another ASR system
+to lower phone or word error rates.
+
+These results
+use continuous articulator positions.
+Work has also been done using
+vocal tract gestures,
+which are discrete representations
+of articulatory information.
+
+??? NEXT: summarize those papers
+
+\subsection{Automatic speech recognition with auditory periphery models}
+
+Another aspect of modern ASR
+that does not match biology
+is the use of ideal frequency analysis
+to generate the feature vectors
+which serve as the input to ASR systems.
+
+??? P. 78 of Kollmeier: evidence of amplitude modulation senstivity
+in the auditory brain
+
+- p. 67, Kollmeier: expliain modulation filterbank,
+  as this seems like it is an important part of the model...
+
+- link that to spectro-temporal receptive fields
+
+??? biologically inspired stuff
+
+\section{Speech synthesis}
+
+\subsection{Articulatory speech synthesis}
+
+??? summary table with different vocal tract models
+
+??? summary table with different acoustic models
+
+??? in the tables, also note available implementations
+(so we can justify writing our own).
+Include programming language in this
+
+??? include online vs batch in table
+
+\subsection{Speech motor control}
+
+??? note that many art. synths consider this part of their
+synthesizer (control model).
+But we will consider it separately because
+it is a primary contribution of this thesis.
+
+??? Saltzman stuff on task dynamics
+is highly related to what we want to do.
+But with SPA stuff on top.
+
+??? also hosung nam's work
+
+??? also mention near the end that people haven't
+yet connected the Saltzman task dynamics stuff
+to the brain; that'll be one of our contributions
+
+\section{Integrated recognition and production systems}
+
+For the purposes of this thesis,
+we consider a system to be integrated
+if speech recognition and production
+share internal representations
+(i.e., representations other than
+the incoming audio waveform or text),
+and are connected such that
+the output of one system
+can be used to improve
+the performance of the other system.
+By this definition,
+the most widely used
+speech recognition and production systems
+are not considered integrated
+even though they can be used
+in a conversational manner;
+virtual agents like Apple's Siri
+can both recognize and produce speech,
+but recognized speech is converted
+to text before speech synthesis occurs,
+and the speech production system
+cannot be modified over time
+as it relies on a large corpus
+of recorded speech.
+
+The most well known integrated system
+in called DIVA
+(Direction Into Velocities of Articulators;
+see Figure~???) ???cite.
+DIVA consists of an articulator synthesizer,
+and several interconnected artificial neural networks
+that drive the articulatory synthesizer
+and process auditory and somatosensory feedback
+in order to improve future synthesized speech.
+DIVA is not pre-programmed with a repository
+of programs to effect various sounds;
+instead, it mimics human speech development
+by learning to control the synthesizer
+through an initial babbling phase
+in which random articulator movements
+are associated with auditory
+and somatosensory feedback.
+DIVA has been used to explain
+speech production phenomena
+like motor equivalence, contextual variability,
+and anticipatory and carryover coarticulation
+(??? cites from Guenther et la brian.pdf intro).
+Additionally, all of the neural networks
+in the model have been mapped
+to brain regions that are hypothesized
+to perform similar functions
+as the neural networks in the model.
+
+??? DIVA figure
+
+DIVA is a productive research tool
+for studying speech development.
+However, I do not believe that DIVA
+in its current form
+can scale to maintaining conversations
+with adult vocabularies.
+Currently, DIVA is focused on speech production,
+so while it can incorporate acoustic feedback
+to learn better speech production,
+there is no clear path
+to incorporate speech recognition
+and higher-level linguistic capabilities.
+Additionally, DIVA currently represents
+stored speech plans with one artificial
+neuron per speech plan,
+where a speech plan can correspond to
+a single phoneme, a syllable, or one or more words.
+In ??? Guenther_et_al_Brain_Lang.pdf,
+they note that ``it is expected that
+premotor cortex sound maps in the brain
+involve distributed representations
+of each speech sound.''
+Using such distributed representations,
+as we do in our model,
+would require several changes to DIVA's
+structure and learning algorithms.
+While these changes are possible,
+they would represent a significant
+modification that may affect
+empirical results obtained
+with the current version of DIVA.
+
+In addition to using highly localist representations,
+DIVA has other biological plausibility issues.
+It represents auditory feedback using the first
+three formant frequencies,
+but does not provide an account of
+how the brain might extract those
+frequencies from the incoming air pressure levels.
+The artificial neural networks
+consist of homogeneous neurons
+with non-spiking linear activation functions,
+though the learning procedure
+uses a local Hebbian learning rule.
+Auditory and somatosensory feedback
+is provided to the model with no delay,
+making the learning procedure
+much easier than a learning procedure
+that must deal with delayed feedback,
+as happens in the real world.
+
+??? citeauthor kroger2009b proposed
+a large integrated model
+similar to DIVA in that
+it is composed of
+several artificial neural networks
+and learns to produce syllables
+through a babbling stage
+in which feedback from
+auditory and somatosensory systems
+tunes the weights between
+neural populations
+(???cite; see Figure~???).
+The primary improvements in
+Kr\"{o}ger's model compared to DIVA
+are the introduction of a phonetic map,
+and a motor planning network.
+
+??? kroger figure
+
+In DIVA, auditory and somatosensory feedback
+is directly associated with a cell
+in the speech sound map,
+meaning that each sound must be learned separately.
+This approach does not generalize across
+similar sounds, nor will it scale
+to large vocabularies of speech sounds.
+Kr\"{o}ger's model overcomes this limitation
+by explicitly decoding phonetic information
+from auditory feedback.
+It then uses that phonetic information
+to generate explicit motor plans.
+Motor plans act as parameterizations
+of the possible vocal tract gesture scores
+that can be produced by the model;
+each motor plan is defined by
+five parameters which define
+the vocalic state,
+the gesture-performing articulator,
+and the location of articulation.
+These five parameters are used
+to generate vocal tract gestures,
+which are then mapped onto
+movements of articulators
+in a three-dimensional vocal tract model.
+
+In Kr\"{o}ger's neurocomputational model,
+phonetic information is extracted
+in an unsupervised manner
+using self-organizing maps
+(???cite Kohonen),
+which cause
+local clusters of neurons
+in the phonetic map become active
+when incoming auditory information
+(in the form of the first three formants)
+is similar to certain patterns
+seen during training.
+The maps are able to
+discriminate between three vowel phonemes
+and three consonant phonemes;
+it is not clear whether
+maps trained in this way
+can scale to discriminating
+between the number of phonemes
+in a realistic language (over 40).
+However, it is clear that an approach
+which uses a finite set of intermediate representations
+(i.e., phonemes)
+between auditory input
+and learned motor sequences
+will scale better than DIVA's approach
+that does not use an intermediate representation.
+
+In contrast to these two models,
+the model that we present
+in the subsequent chapters does not focus on
+modeling speech development,\footnote{
+  The methods used by DIVA and Kr\"{o}ger's
+  neurocomputational model to emulate
+  speech development could be adapted
+  and added to our model.
+  However, since these problem have existing
+  solutions in these two models,
+  we have focused on other aspects
+  of speech recognition and production
+  as being of greater scientific interest.}
+and instead implements
+portions of the human speech system
+not modeled by these two models,
+and aims to be more biologically realistic.
+Biological realism is achieved
+by more sophisticated neural network models
+that use distributed representations
+that can scale to the level
+of adult vocabularies,
+and by using a human auditory model
+to process incoming sounds
+rather than preprocessing the sound
+to obtain the first three formants.
+In addition, while Kr\"{o}ger model
+improves on the DIVA model by
+introducing phoneme representations,
+we follow the motor theory
+of speech representation by
+explicitly decoding vocal tract gestures
+from incoming sound,
+which makes integration between
+the perception and production aspects
+of the model more straightforward.
