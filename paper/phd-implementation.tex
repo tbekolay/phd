@@ -1,12 +1,312 @@
 \chapter{Implementation}
 
-\section{Neural Cepstral Coefficients}
+In this thesis, we implement and evaluate
+four neural models that make up
+parts of the conceptual Sermo model.
+Each model provides
+an explanation for how the brain might
+solve a task necessary for
+speech recognition or synthesis
+using the computational devices at hand,
+namely spiking neurons.
+However, where possible,
+we also present analogous non-neural models
+that could be incorporated in
+non-neural speech recognition and synthesis systems.
 
-Go from audio signal to feature vector, in neurons.
+\section{Neural cepstral coefficients}
 
-\subsection{Network diagram}
+The frontend of most automatic speech recognition systems
+extracts a feature vector from the incoming audio waveform.
+As reviewed in section ???,
+mel-frequency cepstral coefficients (MFCCs)
+have been used successfully in many ASR systems ???cite.
+To a certain extent, MFCCs are motivated
+by the organization of the human auditory system.
+We propose neural cepstral coefficients (NCCs)
+as an alternative feature vector representation
+for automatic speech recognition
+and other tasks involving speech processing.
+Unlike MFCCs, NCCs are both motivated
+by the organization of the human auditory system
+and are implemented the same basic computational units
+as the human auditory system,
+spiking neural networks.
+
+??? NCC pipeline, like AuditoryBasedFeatureVectors.pdf
+or KumarKimSternICA11.pdf
+
+Figure~??? shows the NCC processing pipeline,
+as compared to the MFCC processing pipeline.
+While the pipeline implements
+essentially the same computations,
+the manner in which those computations
+are performed differs significantly.
+The primary difference is that
+incoming audio is processed
+in a continuous online fashion,
+rather than in a frame-based fashion.
+Typical MFCC extraction algorithms
+break the audio signal into
+overlapping fixed-length windows
+called frames,
+which are processed independently
+until the smoothing stage,
+where discontinuities
+due to frame boundaries are
+minimized.
+The NCC extraction algorithm,
+on the other hand,
+maintains internal state
+at each processing stage,
+and updates that internal state
+for each incoming audio sample.
+As each internal state update
+depends on the current state,
+changes occur smoothly through time,
+which obviates the need for
+an explicit smoothing step.
+
+Another implementation difference
+is in the computation of
+the inverse discrete cosine transform.
+Typically, this computation is done as
+\begin{equation}
+  y_k = \frac{x_0}{\sqrt{N}} + \sqrt{\frac{2}{N}} \sum_{n=1}^{N-1}
+  x_n \cos \left( \frac{\pi}{N} n \left( k + \frac{1}{2} \right) \right)
+  \text{ for } 0 \le k < N
+\end{equation}
+where $y_k$ is the $k$th cepstral coefficient,
+$x_n$ is the $n$th auditory filter output,
+and $N$ is the number of auditory filter outputs.
+In matrix notation,
+this equation can be expressed as
+\begin{align}
+  \label{idct}
+  \mathbf{k} &= \left[ 0, 1, \ldots, N-1 \right] & 1 \times N \text{ vector} \nonumber \\
+  \mathbf{s} &= \left[ \sqrt{2}, 1, 1, \ldots, 1 \right] & 1 \times N \text{ vector} \nonumber \\
+  \mathbf{T} &= \sqrt{2}{N} \, \mathbf{s} \circ \cos \left( \frac{\pi}{N} \left(
+    \mathbf{k} + \frac{1}{2} \right) \otimes \mathbf{k} \right)
+    & N \times N \text{ matrix} \nonumber \\
+  \mathbf{y} &= \mathbf{T}\mathbf{x} & N \times 1 \text{ vector}
+\end{align}
+where $\circ$ is the Hadamard (element-wise) product,
+and $\otimes$ is the outer product.
+This rearranged equation
+allows us to precompute a matrix, $T$,
+that maps auditory filter outputs
+directly to cepstral coefficients,
+which enables us to embed this matrix
+in the connection weights between
+two neural population
+(see ??? network diagram for more details).
+By restricting $\mathbf{T}$
+to the first $M$ rows,
+equation \eqref{idct} yields the first
+$M$ cepstral coefficients;
+typically, ASR systems
+use $N \approx 26$ auditory filter outputs
+and $M \approx 13$ cepstral coefficients.
+
+\subsection{NCC neural model}
+
+The NCC pipeline is implemented
+in a Nengo network that uses
+the Brian hears library
+of auditory filter models
+??? cite Brian hears,
+and two layers
+leaky integrate-and-fire (LIF) neurons ensembles
+connected in a feed-forward manner
+(see ??? figure).
+While Brian has the capability
+to simulate spiking neurons,
+we only use Brian's implementation of
+auditory periphery models,
+which do not emit spikes.
+These models,
+summarized in ??? sect prev work,
+emulate the effect of the
+audio waveform on the basilar membrane,
+and the resulting inner hair cell activity
+arising from basilar membrane deflections,
+which may include rectification
+and compression
+(i.e., it accomplishes the first
+??? steps of the MFCC pipeline).
+The output of these models
+can be though of as
+the current input
+to spiral ganglion cells in the ear.
+These auditory periphery models
+accomplish a significant portion
+of the MFCC extraction pipeline,
+which is unsurprising as MFCC extraction
+is designed to emulate certain aspects
+of the human auditory system.
+
+??? figure: net diagram
+
+The simulation timesteps
+for the Nengo model and the contained
+Brain auditory filter model
+are uncoupled.
+The auditory filter model
+is always run with the same timestep
+as the auditory stimulus;
+that is, its internal state is updated
+for each audio sample.
+The Nengo model, on the other hand,
+runs at a timestep independent
+of the auditory stimulus.
+On each Nengo timestep,
+therefore, one or more samples
+of the audio input
+is fed through the
+auditory filter model.
+The \textit{auditory nerve} ensembles
+receives as input the current
+state of the auditory filter model,
+regardless of how many timesteps
+the Brian model has advanced.
+
+The \textit{auditory nerve} ensembles
+mimic the activity of spiral ganglion cells
+projecting down the auditory nerve.
+For each characteristic frequency,
+a heterogeneous population of neurons
+is driven by the current output by
+the auditory filter model.
+Each characteristic frequency
+drives an independent neural ensemble,
+meaning that this layer of ensembles
+can be thought of as being cochleotopically organized,
+as the mean activity of an individual neuron
+only gives information about the output
+of a single auditory filter
+(although that filter may be modulated
+by power in nearby frequencies).
+Together, the decoded output of
+each ensemble gives an approximation of
+the compressed power in the part of the spectrum
+that the auditory filter is sensitive to.
+This quantity is essentially
+the output of the auditory filter
+(i.e., steps ???--??? in the MFCC pipeline),
+but now represented in
+cochleotopically organized spiking neurons.
+It is also the $X$ vector in
+the inverse discrete cosine transform,
+equation~\eqref{idct}.
+
+The \textit{cepstra} ensembles
+each represent one cepstral coefficient.
+The inverse discrete cosine transform
+for that coefficient is computed
+through the connections between
+the auditory nerve ensembles
+and the cepstral ensembles.
+Specifically, each connection
+between an auditory periphery
+and cepstrum ensemble
+scales the decoded value of the
+cepstrum ensemble by
+the corresponding value
+the $\mathbf{T}$ matrix.
+Since this is a linear transform,
+it is done by computing
+normal decoding weights
+according to equation~\eqref{???}
+and scaling the decoders by $T_{i,j}$.
+Since the currents coming from
+multiple connections to an ensemble
+are summed, the cepstral ensembles
+end up representing the
+dot product between the row of
+$T$ that corresponds to its cepstrum
+and the $X$ vector,
+which is collectively represented
+by the auditory periphery layer.
+
+The end result of the networks
+is the decoded output
+of the \textit{cepstra} ensembles,
+which is a continuously varying,
+automatically smoothed set of cepstral coefficients.
+We hypothesize that these coefficients can be used
+as the feature vectors in an
+automatic speech recognition system.
+
+??? make an appendix with a simplified Nengo model
+and a table of parameters and typical values
+
+\subsection{Delta neural cepstral coefficients}
+
+Another common technique in designing frontends
+for automatic speech recognition is to
+include temporal derivatives
+in the feature vector.
+Appending MFCC derivatives
+to the feature vector
+(i.e., MFCC velocities;
+called Delta-Cepstral Coefficients [DCC])
+improve ASR accuracy.
+Appending derivatives of the MFCC derivatives
+(i.e., MFCC accelerations;
+called Double Delta-Cepstral Coefficients [DDCC])
+further improves recognition,
+though by a smaller margin than
+the improvement from the first derivative
+??? find good cite.
+??? Kumar et al kumarkimsternica11.pdf
+used the derivative of the auditory filter output
+instead of the raw auditory filter output
+in a MFCC-like pipeline
+(called Delta-Spectral Cepstral Coefficients [DSCC])
+and found that the ASR system
+was more robust to noise and reverberation.
+
+Temporal derivatives in these systems
+are typically computed through straightforward
+finite differences.
+That is, for an MFCC $y_k$
+at frame $t$, the corresponding delta is
+\begin{equation}
+  \delta_k(t) = y_k(t+n) - y_k(t-n),
+\end{equation}
+where $n$ is a small number of frames
+(typically between one and three).
+The double delta applies the same operation
+to the $\delta_k$ vectors.
+
+An additional nonlinearity is applied
+for DSCCs,
+as they use the derivative of the power spectrum.
+Using the raw power spectrum derivatives
+results in very small cepstral coefficients,
+so ??? Kim et al proposed a ``Gaussianization''
+step in which the power spectrum
+is made to follow a Gaussian distribution
+by inverting the normal cumulative distribution function.
+??? more?
+
+\subsection{NDCC and NSCC neural models}
+
+??? talk about how to do derivatives
+in neurons
+
+?? discuss whether we can do gaussianization?
+we probably can... but maybe not in a bioplaus manner.
+
+??? make an appendix with a simplified Nengo model
+and a table of parameters and typical values
 
 \subsection{Evaluation}
+
+??? it's not clear if the derivatives will help
+since the SVM should manage these,
+so if they don't help then I will
+just use the derivatives
 
 \section{Syllable recognition}
 
