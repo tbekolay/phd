@@ -1,0 +1,56 @@
+<gestural_score>
+  <gesture_sequence type="vowel-gestures" unit="">
+    <gesture value="a" slope="0.000000" duration_s="0.484297" time_constant_s="0.010250" neutral="0" />
+    <gesture value="I" slope="0.000000" duration_s="0.259257" time_constant_s="0.015000" neutral="0" />
+    <gesture value="e" slope="0.000000" duration_s="0.305318" time_constant_s="0.015000" neutral="0" />
+    <gesture value="@" slope="0.000000" duration_s="0.344058" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="lip-gestures" unit="">
+    <gesture value="" slope="0.000000" duration_s="0.076485" time_constant_s="0.015000" neutral="1" />
+    <gesture value="ll-labial-stop" slope="0.000000" duration_s="0.084584" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="tongue-tip-gestures" unit="">
+    <gesture value="tt-postalveolar-fric" slope="0.000000" duration_s="0.147571" time_constant_s="0.015000" neutral="0" />
+    <gesture value="tt-alveolar-stop" slope="0.000000" duration_s="0.071530" time_constant_s="0.015150" neutral="1" />
+    <gesture value="" slope="0.000000" duration_s="0.260506" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tt-alveolar-fric" slope="0.000000" duration_s="0.183563" time_constant_s="0.015000" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.047692" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tt-alveolar-nas" slope="0.000000" duration_s="0.026995" time_constant_s="0.010250" neutral="0" />
+    <gesture value="tt-alveolar-stop" slope="0.000000" duration_s="0.064787" time_constant_s="0.015000" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.238395" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tt-alveolar-fric" slope="0.000000" duration_s="0.137034" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="tongue-body-gestures" unit="">
+    <gesture value="" slope="0.000000" duration_s="0.140670" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tb-uvular-fric" slope="0.000000" duration_s="0.122979" time_constant_s="0.015000" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.156569" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tb-uvular-fric" slope="0.000000" duration_s="0.164668" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="velic-gestures" unit="">
+  </gesture_sequence>
+  <gesture_sequence type="glottal-shape-gestures" unit="">
+    <gesture value="open" slope="0.000000" duration_s="0.159269" time_constant_s="0.020000" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.249251" time_constant_s="0.020000" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.148181" time_constant_s="0.020000" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.236003" time_constant_s="0.015100" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.111620" time_constant_s="0.015100" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.143059" time_constant_s="0.010000" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.091356" time_constant_s="0.015100" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.148011" time_constant_s="0.015100" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.116077" time_constant_s="0.015100" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="f0-gestures" unit="st">
+    <gesture value="30.000000" slope="0.000000" duration_s="0.268148" time_constant_s="0.020000" neutral="0" />
+    <gesture value="36.000000" slope="0.000000" duration_s="0.251051" time_constant_s="0.025650" neutral="0" />
+    <gesture value="28.500000" slope="-0.640000" duration_s="0.302341" time_constant_s="0.029500" neutral="0" />
+    <gesture value="30.000000" slope="-0.640000" duration_s="0.104380" time_constant_s="0.029500" neutral="0" />
+    <gesture value="28.000000" slope="0.000000" duration_s="0.184464" time_constant_s="0.036850" neutral="0" />
+    <gesture value="26.500000" slope="0.000000" duration_s="0.270847" time_constant_s="0.013750" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="lung-pressure-gestures" unit="Pa">
+    <gesture value="0.000000" slope="0.000000" duration_s="0.035093" time_constant_s="0.005000" neutral="0" />
+    <gesture value="1000.000000" slope="0.000000" duration_s="0.565990" time_constant_s="0.005000" neutral="0" />
+    <gesture value="1000.000000" slope="0.000000" duration_s="0.722560" time_constant_s="0.005000" neutral="0" />
+    <gesture value="0.000000" slope="0.000000" duration_s="0.116196" time_constant_s="0.005000" neutral="0" />
+  </gesture_sequence>
+</gestural_score>

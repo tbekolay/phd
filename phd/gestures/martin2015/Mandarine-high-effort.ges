@@ -1,0 +1,49 @@
+<gestural_score>
+  <gesture_sequence type="vowel-gestures" unit="">
+    <gesture value="a" slope="0.000000" duration_s="0.473213" time_constant_s="0.005000" neutral="0" />
+    <gesture value="a" slope="0.000000" duration_s="0.172392" time_constant_s="0.007450" neutral="0" />
+    <gesture value="i" slope="0.000000" duration_s="0.269405" time_constant_s="0.009900" neutral="0" />
+    <gesture value="@" slope="0.000000" duration_s="0.310622" time_constant_s="0.007450" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="lip-gestures" unit="">
+    <gesture value="ll-labial-nas" slope="0.000000" duration_s="0.307715" time_constant_s="0.005000" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.923602" time_constant_s="0.015000" neutral="1" />
+  </gesture_sequence>
+  <gesture_sequence type="tongue-tip-gestures" unit="">
+    <gesture value="" slope="0.000000" duration_s="0.364556" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tt-alveolar-nas" slope="0.000000" duration_s="0.109761" time_constant_s="0.007450" neutral="0" />
+    <gesture value="tt-alveolar-stop" slope="0.000000" duration_s="0.027719" time_constant_s="0.007450" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.412902" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tt-alveolar-nas" slope="0.000000" duration_s="0.053789" time_constant_s="0.007450" neutral="0" />
+    <gesture value="" slope="0.000000" duration_s="0.296495" time_constant_s="0.015000" neutral="1" />
+  </gesture_sequence>
+  <gesture_sequence type="tongue-body-gestures" unit="">
+    <gesture value="" slope="0.000000" duration_s="0.646376" time_constant_s="0.015000" neutral="1" />
+    <gesture value="tb-uvular-fric" slope="0.000000" duration_s="0.082103" time_constant_s="0.009900" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="velic-gestures" unit="">
+    <gesture value="0.500000" slope="0.000000" duration_s="0.282444" time_constant_s="0.015000" neutral="1" />
+    <gesture value="0.100000" slope="0.000000" duration_s="0.074327" time_constant_s="0.015000" neutral="1" />
+    <gesture value="0.500000" slope="0.000000" duration_s="0.578773" time_constant_s="0.015000" neutral="1" />
+    <gesture value="0.200000" slope="0.000000" duration_s="0.327303" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="glottal-shape-gestures" unit="">
+    <gesture value="modal" slope="0.000000" duration_s="0.288390" time_constant_s="0.015000" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.356002" time_constant_s="0.015000" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.034346" time_constant_s="0.012700" neutral="0" />
+    <gesture value="modal" slope="0.000000" duration_s="0.391589" time_constant_s="0.015000" neutral="0" />
+    <gesture value="open" slope="0.000000" duration_s="0.194646" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="f0-gestures" unit="st">
+    <gesture value="32.000000" slope="0.000000" duration_s="0.263583" time_constant_s="0.030200" neutral="0" />
+    <gesture value="30.000000" slope="0.000000" duration_s="0.222785" time_constant_s="0.039650" neutral="0" />
+    <gesture value="31.000000" slope="0.000000" duration_s="0.233749" time_constant_s="0.027050" neutral="0" />
+    <gesture value="39.000000" slope="0.000000" duration_s="0.184167" time_constant_s="0.027050" neutral="0" />
+    <gesture value="30.000000" slope="0.000000" duration_s="0.375146" time_constant_s="0.025650" neutral="0" />
+  </gesture_sequence>
+  <gesture_sequence type="lung-pressure-gestures" unit="Pa">
+    <gesture value="0.000000" slope="0.000000" duration_s="0.190416" time_constant_s="0.015000" neutral="0" />
+    <gesture value="1000.000000" slope="0.000000" duration_s="0.934649" time_constant_s="0.005000" neutral="0" />
+    <gesture value="0.000000" slope="0.000000" duration_s="0.145448" time_constant_s="0.015000" neutral="0" />
+  </gesture_sequence>
+</gestural_score>

@@ -39,3 +39,6 @@ paper/auto/
 
 # Jupyter stuff
 .ipynb_checkpoints/
+
+# Project specific
+*.wav
