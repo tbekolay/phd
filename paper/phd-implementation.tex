@@ -272,6 +272,7 @@ finite differences.
 That is, for an MFCC $y_k$
 at frame $t$, the corresponding delta is
 \begin{equation}
+  \label{dcc}
   \delta_k(t) = y_k(t+n) - y_k(t-n),
 \end{equation}
 where $n$ is a small number of frames
@@ -279,29 +280,160 @@ where $n$ is a small number of frames
 The double delta applies the same operation
 to the $\delta_k$ vectors.
 
-An additional nonlinearity is applied
-for DSCCs,
-as they use the derivative of the power spectrum.
-Using the raw power spectrum derivatives
-results in very small cepstral coefficients,
-so ??? Kim et al proposed a ``Gaussianization''
-step in which the power spectrum
-is made to follow a Gaussian distribution
-by inverting the normal cumulative distribution function.
-??? more?
+% An additional nonlinearity is applied
+% for DSCCs,
+% as they use the derivative of the power spectrum.
+% Using the raw power spectrum derivatives
+% results in very small cepstral coefficients,
+% so ??? Kim et al proposed a ``Gaussianization''
+% step in which the power spectrum
+% is made to follow a Gaussian distribution
+% by inverting the normal cumulative distribution function.
+% ??? more?
 
 \subsection{NDCC and NSCC neural models}
 
-??? talk about how to do derivatives
-in neurons
+Implementing temporal differentiation
+in spiking neural networks
+is not as straightforward as implementing
+equation~\eqref{dcc} in neurons,
+as the neural simulation operates
+online in continuous time,
+and therefore does not necessarily
+have access to the information
+from previous timesteps.
+However, there are several ways
+to build networks that maintain
+information from the past
+and can therefore implement temporal differentiation.
 
-?? discuss whether we can do gaussianization?
-we probably can... but maybe not in a bioplaus manner.
+??? ref Tripp describes six such models,
+two of which use feedforward connections,
+two use adaptive neuron models,
+and two implement linear time-invariant (LTI) filters
+through recurrent connections.
+All six models successfully
+compute a temporal derivative,
+so for simplicity we implemented
+the two feedforward temporal differentiation models,
+with the assumption that
+more sophisticated temporal differentiation
+models could be used if desired.
+
+??? Figure: both derivs
+
+In the first feedforward differentiation model,
+an intermediate ensemble is introduced
+between the ensemble representing the input signal
+and the ensemble that we want to represent
+the derivative of the input signal
+(see Figure~???).
+The \textit{derivative} ensemble
+receives direct positively scaled input from
+the \textit{input} ensemble,
+and delayed negatively scaled input from
+the \textit{intermediate} ensemble.
+The slight delay between the positive signal
+communicated from the \textit{input}
+and the negative signal
+from the \textit{intermediate} ensemble
+results in the \textit{derivative} ensemble
+representing the temporal derivative
+of the input signal.
+
+Information transmitted between two ensembles
+is slightly delayed
+because changes to the input currents
+of the first ensemble
+must first be integrated for one or more
+timesteps before those changes can result in
+spikes that influence
+the second ensemble's input currents.
+The amount of time between
+when input signal changes are reflected
+in the first and second populations
+depends on several factors,
+including the simulation timestep,
+the neuron model, and the synaptic filter model.
+In the feedforward differentiation model
+with an intermediate ensemble,
+all connections use a lowpass filter
+with a relatively long time constant
+($\tau=0.1 \text{ s}$)
+as the synaptic filter model.\footnote{
+  Synaptic filter time constants of around 100 ms
+  are consistent with NMDA glutamate receptors,
+  which ??? cite 1213.full.pdf have suggested
+  are part of differentiator circuits
+  underlying respiratory rhythm.
+  Additionally, in terms of
+  the biological plausibility of the network as a whole,
+  ??? Tripp notes that this form of network
+  has been observed in \textit{C. elegans} ??? cite Dunn
+  and may underlie chemotaxis.}
+
+In the second feedforward differentiation model,
+two connections are made between
+the \textit{input} and \textit{derivative} ensembles.
+The first positively scaled connection
+uses a synaptic filter with a fast time constant
+($\tau_F=0.005 \text{ s}$),
+and the second negatively scaled connection
+uses a synaptic filter with a slow time constant
+($\tau_s=0.1 \text{ s}$).\footnote{
+  Synaptic filter time constants of 5 ms
+  are consistent with some types of
+  AMPA receptors ??? cite Jonasetal.}
+Like the first model,
+this approach exploits the delays introduced
+by synaptic filtering,
+subtracting a more slowly changing signal
+from a signal changing quickly,
+resulting in a temporal derivative.
+While this network has the advantage
+of requiring fewer neurons
+as no intermediate connection is introduced,
+it adds the constraint that
+the neurons in the \textit{derivative} ensemble
+contain both fast and slow
+neurotransmitter receptors.\footnote{
+  Since AMPA and NMDA are both glutamate receptors,
+  no constraint is placed on the \textit{input} population.
+  ??? Tripp notes that a derivative circuit
+  in the vestibular system of oyster toadfish
+  ??? PNAS-2004-Hols...
+  is likely to match the form of the second
+  feedforward differentiation model.}
+
+These differentiator networks
+are added to the NCC network
+shown in Figure~???
+to compute the desired derivative.
+
+??? Figure of whole NCC circuit
+
+% ?? discuss whether we can do gaussianization?
+% we probably can... but maybe not in a bioplaus manner.
+% Depends if it's necessary anyhow
 
 ??? make an appendix with a simplified Nengo model
 and a table of parameters and typical values
 
 \subsection{Evaluation}
+
+We hypothesize that NCCs and DNCCs
+are suitable feature vectors
+for traditional ASR systems
+and for more biologically plausible
+models of the human speech system like Sermo.
+In order to evaluate their effectiveness
+in these situations,
+we compare MFCCs with and without DCCs
+and DDCCs to NCCs and DNCCs
+on phoneme and word classification tasks.
+
+??? choose an SVM implementation and
+explain it here
 
 ??? it's not clear if the derivatives will help
 since the SVM should manage these,
@@ -323,6 +455,9 @@ Go from a syllable semantic pointer
 to audio signal, in neurons.
 
 ??? Do some fine tuning?
+
+??? Make a note that this section was done
+in collaboration with Bernd
 
 \subsection{Network diagram}
 
