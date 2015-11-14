@@ -16,6 +16,15 @@ non-neural speech recognition and synthesis systems.
 
 \section{Neural cepstral coefficients}
 
+\probbox{A raw audio waveform has high temporal resolution,
+  but low spatial resolution, as it is a one-dimensional signal.
+  Audio must therefore be preprocessed such that
+  all the temporal information necessary to recognize speech
+  is available at the current moment in time.
+  Automatic speech recognition systems preprocess speech by
+  extracting feature vectors containing cepstral coefficients.
+  How can a neural model like Sermo preprocess speech?}
+
 The frontend of most automatic speech recognition systems
 extracts a feature vector from the incoming audio waveform.
 As reviewed in section ???,
@@ -93,7 +102,7 @@ this equation can be expressed as
 where $\circ$ is the Hadamard (element-wise) product,
 and $\otimes$ is the outer product.
 This rearranged equation
-allows us to precompute a matrix, $T$,
+allows us to precompute a matrix, $\mathbf{T}$,
 that maps auditory filter outputs
 directly to cepstral coefficients,
 which enables us to embed this matrix
@@ -440,15 +449,6 @@ since the SVM should manage these,
 so if they don't help then I will
 just use the derivatives
 
-\section{Syllable recognition}
-
-Go from a vocal tract gesture score
-to a syllable semantic pointer, in neurons.
-
-\subsection{Network diagram}
-
-\subsection{Evaluation}
-
 \section{Syllable production}
 
 Go from a syllable semantic pointer
@@ -458,6 +458,15 @@ to audio signal, in neurons.
 
 ??? Make a note that this section was done
 in collaboration with Bernd
+
+\subsection{Network diagram}
+
+\subsection{Evaluation}
+
+\section{Syllable recognition}
+
+Go from a vocal tract gesture score
+to a syllable semantic pointer, in neurons.
 
 \subsection{Network diagram}
 

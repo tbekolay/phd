@@ -19,9 +19,31 @@
 \usepackage{tipa}
 \let\ipa\textipa
 
+% Font stuff
+
 % \usepackage{heuristica}
 % \usepackage[heuristica,vvarbb,bigdelims]{newtxmath}
 % \usepackage[T1]{fontenc}
+
+% For fancy boxes
+\usepackage{tikz}
+\usetikzlibrary{shapes,decorations}
+\tikzstyle{probbox}=[draw=black!80, very thick,
+    rectangle, rounded corners, inner sep=10pt, inner ysep=20pt]
+\tikzstyle{fancytitle}=[fill=black!80, text=white]
+\newcommand{\probbox}[1]{%
+  \begin{center}
+    \begin{tikzpicture}
+      \node [probbox] (box){%
+        \begin{minipage}{0.8\textwidth}
+          #1
+        \end{minipage}
+      };
+      \node[fancytitle, right=10pt, rounded corners] at (box.north west) {%
+        \textbf{Problem statement}
+      };
+    \end{tikzpicture}
+  \end{center}}
 
 % Fix error using \copyright with T1 fontenc
 \renewcommand*\copyright{{\usefont{OT1}{lmr}{m}{n}\textcopyright}}
