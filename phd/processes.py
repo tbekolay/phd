@@ -4,7 +4,6 @@ import dill
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np
-from brian.hears.filtering.tan_carney import ZhangSynapseRate
 from scipy.io.wavfile import read as readwav
 from scipy.signal import resample
 
@@ -33,13 +32,12 @@ class NengoSound(bh.BaseSound):
 
 class AuditoryFilterBank(nengo.processes.Process):
     def __init__(self, freqs, sound_process, filterbank, samplerate,
-                 middle_ear=False, zhang_synapse=False):
+                 middle_ear=True):
         self.freqs = freqs
         self.sound_process = sound_process
         self.filterbank = filterbank
         self.samplerate = samplerate
         self.middle_ear = middle_ear
-        self.zhang_synapse = zhang_synapse
 
     @staticmethod
     def bm2ihc(x):
@@ -68,27 +66,17 @@ class AuditoryFilterBank(nengo.processes.Process):
 
         duration = int(dt / sound_dt)
         filterbank.buffersize = duration
+
+        # TODO different filter may not need bm2ihc function
         ihc = bh.FunctionFilterbank(filterbank, self.bm2ihc)
         # Fails if we don't do this...
         ihc.cached_buffer_end = 0
 
-        if self.zhang_synapse:
-            syn = ZhangSynapseRate(ihc, self.freqs)
-            s_mon = br.RecentStateMonitor(
-                syn, 's', record=True, clock=syn.clock, duration=dt*br.second)
-            net = br.Network(syn, s_mon)
-
-            def step_synapse(t):
-                net.run(dt * br.second)
-                return s_mon.values[-1]
-            return step_synapse
-        else:
-            def step_filterbank(
-                    t, startend=np.array([0, duration], dtype=int)):
-                result = ihc.buffer_fetch(startend[0], startend[1])
-                startend += duration
-                return result[-1]
-            return step_filterbank
+        def step_filterbank(t, startend=np.array([0, duration], dtype=int)):
+            result = ihc.buffer_fetch(startend[0], startend[1])
+            startend += duration
+            return result[-1]
+        return step_filterbank
 
 
 class FuncProcess(nengo.processes.Process):
