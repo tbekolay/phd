@@ -451,22 +451,81 @@ just use the derivatives
 
 \section{Syllable production}
 
-\probbox{Once the intention to voice a syllable
+\probbox{Once the intention to voice a syllable sequence
   has been formed, the motor system must translate
-  a static conceptual representation of that syllable
+  a sequence of static conceptual representations of those syllables
   to a continuous trajectory of motor commands
   that will cause muscle activations in the vocal tract.
   How can a neural model like Sermo generate
-  a motor command trajectory from a static syllable representation?}
+  a motor command trajectory from
+  a sequence of static syllable representation?}
 
-Sermo theorizes that the speech motor system
-is organized at the level of syllables.
+We theorize that the speech motor system
+is organized at the level of syllables,
+and that motor command trajectories are explicitly stored
+for syllables that are frequently voiced.
+In this neural model,
+we describe how sequences of syllables are represented,
+and how those representations
+generate motor command trajectories
+that can control an articulatory synthesizer.
 
+A sequence of syllables is represented
+by a semantic pointer
+that tags each syllable with its place
+in the list; i.e.,
+\begin{equation}
+  \text{SEQ} = \text{SYLL1} \circledast \text{POS1} \oplus
+    \text{SYLL2} \circledast \text{POS2} \ldots
+\end{equation}
+For example, the word ``family'' would
+be represented as ??? /fam schwa lee/
+\begin{equation}
+  \text{FAMILY} = \text{FAM} \cirledast \text{POS1} \oplus
+    \text{SCHWA} \circledast \text{POS2} \oplus
+    \text{LEE} \circledast \text{POS3}
+\end{equation}
 
-Go from a syllable semantic pointer
-to audio signal, in neurons.
+??? this representation places a limitation
+on the number of syllables that can be in a sequence.
+From Spaun, that limit is around 7 ??? look up.
+most language average between 1 and 3 syllables
+per word ??? Pellegrino...pdf
+We don't believe that this limit actual limits us,
+because the linguistic subsystem would be hierarchically
+organized such that it is producing sequences of words,
+each of which is its own sequence of syllables
+that can be easily represented and queried.
+long sequences of syllables would therefore
+be a consequences of having word sequences
+map onto syllable sequences.
+
+The syllable production model
+begins with a syllable sequence
+randomly generated semantic pointer
+that represents a syllable.\footnote{
+  The semantic pointer could reflect
+  how the syllable is produced; e.g.,
+  it could have a representation like
+  $\text{BA}=\text{B}\circledast\text{ONSET}\oplus
+  \text{A}\circledast\text{NUCLEUS}$,
+  where semantic pointers for the individual phonemes
+  and syllable parts are randomly generated.
+  However, as we will show in section~???,
+  we do not need this information
+  recognize syllables using production information.
+  Therefore, we deliberately do not impose
+  any structure on the syllable semantic pointers
+  in this model because we anticipate
+  that higher-level linguistic subsystems in Sermo
+  will dictate the features of the syllable
+  that must be contained
+  in the syllable semantic pointer representation.}
 
 ??? Do some fine tuning?
+
+??? Should we do a sequence of syllables?
+maybe, because it's already done
 
 ??? Make a note that this section was done
 in collaboration with Bernd
@@ -474,6 +533,8 @@ in collaboration with Bernd
 \subsection{Network diagram}
 
 \subsection{Evaluation}
+
+??? compare original VTG -> audio to Nengo -> VTG -> audio
 
 \section{Syllable recognition}
 
@@ -492,6 +553,9 @@ to audio signal, in neurons.
 Learn a syllable recognition
 and a syllable production
 network from this.
+
+Contrast this to syllable production because it's
+an infrequently voiced syllable.
 
 \subsection{Bootstrapped syllable learning}
 
