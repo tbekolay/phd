@@ -4,5 +4,5 @@ import brian_no_units  # Speeds things up
 import brian  # Raises a bunch of warnings, no thanks
 warnings.simplefilter("default")
 
-from .sermo import Sermo
-from . import filters, plots, processes
+from .gestures import ges_path
+from . import filters, plots, processes, sermo

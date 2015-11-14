@@ -3,7 +3,9 @@ from nengo.utils.compat import iteritems
 
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
-    Cepstra
+    Cepstra,
+    FeedforwardDeriv,
+    IntermediateDeriv,
 )
 from . import params
 

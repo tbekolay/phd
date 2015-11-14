@@ -24,7 +24,7 @@ def idct(n, size_out):
     s = np.ones(n)
     s[0] = np.sqrt(0.5)
     idct_matrix = (np.sqrt(2. / n) * s
-                   * np.cos(np.pi * (k[:, np.newaxis] + 0.5) * k / n))
+                   * np.cos(np.pi * np.outer(k + 0.5, k) / n))
     return idct_matrix[:size_out]
 
 
