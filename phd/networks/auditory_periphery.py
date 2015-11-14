@@ -23,7 +23,7 @@ def AuditoryPeriphery(freqs, sound_process, auditory_filter,
 
         # Cochlear neurons projecting down auditory nerve
         net.an = nengo.networks.EnsembleArray(neurons_per_freq, freqs.size,
-                                              intercepts=Uniform(0.2, 0.8),
+                                              intercepts=Uniform(-0.1, 0.5),
                                               encoders=Choice([[1]]))
         # TODO different filters may give different magnitude output?
         nengo.Connection(net.ihc, net.an.input)

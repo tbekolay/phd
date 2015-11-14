@@ -5,8 +5,9 @@ audio signal already, so all that is left to do the cepstrum is to take
 the inverse cosine transform. Easy!
 """
 
-import numpy as np
 import nengo
+import numpy as np
+from nengo.networks import EnsembleArray
 
 
 def idct(n, size_out):
@@ -29,13 +30,14 @@ def idct(n, size_out):
 
 
 
-def Cepstra(size_in, size_out, net=None):
+def Cepstra(n_neurons, n_freqs, n_cepstra, net=None):
     if net is None:
         net = nengo.Network("Cepstra")
 
     with net:
-        net.input = nengo.Node(size_in=size_in, label="input")
-        net.output = nengo.Node(size_in=size_out, label="output")
-        nengo.Connection(net.input, net.output,
-                         synapse=None, transform=idct(size_in, size_out))
+        net.input = nengo.Node(size_in=n_freqs, label="input")
+        net.out_ea = EnsembleArray(n_neurons, n_ensembles=n_cepstra)
+        nengo.Connection(net.input, net.out_ea.input,
+                         synapse=None, transform=idct(n_freqs, n_cepstra))
+        net.output = net.out_ea.output
     return net

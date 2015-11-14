@@ -48,21 +48,11 @@ class PeripheryParams(ParamsObject):
     neurons_per_freq = params.IntParam(default=12)
     fs = params.NumberParam(default=20000)
     middle_ear = params.BoolParam(default=True)
-    zhang_synapse = params.BoolParam(default=False)
 
 
 class CepstraParams(ParamsObject):
-    size_out = params.IntParam(default=13)
-
-
-class RecognitionParams(object):
-    def __init__(self):
-        self.periphery = PeripheryParams()
-        self.cepstra = CepstraParams()
-
-    @property
-    def dimensions(self):
-        return self.periphery.freqs.size
+    n_neurons = params.IntParam(default=30)
+    n_cepstra = params.IntParam(default=13)
 
 
 class ExecutionParams(object):
@@ -73,41 +63,28 @@ class IntegrationParams(object):
     pass
 
 
-class Sermo(object):
-    def __init__(self, recognition=True, execution=True):
-        self.recognition = RecognitionParams() if recognition else None
-        self.execution = ExecutionParams() if execution else None
-        self.integration = (IntegrationParams() if execution and recognition
-                            else None)
+class Features(object):
+    def __init__(self):
+        self.config = nengo.Config(
+            nengo.Ensemble, nengo.Connection, nengo.Probe)
+        self.periphery = PeripheryParams()
+        self.cepstra = CepstraParams()
 
-    def build(self, training=False):
-        net = nengo.Network()
-        net.training = training
-        if self.recognition is not None:
-            self.build_recognition(net)
-        if self.execution is not None:
-            self.build_execution(net)
-        if self.integration is not None:
-            self.build_integration(net)
-        return net
+    def add_derivative(self):
+        pass
 
-    def build_recognition(self, net):
-        with net:
+    def build(self, net=None):
+        if net is None:
+            net = nengo.Network("Sermo feature extraction")
+        with net, self.config:
             self.build_periphery(net)
             self.build_cepstra(net)
+        return net
 
     def build_periphery(self, net):
-        net.periphery = AuditoryPeriphery(
-            **self.recognition.periphery.kwargs())
+        net.periphery = AuditoryPeriphery(**self.periphery.kwargs())
 
     def build_cepstra(self, net):
-        net.cepstra = Cepstra(size_in=net.periphery.freqs.size,
-                              **self.recognition.cepstra.kwargs())
-        nengo.Connection(net.periphery.an.output,
-                         net.cepstra.input)
-
-    def build_execution(self, net):
-        pass
-
-    def build_integtration(self, net):
-        pass
+        net.cepstra = Cepstra(n_freqs=net.periphery.freqs.size,
+                              **self.cepstra.kwargs())
+        nengo.Connection(net.periphery.an.output, net.cepstra.input)
