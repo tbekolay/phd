@@ -813,14 +813,34 @@ The extracted articulatory information
 could be used by another ASR system
 to lower phone or word error rates.
 
-These results
+The aforementioned results
 use continuous articulator positions.
-Work has also been done using
-vocal tract gestures,
-which are discrete representations
-of articulatory information.
-
-??? NEXT: summarize those papers
+Some work has also been done
+relating this work to
+vocal tract gestures.
+For example,
+??? 04.542...pdf and 05.54200a1...pdf
+showed that the vocal tract gesture score
+can be estimated
+from the continuous articulator positions,
+which can then be used
+to do word classification with
+over 80\% accuracy on a synthesized dataset.
+??? 01.10.1.1.294 and 01.JASMAN...
+showed that a gesture score
+can be estimated from natural speech
+through a landmark-based time alignment procedure;
+however, this model assumed that the
+words in the utterance were known \textit{a priori},
+and applied their technique primarily
+for annotating data sets with time-aligned gesture scores.
+Surprisingly, we have been unable to find any literature
+attempting to extract vocal tract gesture scores
+from acoustic information directly,
+nor through a pipeline in which
+articulator positions are decoded,
+and then gesture scores are estimated
+from those articulator positions.
 
 \section{Human speech production}
 
