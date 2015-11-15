@@ -453,7 +453,7 @@ just use the derivatives
 
 \probbox{Once the intention to voice a syllable sequence
   has been formed, the motor system must translate
-  a sequence of static conceptual representations of those syllables
+  a sequence of static conceptual syllable representations
   to a continuous trajectory of motor commands
   that will cause muscle activations in the vocal tract.
   How can a neural model like Sermo generate
@@ -468,7 +468,11 @@ In this neural model,
 we describe how sequences of syllables are represented,
 and how those representations
 generate motor command trajectories
-that can control an articulatory synthesizer.
+that control an articulatory synthesizer.\footnote{
+  The model described in this section was created
+  in collaboration with Bernd Kr\"{o}ger.
+  A preliminary version of the model was presented
+  in ??? cite kroger.2014.pdf}
 
 A sequence of syllables is represented
 by a semantic pointer
@@ -478,42 +482,48 @@ in the list; i.e.,
   \text{SEQ} = \text{SYLL1} \circledast \text{POS1} \oplus
     \text{SYLL2} \circledast \text{POS2} \ldots
 \end{equation}
-For example, the word ``family'' would
-be represented as ??? /fam schwa lee/
+For example, the word ``family'' (??? /fam schwa lee/)
+would be represented as
 \begin{equation}
-  \text{FAMILY} = \text{FAM} \cirledast \text{POS1} \oplus
+  \text{FAMILY} = \text{FAM} \circledast \text{POS1} \oplus
     \text{SCHWA} \circledast \text{POS2} \oplus
-    \text{LEE} \circledast \text{POS3}
+    \text{LEE} \circledast \text{POS3}.
+\end{equation}
+Representing a syllable sequence
+by binding syllables to list positions
+allows us to query the sequence
+for its constituent syllables,
+as was done in ??? Choo 2010, eliasmith2012.
+For example, to query the model
+for the first syllable,
+we can bind the sequence semantic pointer
+with the inverse of the first position pointer.
+\begin{equation}
+  \text{FAM} \approx \text{FAMILY} \circledast \text{POS1}^{-1}
 \end{equation}
 
-??? this representation places a limitation
-on the number of syllables that can be in a sequence.
-From Spaun, that limit is around 7 ??? look up.
-most language average between 1 and 3 syllables
-per word ??? Pellegrino...pdf
-We don't believe that this limit actual limits us,
-because the linguistic subsystem would be hierarchically
-organized such that it is producing sequences of words,
-each of which is its own sequence of syllables
-that can be easily represented and queried.
-long sequences of syllables would therefore
-be a consequences of having word sequences
-map onto syllable sequences.
-
-The syllable production model
-begins with a syllable sequence
-randomly generated semantic pointer
-that represents a syllable.\footnote{
-  The semantic pointer could reflect
-  how the syllable is produced; e.g.,
+The semantic pointers representing syllable positions
+are constructed such that subsequent positions
+are the result of binding a position with
+a randomly generated $\text{NEXTPOS}$ pointer.
+For example,
+\begin{equation}
+  \label{nextpos}
+  \text{POS2} = \text{POS1} \circledast \text{NEXTPOS}
+\end{equation}
+The initial position, $\text{POS1}$,
+and semantic pointers for each syllable
+are also randomly generated.\footnote{
+  Syllable semantic pointer could be constructed to
+  reflect how the syllable is produced; e.g.,
   it could have a representation like
-  $\text{BA}=\text{B}\circledast\text{ONSET}\oplus
-  \text{A}\circledast\text{NUCLEUS}$,
+  $\text{BA} = \text{B} \circledast \text{ONSET} \oplus
+    \text{A} \circledast \text{NUCLEUS}$,
   where semantic pointers for the individual phonemes
   and syllable parts are randomly generated.
   However, as we will show in section~???,
-  we do not need this information
-  recognize syllables using production information.
+  we do not need this information to
+  produce or recognize syllables.
   Therefore, we deliberately do not impose
   any structure on the syllable semantic pointers
   in this model because we anticipate
@@ -521,27 +531,393 @@ that represents a syllable.\footnote{
   will dictate the features of the syllable
   that must be contained
   in the syllable semantic pointer representation.}
+Throughout the simulation,
+the current syllable to be voiced
+is computed by binding the sequence
+with the current position pointer.
+\begin{equation}
+  \text{SYLL} = \text{WORD} \circledast \text{CURRPOS}^{-1},
+\end{equation}
+where $\text{CURRPOS}$ starts as $\text{POS1}$
+and changes over the course of the simulation
+by binding with the $\text{NEXTPOS}$ pointer
+when each syllable has been voiced.
+
+It should be noted that
+this choice of representation
+sets a soft upper bound
+on the number of syllables in a sequence.
+In ??? eliasmith2012,
+it was shown that a similar network
+could represent lists with six elements accurately;
+elements in the middle of
+lists with seven or more elements
+were often unable to be queried.
+However, we assume that the
+language subsystems producing
+syllable sequences to be voiced
+are organized at the level of words,
+meaning that most syllable sequences
+will be between one and three syllables
+on average (see ??? Pellegrino...pdf).
+Linguistic subsystems would themselves
+use hierarchical representations
+of higher level linguistic structures,
+allowing for the syllable production subsystem
+to receive a reliable stream of
+short syllable sequences
+that are indistinguishable from
+a single long syllable sequence
+in most analyses.
+
+Each syllable semantic pointer
+is associated with a
+trajectory generation subsystem
+based on dynamic movement primitives (DMP)
+??? cite Schall, DeWolf.
+DMPs allow for reliable trajectory generation
+that can be temporally scaled,
+allowing for syllables to be voiced
+quickly or slowly.
+Each DMP generates a trajectory
+of vocal tract gestures,
+which are then mapped to
+motor commands that cause
+muscle activations in the vocal tract.
+
+Traditionally, DMPs can be either discrete or rhythmic,
+depending on whether the trajectory
+is followed repetitively.
+Since syllables are voiced
+one after another in typical speech,
+a discrete DMP would seem to be
+the obvious choice;
+however, it is possible for
+the same syllable to be voiced
+twice in a row,
+and some forms of singing
+feature rhythmic repetitions
+of the same syllable.
+Therefore, we use a hybrid approach
+in which syllable DMPs can be used rhythmically
+or discretely as needed.
+
+Each DMP consists of a point attractor
+and a forcing function.
+Currently, we do not implement
+separate point attractors for each DMP,
+and instead assume that all DMPs
+have the same point attractor,
+whose stable point is
+to have no active vocal tract gestures.
+The forcing function for each DMP
+generates a sequence of temporally coordinated
+vocal tract gestures
+that are defined manually.\footnote{
+  We assume that these vocal tract gesture sequences
+  would be learned through babbling and imitation phases,
+  as are modeled in DIVA and the Kr\"{o}ger model.
+  We leave the incorporation of this learning process
+  into the Sermo model as future work.}
+
+??? should we do all of this with direct production info
+and not gestures? It's worth looking into...
 
 ??? Do some fine tuning?
 
-??? Should we do a sequence of syllables?
-maybe, because it's already done
+\subsection{Neural model}
 
-??? Make a note that this section was done
-in collaboration with Bernd
+??? Neural model figure
 
-\subsection{Network diagram}
+SPA modules implemented in Nengo are used
+to robustly iterate through
+the syllable sequence list.
+The input sequence is represented
+in a \textit{state} module,
+which does not modify the sequence.
+The current position pointer
+is tracked by two interconnected
+\textit{working memory} modules,
+as was done in ??? eliasmith2012.
+The current syllable is computed
+by binding the \textit{state}
+with the inverse of the
+current pointer represented
+in \textit{working memory}.
+That syllable is sent to
+a \textit{temporal associative memory},
+which associates a DMP network
+with each syllable in the model vocabulary.
+
+The binding operation is computed
+in a straightforward manner
+(see ??? something for details),
+but the two working memory modules
+warrant further explanation
+in regard to how they
+calculate the next position pointer.
+This calculation
+uses the current position
+(see equation~\eqref{nextpos}),
+so the straightforward approach
+of computing this in a single recurrent loop
+fails because one of the two pointers
+being used in the computation
+is also the result of the computation.
+Instead, we exploit the fact that
+each working memory module is gated
+such that it operates in two regimes.
+In the ``acquisition'' regime,
+the memory module acquires a state to remembered.
+In the ``maintenance'' regime,
+the memory module ignores any incoming state,
+and maintains a memory of the last state
+encountered in the first regime.
+The two working memory modules
+are connected to each other,
+and are always in the opposite regime.
+Initially, the first memory
+acquires the $\text{POS1}$ state
+from an external source.
+The gating signal turns on,
+which sets the first memory
+into the maintenance regime,
+representing the $\text{POS1}$ state.
+This simultaneously sets the second memory
+into the acquisition regime,
+where it acquires the state
+being maintained by the first memory
+($\text{POS1}$ initially).
+The second memory is connected
+to the input of the first memory
+such that it computes the
+next position in the connection,
+and therefore is providing
+$\text{POS2}$ as input to the first memory,
+though it is currently ignoring it.
+When the gating signal is released,
+the two memories switch regimes.
+The second memory maintains
+its memory of $\text{POS1}$
+and therefore projects $\text{POS2}$
+to the first memory;
+the first memory acquires
+the $\text{POS2}$ state from the second memory.
+This process repeats for each position
+in the syllable sequence;
+each time the gating signal
+is turned on and off,
+the position pointer increments.
+
+This method of incrementing the position pointer
+is both robust and fast.
+It takes less than 50 ms to acquire
+a new memory state,
+and that state can be maintained
+for several seconds.
+Since syllables take
+on the order of hundred of milliseconds
+to be voiced,
+the circuit can go through a syllable sequence
+fast enough for spirited conversation.
+However, one aspect of the circuit as described
+poses a timing challenge.
+As discussed in section~??? derivs,
+there is a slight transmission delay
+when sending a signal between two ensembles.
+Yet, humans are capable of producing
+continuous speech with
+few to no discernible pauses between syllables.
+Therefore, the next syllable to be voiced
+must follow the current syllable very quickly,
+even overlapping when appropriate.
+
+To facilitate this,
+we use the trajectory generating DMPs
+to also generate control signals
+to switch the working memories
+to the next syllable,
+and to initiate the next syllable's DMP oscillator.
+Since the DMP is already involved in
+temporally coordinating
+the vocal tract movements
+producing the syllable itself,
+it is ideally suited to
+ensure that the next syllable
+is timed appropriately.
+Since it is only providing control signals
+to the working memory modules,
+it can transition to the next syllable
+without needing to know
+what syllable will be voiced next.
+
+Like non-temporal associative memories
+(see ??? stewart2011.pdf),
+the temporal associative memory
+contains an ensemble
+for each semantic pointer
+in the memory's vocabulary
+that is responsible for computing
+the similarity between
+that semantic pointer
+and some input signal.
+This computation is carried out
+through the connection between
+the ensemble representing the input signal
+and the ensemble representing
+the similarity to the desired pointer.
+The weights on this linear connection
+are set to be the semantic pointer itself;
+the encoding process (see equation~\eqref{???})
+therefore computes the dot product
+between the desired semantic pointer
+and the input signal.
+Since semantic pointers are not necessarily
+orthogonal to each other,
+more than one ensemble may activate
+for a given input signal.
+In order to clean up to a single
+output semantic pointer,
+all of the ensembles
+representing semantic pointer similarity
+mutually inhibit one another.
+As long as the semantic pointers
+are sufficiently dissimilar
+to each other,
+this mutual inhibition
+implements a winner-take-all function,
+resulting in only the ensemble
+representing similarity for the
+semantic pointer represented by
+the input signal being active.
+
+In non-temporal associative memories,
+the similarity ensembles
+project either the same (autoassociative)
+or another (heteroassociative) semantic pointer
+to a \textit{state} module,
+which therefore represents
+a static cleaned up version of the pointer
+associated with
+the original noisy input signal.
+In temporal associative memories,
+we instead associate each similarity ensemble
+with a DMP network so that
+the \textit{state} module
+represents a continuous trajectory
+in some vector space.
+In our case, the vector space of interest
+consists of 48 dimensions,
+each representing a vocal tract gesture.
+
+As previously mentioned,
+our DMP networks can be used in either
+a discrete or rhythmic way.
+Normally, discrete DMP networks
+are created by decoding the forcing function
+off of a one-dimensional ramp,
+playing out the trajectory defined by the forcing function
+as the ramp climbs from zero to one.
+Rhythmic DMPs are created by
+decoding the forcing function
+off of a controlled two-dimensional oscillator,
+playing out the trajectory defined by the forcing function
+as the oscillator's angle moves from
+$0$ to $2\pi$.
+The ability to climb the ramp
+at different velocities
+or drive the oscillator
+at different frequencies
+is what enables the DMP
+to generate trajectories at different timescales.
+
+In our DMP networks,
+we enable discrete or rhythmic behavior
+by using a two-dimensional oscillator
+which has a ``dead zone'' in
+phase space such that,
+without intervention,
+it will perform only one incomplete cycle,
+allowing for a discrete trajectory to
+be decoded from the oscillator.
+However, unlike discrete trajectories
+that use ramps,
+providing a short stimulus as the oscillator
+reaches the dead zone can allow it
+to complete another oscillatory cycle;
+discrete trajectories using ramps must
+be completely inhibited before another
+trajectory can be generated,
+which would cause disfluencies
+when repeating syllables.
+However, the ability to operate
+both discretely and rhythmically
+comes at the cost of robustness
+and frequency range.
+Typical rhythmic DMPs
+can operate at high frequencies.
+High frequencies could cause our DMPs
+to have enough momentum to pass through
+the dead zone and continue oscillating.
+In general, the size of the dead zone
+can be used to balance the tradeoff
+between how much of the phase space
+can be used for the forcing function,
+and how high the frequency can be pushed
+before unwanted rhythmic behavior occurs.
+
+The forcing function of each DMP
+interpolates a vector representation of
+a manually defined
+vocal tract gesture score over time.
+The gesture scores are
+designed to be used with the VocalTractLab
+articulatory synthesizer ??? cite.
+While a full speech production system
+would also include a mapping from
+the gesture score to
+vocal tract parameter changes,
+this mapping would be identical
+for all syllables
+and so we leave the neural implementation
+of this mapping as future work.
+Instead, we automatically generate
+a gesture score from the neurally generated
+vector representation over time,
+which can then be synthesized
+by VocalTractLab.
+
+\subsection{Vocal tract parameters}
+
+??? Instead of gestures, we could instead
+generate parameters. Pro: continuous, lower dimension.
+Con: can't optimize the mapping between
+gesture and parameters.
+However, worth trying out?
 
 \subsection{Evaluation}
 
 ??? compare original VTG -> audio to Nengo -> VTG -> audio
+
+??? The goal of a syllable production system
+is to generate an audio waveform
+that is perceptually classified
+by a listener as corresponding to
+the intended syllable sequence.
+While it is possible to quantify
+whether this goal is achieved
+by ...
+
+??? For testing, we use gesture scores
+for German syllables
+provided by Bernd Kr\"{o}ger.
 
 \section{Syllable recognition}
 
 Go from a vocal tract gesture score
 to a syllable semantic pointer, in neurons.
 
-\subsection{Network diagram}
+\subsection{Neural model}
 
 \subsection{Evaluation}
 
