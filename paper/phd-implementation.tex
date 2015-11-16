@@ -449,6 +449,55 @@ since the SVM should manage these,
 so if they don't help then I will
 just use the derivatives
 
+% From earlier iteration
+
+% ??? Functional evaluation: can we decode downstream features?
+% How well do we do compared to other systems?
+% We don't have to do as well as them,
+% but we have to do well enough that it's not ridiculous.
+
+% ??? for phonemes: our gold standard is a set of labels
+% over time with the proper phoneme.
+% If the system categorizes to that label in that period,
+% then it's correct. Or maybe what's more important
+% is that the phonemes are all in the same order,
+% and we also have some kind of timing information?
+
+% ??? Neural evaluation: One thing that's commonly measured
+% in auditory neuroscience is the spectro-temporal receptive field
+% of auditory neurons. We can make these for our downstream feature
+% neurons and compare them to published STRFs and see if they look similar.
+% Note that it would be easy to make neurons that can replicate STRFs,
+% as we would just use the temporal transformations that matter.
+% But, we make our choice of transformations based on what would
+% be best to decode certain features;
+% being able to also replicate STRFs gives an indication that
+% we made good choices, and that this system is engineered
+% in a similar way to how the system developed and evolved (maybe?)
+
+% ??? should we talk about the experiments from the results section here?
+
+% ??? Nonsense CVCs: cite Allen 94;
+
+% ``Typical ASR systems start with a `front-end' that transforms
+% the speech signal into a `feature vector' which is then processed
+% by a `back-end' classifier. These systems frequently place a
+% heavy emphasis on word and language models as a method of
+% increasing the recognition scores.''
+
+% ``Because of confusion and misunderstanding based on
+% coarticulation arguments, only a small amount of research
+% has been done on the automatic recognition of nonsense CVCs.
+% From the work of Fletcher and Steinberg, it should be clear
+% that the real challenge in machine recognition today is
+% human-like performance for phones and nonsense CVC
+% under conditions of typical channel distortions.
+% Since the human performance is well-known under
+% these conditions [15], [19], nonsense CVCs
+% represent an excellent database. Decreasing
+% the error rates for these elementary signals would have
+% a major impact on overall system performance and robustness.''
+
 \section{Syllable production}
 
 \probbox{Once the intention to voice a syllable sequence

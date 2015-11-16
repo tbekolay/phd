@@ -13,16 +13,101 @@ In this chapter, we present
 a conceptual model of the human speech system
 that we believe can be implemented
 in biologically plausible spiking neural networks.
+
 The model, dubbed Sermo
 (\textul{S}peech \textul{e}xecution and \textul{r}ecognition
 \textul{m}odel \textul{o}rganism),
 is a synthesis of the background material
-summarized in the previous chapter,
-and provides context for
-the parts of the model concretely implemented
-in the subsequent chapters.
+summarized in the previous chapter.
+The goal of Sermo
+is to break the larger
+intractable problem of human speech
+into concrete subproblems
+that have existing partial solutions,
+or provide a reasonable challenge
+for machine learning
+and computational neuroscience researchers.
+Pragmatically for this thesis,
+Sermo provides context for
+the subproblems for which
+we have implemented concrete solutions
+in subsequent chapters.
 
-\section{Recognition system}
+\section{Sermo description}
+
+??? main figure
+
+??? break it down: auditory feature extraction,
+  linguistic processing (ventral),
+  sensorimotor integration (dorsal),
+  speech motor control
+
+In addition to the overall organization
+of subsystems and how they interact,
+we also impose the following constraints
+on Sermo in order to make explicit
+that it is modeled after a biological system,
+and should be able to interact
+with biological systems naturally.
+
+\begin{itemize}
+  \item Subsystems must operate in a continuous, online fashion.
+  \item Subsystems must be implementable in biologically plausible
+    spiking neurons.
+  \item Learning rules may only use local error information,
+    and must compute error signals with spiking neurons.
+\end{itemize}
+
+Solutions to subproblems that do not
+meet these criteria are still
+a crucial component of progress in this model.
+Adapting solutions that work in
+discrete time, with rate based neuron models,
+or with idealized learning rules like backpropagation
+to meet these criteria
+is a critical research activity,
+for the following reasons.
+
+\begin{itemize}
+  \item Models meeting these criteria can be compared directly
+    to experimental data at all levels,
+    from single unit activity recordings to behavior.
+  \item Models meeting these criteria can be implemented
+    in neuromorphic hardware.
+\end{itemize}
+
+Direct experimental comparisons enable
+iterative development of the model.
+As Sermo subsystems are implemented,
+they will be used to make testable predictions.
+As these predictions are tested,
+the model can be invalidated
+or updated to incorporate new empirical results.
+
+Neuromorphic hardware
+presents a plausible avenue
+to real time interaction
+between humans and Sermo instances.
+Many of the subsystems already implemented
+run at many times slower than real time,
+despite the use of recent general purpose
+CPUs and GPUs,
+and reasonably efficient algorithms.
+While incremental advances
+in these technologies may
+bring subsystems closer to real time,
+a fully integrated system
+with all subsystems interacting online
+is intractable for the foreseeable future.
+Neuromorphic systems that are designed
+to simulate millions of spiking neuron models
+in real time
+are currently under development
+(e.g., ??? cites),
+and may make a full Sermo instance
+possible in the next few decades.
+
+\subsection{Auditory feature extraction}
 
 The recognition system is composed of
 three layers connected in a feed-forward manner.
@@ -72,7 +157,7 @@ such as those based on deep learning (???refsection),
 in which... ???more, it's discrete
 This system is also ???something about NEF
 
-\subsection{Auditory periphery}
+\subsubsection{Auditory periphery}
 
 ???figure of periphery
 
@@ -133,7 +218,7 @@ by sophisticated periphery models either
 ???question: do we take the envelope here,
 or is that later?
 
-\subsection{Auditory preprocessing}
+\subsubsection{Auditory preprocessing}
 
 The auditory preprocessing layer
 takes frequency information from the auditory periphery,
@@ -244,10 +329,9 @@ is straightforward,
 making the preprocessing layer
 generic and extensible.
 
-
 ??? Modulation filterbank: implement, talk about
 
-\subsection{Features}
+\subsubsection{Feature detectors}
 
 The feature layer takes temporally transformed
 frequency information from the preprocessing layer
@@ -444,7 +528,7 @@ speed; in general, most people talk at the same pace,
 but you can tell if they are speaking in a
 marked fast or slow pace.
 
-\subsection{The role of feedback}
+\subsubsection{The role of feedback}
 
 The above system is primarily feed-forward
 (though feedback is used extensively in the
@@ -469,56 +553,13 @@ signals between layers in the auditory system.
 This type of feedback could be added
 to this system in future work.
 
-\subsection{Evaluation}
+\subsection{Linguistic processing}
 
-??? Functional evaluation: can we decode downstream features?
-How well do we do compared to other systems?
-We don't have to do as well as them,
-but we have to do well enough that it's not ridiculous.
+??? pass!
 
-??? for phonemes: our gold standard is a set of labels
-over time with the proper phoneme.
-If the system categorizes to that label in that period,
-then it's correct. Or maybe what's more important
-is that the phonemes are all in the same order,
-and we also have some kind of timing information?
+\subsection{Sensorimotor integration}
 
-??? Neural evaluation: One thing that's commonly measured
-in auditory neuroscience is the spectro-temporal receptive field
-of auditory neurons. We can make these for our downstream feature
-neurons and compare them to published STRFs and see if they look similar.
-Note that it would be easy to make neurons that can replicate STRFs,
-as we would just use the temporal transformations that matter.
-But, we make our choice of transformations based on what would
-be best to decode certain features;
-being able to also replicate STRFs gives an indication that
-we made good choices, and that this system is engineered
-in a similar way to how the system developed and evolved (maybe?)
-
-??? should we talk about the experiments from the results section here?
-
-??? Nonsense CVCs: cite Allen 94;
-
-``Typical ASR systems start with a `front-end' that transforms
-the speech signal into a `feature vector' which is then processed
-by a `back-end' classifier. These systems frequently place a
-heavy emphasis on word and language models as a method of
-increasing the recognition scores.''
-
-``Because of confusion and misunderstanding based on
-coarticulation arguments, only a small amount of research
-has been done on the automatic recognition of nonsense CVCs.
-From the work of Fletcher and Steinberg, it should be clear
-that the real challenge in machine recognition today is
-human-like performance for phones and nonsense CVC
-under conditions of typical channel distortions.
-Since the human performance is well-known under
-these conditions [15], [19], nonsense CVCs
-represent an excellent database. Decreasing
-the error rates for these elementary signals would have
-a major impact on overall system performance and robustness.''
-
-\section{Synthesis system}
+\subsection{Speech motor control}
 
 The synthesis system translates
 high-level features describing an utterance
@@ -550,7 +591,7 @@ an articulatory synthesizer and a neural control system.
 ??? might want to make this more specific after writing
 the background section
 
-\subsection{Articulatory synthesizer}
+\subsubsection{Articulatory synthesizer}
 
 As summarized in ???secref,
 articulatory synthesizers are composed
@@ -607,7 +648,7 @@ efficiency and interoperability with Nengo.
 
 ??? acoustic model -- wait until later
 
-\subsection{Neural control system}
+\subsubsection{Neural control system}
 
 ??? Rewrite after we make a few sims
 
@@ -708,3 +749,25 @@ We might expect that the
 \section{Relation to DIVA and the Kr\"{o}ger model}
 
 \section{Subsystems modeled in this thesis}
+
+\section{Limitations and how to overcome them}
+
+??? there are large swaths of the model missing,
+most notably in how the ventral linguistic systems
+might be implemented.
+
+??? the only productive way around this is to
+collaborate on the development of the model,
+both conceptually and concretely.
+We assert that
+the traditional publication system
+is just one piece of how science should progress.
+Modern tools for visualizing
+and disseminating information,
+and proposing and discussing changes
+are another piece of puzzle.
+I have been using these tools
+to track my personal progress,
+and upon publication
+will release these tools
+in order to overcome these limitations.
