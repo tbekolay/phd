@@ -37,10 +37,45 @@ in subsequent chapters.
 
 ??? main figure
 
-??? break it down: auditory feature extraction,
-  linguistic processing (ventral),
-  sensorimotor integration (dorsal),
-  speech motor control
+Sermo is split into five interacting systems,
+as summarized in Figure~???.
+\begin{itemize}
+  \item \textbf{Auditory feature extraction}
+    converts incoming audio waveforms into
+    features suitable for linguistic processing
+    and sensorimotor integration.
+    This system is analogous to the frontend
+    of an ASR system,
+    and to the auditory periphery and
+    early auditory pathways in the human speech system.
+  \item \textbf{Non-auditory sensory modalities}
+    gather relevant information
+    from non-auditory sources
+    to inform or correct other systems.
+  \item \textbf{Sensorimotor integration}
+    uses sensory information to
+    recognize and predict the motor intentions
+    of speakers, including one's self.
+    This system is analogous to the
+    dorsal stream in the human speech system.
+  \item \textbf{Linguistic processing}
+    converts sensory and sensorimotor information
+    into sublexical and lexical representations
+    suitable for high level linguistic
+    and cognitive reasoning.
+    This system is anologous to
+    the language model in an ASR system,
+    and to the ventral stream
+    in the human speech system.
+  \item \textbf{Speech motor control}
+    uses lexical and sensorimotor information
+    to generate motor commands
+    that drive a simulated vocal tract model,
+    which produces audio waveforms.
+\end{itemize}
+
+Further details on each of these
+systems follows in the subsequent sections.
 
 In addition to the overall organization
 of subsystems and how they interact,
@@ -109,55 +144,51 @@ possible in the next few decades.
 
 \subsection{Auditory feature extraction}
 
-The recognition system is composed of
-three layers connected in a feed-forward manner.
+The auditory feature extraction system
+preprocesses audio waveforms
+in order to support
+linguistic and sensorimotor analysis.
+As has been shown through
+the gap between
+automatic speech recognition
+and human speech comprehension,
+the temporal characteristics
+of speech
+make these analysis problems
+difficult to solve
+with traditional computers.
+Digital computation is precise and discrete;
+human speech is variable and continuous.
+We hypothesize that the
+parallel and distributed nature
+of biological computation
+is central to its
+ability to process temporal information.
 
-??? Note: I think we'll change from phonemes to vocal tract gestures,
-for this model. It's possible to learn phonemes and / or words,
-but that might not make sense for this particular system;
-the ventral stream, for example, might use words,
-but for us, gestures make more sense.
-See nihms521633.pdf for another account of why phonemes
-aren't necessarily the best thing.
+Sermo defines three subproblems
+that must be solved
+by the auditory feature extraction system:
+\textit{spectral analysis},
+\textit{temporal transformation},
+and \textit{decorrelation}.
+In spectral analysis,
+the incoming auditory signal
+is projected into frequency space
+by analyzing the spectral density
+of the signal in the recent past.
+Temporal transformation
+... ???
+Decorrelations...???
 
-???come up with a name maybe
+\subsubsection{Spectral analysis}
 
-???figure of whole system
-
-\begin{itemize}
-\item \textbf{Auditory periphery.} The auditory periphery layer
-  takes incoming air pressure waves and converts them
-  to a frequency representation,
-  mimicking the function of the human ear.
-\item \textbf{Auditory preprocessing.} The auditory preprocessing layer
-  represents the frequency information from the auditory periphery,
-  and through recurrent connections within the layer,
-  also represents temporal dynamics of frequency information
-  (e.g., time derivatives).
-\item \textbf{Features.} The feature layer
-  represents speech-relevant features;
-  in this work, we represent phonemes, pitch, and volume.
-  Features are computed from information
-  in the auditory preprocessing layer.
-\end{itemize}
-
-This system is similar to many previous systems,
-and aside from its feedforward nature,
-follows naturally from the organization
-of the human speech system (???ref or ???section).
-The primary way in which this system
-deviates from previous models
-is by imposing biological constraints.
-Specifically, the system operates
-in continuous time,
-and only uses locally available information.
-Adhering to these constraints differentiates
-this system from similar systems,
-such as those based on deep learning (???refsection),
-in which... ???more, it's discrete
-This system is also ???something about NEF
-
-\subsubsection{Auditory periphery}
+Sermo theorizes that spectral analysis
+is performed by a model
+of the auditory periphery.
+An auditory periphery model
+emulates the human ear
+up to the signals
+traveling down the auditory nerve.
 
 ???figure of periphery
 
@@ -215,8 +246,41 @@ by sophisticated periphery models either
   we will use for testing in this work.
 \end{itemize}
 
-???question: do we take the envelope here,
-or is that later?
+\subsubsection{Temporal transformation}
+
+??? Signal processing (LTI systems theory)
+has much to teach us here;
+important research activities
+would include implementing these algorithms
+in biologically plausible systems
+to see which algorithms
+can be implemented naturally
+and how they perform in the context
+of Sermo.
+
+One aspect of auditory feature extraction
+that warrants significant further research
+is the extent to which
+information from the recent past
+is used at the current moment.
+Until recently,
+the most successful ASR systems
+were based on Hidden Markov Models (HMMs),
+which inherently assume that ...
+
+??? DNNs are the best now,
+but their treatment of time
+is difficult to interrogate.
+Many bidirectionally connected layers
+of LSTMs and GRUs
+appear to be sufficient for
+linguistic and sensorimotor information retrieval,
+but it is not clear what temporal transformations
+are actually taking place.
+
+\subsubsection{Decorrelation}
+
+??? DCT_TR802.pdf
 
 \subsubsection{Auditory preprocessing}
 
@@ -527,6 +591,40 @@ as future work.
 speed; in general, most people talk at the same pace,
 but you can tell if they are speaking in a
 marked fast or slow pace.
+
+\subsubsection{Evaluation}
+
+Progress in the auditory feature extraction system
+is difficult to measure
+because it is most useful
+in the context of other systems.
+It is not readily apparent
+what impact
+an improved decorrelation network
+might have on the sensorimotor integration
+system's ability to decode production information,
+for example.
+Although we can assume that
+an output representation with
+less autocorrelation
+will be easier to decode,
+the gains from this improvement
+may be modest compared to
+changing the time constants on temporal transformations,
+or even increasing the number of neurons
+used to represent certain pieces of information.
+
+We believe that this difficulty
+motivates the development
+of large integrated systems
+like Sermo
+as it enables evaluation
+through comparing candidates solutions
+to different subproblems
+in the context of
+known best solutions
+to subproblems in the sensorimotor integration
+and linguistic processing systems.
 
 \subsubsection{The role of feedback}
 
