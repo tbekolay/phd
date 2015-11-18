@@ -93,14 +93,33 @@ with biological systems naturally.
     and must compute error signals with spiking neurons.
 \end{itemize}
 
+Another way to summarize these constraints
+is to emphasize that Sermo
+is a mechanistic model
+of the human speech system.
+We are not only concerned with
+classifying and generating speech
+with human-like accuracy,
+we also wish to gain insight
+into what information is required
+to classify and generate speech.
+
 Solutions to subproblems that do not
-meet these criteria are still
-a crucial component of progress in this model.
-Adapting solutions that work in
+meet these criteria
+(e.g., statistical models)
+are still a crucial component
+of progress in this model.
+Some parts of the model are
+necessarily statistical,
+and the information being transformed
+may not be easily explained
+by a label like ``lexical representation.''
+In these situations,
+however, it is still a critical research activity
+to adapt statistical models that work in
 discrete time, with rate based neuron models,
 or with idealized learning rules like backpropagation
-to meet these criteria
-is a critical research activity,
+to meet the above criteria,
 for the following reasons.
 
 \begin{itemize}
@@ -142,7 +161,45 @@ are currently under development
 and may make a full Sermo instance
 possible in the next few decades.
 
+A final note about
+the general architecture of Sermo
+and its subsystems
+is that we will focus on a view
+of Sermo as it would be used
+in a conversational setting
+that does not require learning.
+We treat each subsystem as a separate
+module that is defined primarily
+by the input it expects,
+and the output it provides;
+however, in development and other forms
+of learning,
+there would be a proliferation of
+interconnections between modules
+providing error information.
+Detailing these connections
+in each subsystem and across subsystems
+would be an important area
+for further developing the model,
+but we believe that presenting
+a static endpoint for learning
+is important as a first step
+before considering
+how that endpoint might come about.
+Regardless,
+as learning is ubiquitous in speech,
+we provide a model that learns
+through synaptic plasticity
+in Section~??? as
+a proof of concept that
+the subsystems in Sermo
+can be learned if appropriate
+error information is computed
+as part of the model.
+
 \subsection{Auditory feature extraction}
+
+??? Add input / output box, similar to Implementation probbox?
 
 The auditory feature extraction system
 preprocesses audio waveforms
@@ -169,16 +226,40 @@ Sermo defines three subproblems
 that must be solved
 by the auditory feature extraction system:
 \textit{spectral analysis},
-\textit{temporal transformation},
-and \textit{decorrelation}.
+\textit{decorrelation},
+and \textit{temporal transformation}.
 In spectral analysis,
 the incoming auditory signal
 is projected into frequency space
 by analyzing the spectral density
 of the signal in the recent past.
-Temporal transformation
-... ???
-Decorrelations...???
+The spectral density of the signal
+is expected to have high
+correlation between nearby frequencies.
+Generally, these correlations
+make feature extraction more difficult,
+so the decorrelation step
+projects the spectral density
+onto a set of basis functions
+that are more orthogonal;
+typically, fewer basis functions
+are used than frequency components.
+Finally, while the information
+in the spectral density
+and decorrelated vector
+contains information from
+a window of time defined by
+the spectral analysis step,
+the temporal characteristic of speech
+may require that information
+from further in the past is available
+at the current time.
+Temporal transformations
+maintain past information
+to filter spectral
+and decorrelated spectral information
+for better linguistic
+and sensorimotor information decoding.
 
 \subsubsection{Spectral analysis}
 
@@ -190,212 +271,245 @@ emulates the human ear
 up to the signals
 traveling down the auditory nerve.
 
-???figure of periphery
+There are many existing
+models of the auditory periphery
+that meet the constraints
+imposed by Sermo (see Section~???).
+Each auditory perhiphery model
+captures certain psychoacoustic phenomena
+at a particular computational cost.
+In general, these two quantities
+are often traded off;
+the more accurately the ear is modeled,
+the most costly the model is to simulate.
 
-As summarized in secition ???ref,
-there are many models of the auditory periphery
-that differ in how many phenomena they capture,
-and in their computational costs.
-For this system,
-the primary selection criteria is
-the computational cost;
-periphery models that simulate quickly
-allow for rapid iterative development
-to determine the conditions
-under which the model is successful
-under which it fails.
-We will therefore use
-a bank of Gammatone filters as the
-auditory periphery model,
-as it captures the primary phenomena
-of the auditory periphery
-and incurs the least computational cost
-of the models surveyed.
-
-???talk about the various phenomena
-and why it isn't important for this model
-
-Unlike some of the other layers, however,
-this layer is modular.
-All auditory periphery models expose
-generally the same interface;
-the input is air pressure waves,
-and the output is either action potentials
-traveling down the auditory nerve,
-or basilar membrane deflections
-which can be converted to action potentials
-using various spike generation mechanisms.
-Should we determine that Gammatone filters
-are not sufficient for extracting
-the features that we aim to collect,
-then we can try other auditory periphery models
-with minimal changes to the rest of the system.
-In doing so, we would also be able to
-determine functional roles for the
-unique phenomena captured by the
-periphery model that is able to extract particular features.
-However, we believe that many
-of the phenomena captured
-by sophisticated periphery models either
-\begin{itemize}
-\item replicate unnecessary biological detail
-  (i.e., details that come about because biological parts
-  are necessarily noisy and imperfect), or
-\item become necessary in more complicated
-  auditory environments than the ones
-  we will use for testing in this work.
-\end{itemize}
-
-\subsubsection{Temporal transformation}
-
-??? Signal processing (LTI systems theory)
-has much to teach us here;
-important research activities
-would include implementing these algorithms
-in biologically plausible systems
-to see which algorithms
-can be implemented naturally
-and how they perform in the context
-of Sermo.
-
-One aspect of auditory feature extraction
-that warrants significant further research
-is the extent to which
-information from the recent past
-is used at the current moment.
-Until recently,
-the most successful ASR systems
-were based on Hidden Markov Models (HMMs),
-which inherently assume that ...
-
-??? DNNs are the best now,
-but their treatment of time
-is difficult to interrogate.
-Many bidirectionally connected layers
-of LSTMs and GRUs
-appear to be sufficient for
-linguistic and sensorimotor information retrieval,
-but it is not clear what temporal transformations
-are actually taking place.
+It is difficult to assert \textit{a priori}
+which psychoacoustical phenomena
+are important for speech.
+It would be reasonable to assume that
+the majority of what the ear does
+is important for an individual's survival;
+however, we process many types of sound,
+not just speech.
+An ideal auditory filter model
+for the spectral analysis subsystem
+in Sermo
+would capture all of the phenomena
+that are important for speech,
+but no additional phenomena
+that increase the computational cost
+of the model.
 
 \subsubsection{Decorrelation}
 
-??? DCT_TR802.pdf
+Decorrelation techniques like
+linear filters and the discrete cosine transform
+are widely used in digital computing
+for compression ??? cite DCT_TR802.pdf.
+In compression, a signal is projected
+onto a set of basis functions;
+only the coefficients are stored,
+as an approximation of the original signal
+can be recovered later by linearly combining
+the basis functions weighted by those coefficients.
+A similar argument can be made
+to explain why automatic speech recognition systems
+often use a decorrelation technique
+at the frontend.
+By operating on the coefficients of a set
+of basis functions,
+the set of parameters that must be optimized
+by the backend is reduced.
 
-\subsubsection{Auditory preprocessing}
+While this line of reasoning
+does not guarantee that
+the brain also explicitly decorrelates
+the frequency representation
+provided by the auditory periphery,
+it is clear that biological systems
+aim to minimize energy expenditure whenever possible.
+Learning through synaptic plasticity
+takes more energy than does
+typical signal transmission.
+Since much of the speech system
+is developed and refined
+through synaptic plasticity,
+using decorrelated representations
+as early in the speech system as possible
+may reduce the brain's energy expenditure
+over one's lifetime.
+Therefore, we hypothesize
+that a system implemented
+with a biologically plausible substrate,
+as Sermo is,
+decorrelates the frequency representation
+provided by the auditory periphery.
 
-The auditory preprocessing layer
-takes frequency information from the auditory periphery,
-and computes generic temporal transformations.
-Each downstream feature will use a different
-subset of these transformations.
-For efficiency,
-only transformations used by at least one
-downstream feature will be
-included in the final integrated system,
-but for testing the auditory system independently,
-many transformations will be computed
-to determine the critical set of
-transformations needed by each downstream feature.
+\subsubsection{Temporal transformation}
 
-It is important to be explicit about
-why the auditory preprocessing layer is necessary,
-as it exemplifies the constraints involved in
-using biologically inspired methods.
-We use temporal transformations
-so that all of the information necessary
-to determine the phoneme currently being voiced,
-or to determine any other downstream feature,
-is available at the current moment in time.
-Humans can be trained to look at
-audio spectrograms and decipher
-the utterance based on how the
-frequency information changes over time.
-Many speech recognition systems operate
-in a similar way, by looking at
-???millisecond slices of time
-and decoding phonemes with that portion
-of the spectrogram ???refs and specifics.
-In contrast, humans receive audio
-as a constant stream,
-using internal processes to remember
-parts of the recent audio past
-in order to decode linguistic
-and non-linguistic information.
-Our system also operates in
-an online real-time fashion,
-receiving a constant stream of audio input,
-and using internal processes
-to keep around the information
-needed to decode speech.
-The audio preprocessing layer
-is the primary method in which
-raw audio information from the recent past
-is made available at the current time.
+The extent to which the recent past
+is used to recognize speech
+at the current moment
+is of crucial importance,
+yet is not often studied systematically.
+In the brain, spectrotemporal receptive fields
+have been measured using
+tone ramps and other temporally varying signals,
+revealing neurons that appear to be active
+hundreds of milliseconds
+after activity at
+the cell's characteristic frequency,
+but it is not clear if those
+neurons are involved in speech,
+nor is it clear what transformation they are implementing.
+In automatic speech recognition,
+the length of the audio frame
+and how much it increments on each timestep
+is often chosen arbitrarily,
+or uses values known to work.
 
-These transformations are expressed as
-linear time-invariant filters.
-These filters are applied to the incoming
-frequency information.
-???more about LTIs
+Until recently,
+the most successful ASR systems
+were based on Hidden Markov Models (HMMs),
+which are based on the Markov assumption,
+which that is that only the information
+from the previous state is required
+to reason about the current state.
+Despite the fact that speech is highly temporally correlated,
+these systems were relatively successful.
+However, a great deal of engineering
+went into the application of HMMs
+to speech, primarily because of
+its temporal nature
+(see e.g., ??? Rabiner tutorial,
+some other cite).
+One such improvement for HMM-based ASR systems
+is to include the first and second temporal derivatives
+in the state representation.
+Current state-of-the-art systems
+are based on hierarchies of bidirectionally connected
+recurrent neural networks (RNNs),
+which are able to maintain information about
+previous states through recurrent connections.
+It is reasonable to assume that
+a more flexible representation
+of the recent past
+is part of why these networks
+fare better than HMM-based systems
+which have had decades of incremental improvements.
 
-???rundown of what transformations are done
+Further study into how much temporal information
+is maintained by deep RNNs,
+and how that temporal information is transformed
+would benefit Sermo
+and other speech systems.
+In particular, expressing the deep RNN's
+temporal transformation as a
+linear time-invariant (LTI) filter
+would be of particular interest,
+as LTI filters can be efficiently implemented
+with spiking neural networks
+(see ??? cite Aaron's stuff).
+Alternatively, LTI filters
+commonly used in engineering applications
+can be experimented with
+to investigate whether decoding accuracy
+is improved in downstream
+linguistic and sensorimotor systems.
 
-???try to have a citation for each transformation
+The above system is primarily feed-forward
+(though feedback is used extensively in the
+auditory preprocessing layer).
+It is important to note that
+a complete auditory processing system
+would match the brain (???refs) and have
+feedback connections between all layers
+in order to refine each layer's ability
+to provide useful output downstream layers.
+(??? more stuff from refs)
 
-???include equations
+Feedback is an undeniably important
+component of a full system that operates
+for long periods of time with sensors
+that are constantly changing and degrading.
+In this work, however, we assume
+that the auditory periphery does not change
+its ability to process sounds over a long timescale,
+and therefore we do not include corrective feedback
+signals between layers in the auditory system.
+This type of feedback could be added
+to this system in future work.
 
-A central question that we will explore
-is whether features can be decoded
-from temporal transformations
-of each frequency,
-or it is necessary for nearby frequencies
-to interact in some transformations.
-For example,
-equation~???eqref calculates
-the derivative of a signal;
-i.e., it tells us how the power associated
-with a particular frequency has changed recently.
-We could instead look at the derivative
-of the difference between two frequencies.
-???put in equation.
-This equation tells us how the relative
-power between two frequencies
-has changed recently.
-???someref indicates that
-correctly identifying bigrams
-is as essential to phonology
-as correctly identifying individual phonemes.
-Temporal transformations that
+\subsubsection{Evaluation}
 
-This layer does not contain all possible
-temporal transformations;
-there are an infinite number of filters
-that could be applied to the incoming
-frequency information.
-The filters above were chosen
-because they appear in the literature.
-However, additional transformations
-can be added if they are needed
-by other downstream features.
-Other LTI filters could also be added
-systematically to discover useful filters
-that might form predictions of
-filters we might find in the brain.
+Progress in the auditory feature extraction system
+is difficult to measure
+because it is most useful
+in the context of other systems.
+It is not readily apparent
+what impact
+an improved decorrelation network
+might have on the sensorimotor integration
+system's ability to decode production information,
+for example.
+Although we can assume that
+an output representation with
+less autocorrelation
+will be easier to decode,
+the gains from this improvement
+may be modest compared to
+changing the time constants on temporal transformations,
+or even increasing the number of neurons
+used to represent certain pieces of information.
 
-While the ability to add new LTI filters
-does not make the preprocessing layer
-as modular and interchangeable
-as the auditory periphery,
-the procedure for adding
-new temporal transformations
-is straightforward,
-making the preprocessing layer
-generic and extensible.
+We believe that this difficulty
+motivates the development
+of large integrated systems
+like Sermo
+as it enables evaluation
+through comparing candidates solutions
+to different subproblems
+in the context of
+known best solutions
+to subproblems in the sensorimotor integration
+and linguistic processing systems.
+In other words,
+one of the primary contributions of Sermo
+is to propose standardized input and output formats
+required by each subsystem.
+We will show a proof of concept
+that Sermo supports such comparisons
+in Section~??? in which we compare
+??? auditory periphery models
+on a word classification task.
 
-??? Modulation filterbank: implement, talk about
+\subsection{Non-auditory sensory modalities}
 
-\subsubsection{Feature detectors}
+Biological systems are remarkably adept
+at integrating information
+from different sensory modalities
+in order to guide behavior.
+In speech,
+we use visual information
+from other speakers to improve recognition,
+and somatosensory information
+from vocal tract articulators
+to improve production.
+A fully realized version of Sermo
+would include these non-auditory sensory systems;
+however, the currently implemented
+subset of Sermo does not.
+
+\subsection{Sensorimotor integration}
+
+Input: auditory and non-auditory features
+
+Output: production information: vocal tract gestures,
+or vocal tract parameters.
+
+\subsection{Linguistic processing}
+
+??? pass!
 
 The feature layer takes temporally transformed
 frequency information from the preprocessing layer
@@ -592,71 +706,6 @@ speed; in general, most people talk at the same pace,
 but you can tell if they are speaking in a
 marked fast or slow pace.
 
-\subsubsection{Evaluation}
-
-Progress in the auditory feature extraction system
-is difficult to measure
-because it is most useful
-in the context of other systems.
-It is not readily apparent
-what impact
-an improved decorrelation network
-might have on the sensorimotor integration
-system's ability to decode production information,
-for example.
-Although we can assume that
-an output representation with
-less autocorrelation
-will be easier to decode,
-the gains from this improvement
-may be modest compared to
-changing the time constants on temporal transformations,
-or even increasing the number of neurons
-used to represent certain pieces of information.
-
-We believe that this difficulty
-motivates the development
-of large integrated systems
-like Sermo
-as it enables evaluation
-through comparing candidates solutions
-to different subproblems
-in the context of
-known best solutions
-to subproblems in the sensorimotor integration
-and linguistic processing systems.
-
-\subsubsection{The role of feedback}
-
-The above system is primarily feed-forward
-(though feedback is used extensively in the
-auditory preprocessing layer).
-It is important to note that
-a complete auditory processing system
-would match the brain (???refs) and have
-feedback connections between all layers
-in order to refine each layer's ability
-to provide useful output downstream layers.
-(??? more stuff from refs)
-
-Feedback is an undeniably important
-component of a full system that operates
-for long periods of time with sensors
-that are constantly changing and degrading.
-In this work, however, we assume
-that the auditory periphery does not change
-its ability to process sounds over a long timescale,
-and therefore we do not include corrective feedback
-signals between layers in the auditory system.
-This type of feedback could be added
-to this system in future work.
-
-\subsection{Linguistic processing}
-
-??? pass!
-
-\subsection{Sensorimotor integration}
-
 \subsection{Speech motor control}
 
 The synthesis system translates
@@ -749,6 +798,25 @@ efficiency and interoperability with Nengo.
 \subsubsection{Neural control system}
 
 ??? Rewrite after we make a few sims
+
+??? This is basically the mapping between VTGs
+and the actual motor tract trajectories.
+Why is this necessary? It may not be,
+but one thought of why it may be
+is that we can easily account for
+vocal tract perturbations,
+and how we compensate works
+across all of our utterances.
+If we assume that we're just learning
+motor trajectories for each syllable,
+then we would have to update all of these
+to have this kind of transference.
+This doesn't make sense.
+So, if we're generating vocal tract gesture trajectories,
+then all we need to do is
+adjust the mapping from gesture trajectories
+to the articulator parameters,
+and it will work for all syllables.
 
 As summarized in ???secref,
 the ???brain parts
