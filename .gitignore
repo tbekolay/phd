@@ -42,3 +42,4 @@ paper/auto/
 
 # Project specific
 *.wav
+cache/
