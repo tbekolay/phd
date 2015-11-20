@@ -440,49 +440,6 @@ signals between layers in the auditory system.
 This type of feedback could be added
 to this system in future work.
 
-\subsubsection{Evaluation}
-
-Progress in the auditory feature extraction system
-is difficult to measure
-because it is most useful
-in the context of other systems.
-It is not readily apparent
-what impact
-an improved decorrelation network
-might have on the sensorimotor integration
-system's ability to decode production information,
-for example.
-Although we can assume that
-an output representation with
-less autocorrelation
-will be easier to decode,
-the gains from this improvement
-may be modest compared to
-changing the time constants on temporal transformations,
-or even increasing the number of neurons
-used to represent certain pieces of information.
-
-We believe that this difficulty
-motivates the development
-of large integrated systems
-like Sermo
-as it enables evaluation
-through comparing candidates solutions
-to different subproblems
-in the context of
-known best solutions
-to subproblems in the sensorimotor integration
-and linguistic processing systems.
-In other words,
-one of the primary contributions of Sermo
-is to propose standardized input and output formats
-required by each subsystem.
-We will show a proof of concept
-that Sermo supports such comparisons
-in Section~??? in which we compare
-??? auditory periphery models
-on a word classification task.
-
 \subsection{Non-auditory sensory modalities}
 
 Biological systems are remarkably adept
@@ -836,45 +793,6 @@ to other researchers
 to collaboratively determine
 if this decoding process is possible.
 
-\subsubsection{Evaluation}
-
-While a version of Sermo
-that explains development
-would require many presentations
-in order to generalize trajectories
-associated with syllables,
-the current system
-is provided a desired trajectory
-for each syllable.
-Therefore, we can directly
-test the sensorimotor integration system's
-ability to classify
-and generate known trajectories.
-Classification if either done
-correctly or incorrectly,
-though some classification methods
-may provide confidence information
-that can be used to further evaluate the system.
-Generation, on the other hand,
-cannot be easily evaluated
-as correct or incorrect.
-One method of evaluation would be to
-measure how much the generated trajectory
-deviates from
-(comparing, for example,
-the squared jerk of the trajectories;
-see ??? http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3470860/).
-However, it is more important that
-the generated trajectory
-is able to produce the desired syllable.
-Therefore, a more useful evaluation
-of a trajectory generation system
-would be to connect it to the
-speech motor control system,
-and have humans
-perceptually evaluate
-the generated audio.
-
 \subsection{Linguistic processing}
 
 As summarized in Section~???
@@ -1111,15 +1029,308 @@ These synthesizers would not be suitable
 for real time conversation without
 being adapted for online use.
 
-\section{Relation to the DIVA Kr\"{o}ger models}
+\section{Evaluation}
+
+As a conceptual model,
+Sermo outlines what we believe a fully integrated
+speech system would look like macroscopically.
+The model provides context
+motivating research of each
+of the subproblems that must be solved
+for the full model to work in real time.
+It is important, therefore,
+to consider how to evaluate
+subsystems in Sermo,
+as the fully integrated model
+will take many years to develop.
+
+Progress in the auditory feature extraction system
+is difficult to measure
+because it is most useful
+in the context of other systems.
+It is not readily apparent
+what impact
+an improved decorrelation network
+might have on the sensorimotor integration
+system's ability to decode production information,
+for example.
+Although we can assume that
+an output representation with
+less autocorrelation
+will be easier to decode,
+the gains from this improvement
+may be modest compared to
+changing the time constants on temporal transformations,
+or even increasing the number of neurons
+used to represent certain pieces of information.
+
+Fortunately, the decoding systems
+that are the primary use
+of the feature extraction system
+can be evaluated directly
+through phoneme and word error rates,
+in the case of linguistic decoding,
+and through the mean squared error
+in the case of sensorimotor decoding.
+There are several existing data sets
+with full training and testing
+input-output pairs,
+such as TIMIT for linguistic decoding
+??? cite and
+mngu0 and X-ray microbeam ???cites
+for continuous sensorimotor decoding.
+Currently, there are no data sets
+for discrete sensorimotor decoding
+(i.e., inferring vocal tract gestures
+from acoustic information).
+We plan to synthesize a
+vocal tract gesture
+data set to catalyze progress
+in this area.
+
+These data sets not only offer a method
+to evaluate decoding methods,
+but allow us to evaluate choices made
+in the feature extraction system.
+In general, we see the strength
+of large integrated systems like Sermo
+as allowing for candidates solutions
+to different subproblems
+to be evaluated in the context of
+known best solutions
+to subproblems in connected systems.
+In other words,
+one of the primary contributions of Sermo
+is to propose standardized input and output formats
+required by each subsystem.
+We will show a proof of concept
+that Sermo supports such comparisons
+in Section~??? in which we compare
+??? auditory periphery models
+on a word classification task.
+
+The strongest evaluation
+of the sensorimotor integration
+and speech motor control systems
+is for listeners to perceptually evaluate
+synthesized speech.
+If a desired sequence of syllables
+is identified by all listeners
+as the intended sequence,
+then these systems can be considered successful.
+However, en route to such an experiment,
+the trajectory generation and classification systems
+can compare their outputs to known trajectories.
+While a version of Sermo
+that explains development
+would require many presentations
+in order to generalize trajectories
+associated with syllables,
+the current system
+is provided a desired trajectory
+for each syllable.
+Therefore, we can directly
+test the sensorimotor integration system's
+ability to classify
+and generate known trajectories.
+Classification if either done
+correctly or incorrectly,
+though some classification methods
+may provide confidence information
+that can be used to further evaluate the system.
+Generation, on the other hand,
+cannot be easily evaluated
+as correct or incorrect.
+One method of evaluation would be to
+measure how much the generated trajectory
+deviates from the target trajectory
+(comparing, for example,
+the squared jerk of the trajectories;
+see ??? http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3470860/).
+However, a stronger evaluation
+is to use the generated trajectories
+to drive the speech motor control system,
+and perceptually evaluate generated audio.
+
+\section{Relation to the DIVA and Kr\"{o}ger models}
 
 As discussed in Section~???,
 the models most similar to Sermo
 and the subsystems modeled in this thesis
 are the DIVA model by ??? Guenther et al,
 and the Kr\"{o}ger model by ??? kroger et al.
+Unlike Sermo, both of these models
+focuses on the development of the speech system,
+rather than attempting to model
+an adult speech system directly.
+Nevertheless, there are significant overlaps
+between these models and Sermo.
 
-??? more
+DIVA (see Figure~???) primarily models
+the trajectory generation step
+in Sermo's sensorimotor integration system.
+Activation of a cell in the ``speech sound map''
+generates feedforward control signals
+that drive an articulatory synthesizer.
+It also includes auditory somatosensory feedback systems
+analogous to Sermo's auditory feature extraction
+and non-auditory sensory systems.
+
+The primary strength of DIVA
+that is not currently captured in Sermo
+is an account of the development
+of feedforward control signal trajectories
+through repeated trials in which
+auditory and somatesensory feedback
+corrects parts of the trajectory
+in which the produced sound differs
+from the expected sound.
+We believe that Sermo can be adapted
+to learn trajectories online in a similar way,
+using biologically plausible learning rules
+(e.g., ??? cite macneil, bekolay).
+
+There are several critical differences
+between how Sermo and DIVA view
+the overlapping systems.
+First, while Sermo asserts that
+the motor system is organized at the level
+of syllables in order to ensure
+realistic scaling to adult vocabularies,
+DIVA allows its speech sound cells to
+correspond to phonemes, syllables, words,
+or even short phrases.
+Additionally, in DIVA
+the motor trajectory is initiated
+by activating a speech sound cell,
+(??? Guenther notes that a fully realized
+model would use a distributed representation),
+and it is not clear how sequences
+of sound cells would be temporally coordinated.
+In Sermo, considerable effort is taken
+to create reasonable representations
+for the speech target
+(which in Sermo are always syllables),
+and to temporally coordinate
+sequences of syllables.
+
+Second, the form of auditory feedback
+differs significantly.
+Sermo sees auditory processing as part of
+the model, and therefore uses
+a biologically inspired auditory filter
+and statistical methods that can be
+performed by spiking neurons.
+DIVA processes audio waveforms offline,
+and provides the model with
+representations that are well suited
+for the operations performed by the model;
+specifically, they provide the model with
+the first three formant frequencies
+at each moment in time,
+though they have used log formant ratios
+and wavelet-based transformations
+with similar results ???cite.
+Regardless, this ideal offline auditory processing
+gives DIVA a significant advantage
+in terms of being able to
+associate auditory feedback
+with control signals,
+which is the primary function of the model.
+
+Finally, despite positioning itself as
+a biologically plausible neural network model
+of speech production
+(the ``most thoroughly defined and tested''
+as of 2006; ???cite)
+it performs many operations
+that are not easily implementable
+in a biological system.
+Most notably,
+while simulated neurons communicate
+by sending signals through
+synaptic connection weight matrices,
+perfect representation and communication
+are assumed.
+In other words, there is no neural
+or synaptic model in DIVA;
+model activations are defined as
+differential equations
+which are computed directly.
+The state variables in these equations
+are multiplied by connection weights,
+but signals propagate immediately
+and with no degradation or noise.
+In order to represent temporal effects,
+signals are perfectly delayed
+by arbitrary amounts of time
+(??? cite DIVA manual).
+While it may be possible to approximate
+the computations that
+DIVA assumes are possible
+with biologically plausible spiking neural networks,
+it is not clear whether
+neural approximations will
+be sufficient to produce similar behavior
+as the idealized DIVA model.
+
+The Kr\"{o}ger model also
+focuses on learning and development,
+rather than a full adult speech system.
+The primary system modeled
+is the sensorimotor trajectory generation system,
+which is learned using
+auditory and somatosensory information.
+This model also adds
+a linguistic processing system,
+allowing the motor system to be driven
+by syllable representations.
+Unlike DIVA, the Kr\"{o}ger model
+assumes speech motor organization
+at the level of syllables,
+which matches Sermo's motor organization.
+The Kr\"{o}ger model also
+introduces an intermediate representation
+between the motor plan (i.e., trajectory)
+and the articulatory synthesizer,
+playing a similar role as Sermo's
+motor expansion system.
+Thus, in terms of gross structure, then,
+the Kr\"{o}ger model covers a larger subset
+of Sermo compared to DIVA.
+
+The Kr\"{o} model also uses
+a more sophisticated neural network model,
+the growing self-organized map (GSOM).
+??? summarize from Cao.
+
+In terms of whether the operations
+of the model can be realized in spiking neurons,
+the outlook is more promising
+for the Kr\"{o}ger model.
+The auditory representation used
+is the power spectrum of the audio signal,
+which is computed as a bark-scaled spectrogram.
+While this is an ideal mathematical transform,
+it performs the same function as the
+auditory periphery models used in Sermo.
+However, while the neural network model
+is an improvement over DIVA,
+it still uses an overly simplistic
+representation scheme.
+Words in the phonemic map
+are represented with one neuron each,
+and syllables in the phonetic map
+are also represented with one neuron;
+this representation scheme is unrealistic
+and  does not scale to adult vocabularies
+(??? cite Crawford).
+??? transition
+there is still no guarantee
+that a spiking neural approximation
+of GSOMs will be accurate enough
+to reproduce the results
+of the model.
 
 \section{Subsystems modeled in this thesis}
 
@@ -1127,84 +1338,121 @@ In the subsequent chapters of this thesis,
 we will present mechanistic models
 implemented in spiking neurons
 spanning several systems
-in the conceptual Sermo model.
+in the conceptual Sermo model
+(see Figure~???).
 
-??? go over the implementation and discuss
-what parts they span
+??? Figure with model areas highlighted
+
+The first model presents an implementation
+of the auditory feature extraction system
+that performs similar operations as
+the frontend in an automatic speech recognition system,
+but does so in an online fashion
+using an auditory periphery model
+and a spiking neural network.
+The resulting representations are called
+neural cepstral coefficieints,
+and we will compare their ability
+to classify speech with
+existing approaches in ASR.
+
+The second model implements
+a syllable sequencing model
+as a stand-in for a
+full linguistic processing system,
+and generates production information trajectories
+from those syllables.
+The production information will be
+used to synthesize speech samples
+with the VocalTractLab articulatory synthesizer.
+We will compare the generated trajectories
+to target trajectories,
+and make qualitative observations
+of the synthesized speech.
+
+The third model implements
+the trajectory classification portion
+of the sensorimotor integration system.
+Production information trajectories
+will be generated
+by the trajectory generation system
+and provided to a trajectory classifier.
+We will evaluate the system by
+comparing the classified syllable
+to the intended target syllable.
+
+% ??? fourth model, learning?
 
 \section{Limitations}
 
-??? there are large swaths of the model missing,
-most notably in how the ventral linguistic systems
-might be implemented.
+Two primary issues limit the Sermo model
+as presented in this chapter.
+First, it is clear that the subset of Sermo
+that is implemented in this thesis
+is more throughly defined than
+the parts that are not modeled in detail,
+such as the linguistic processing system
+and non-auditory sensory modalities.
+However, we envision the Sermo model
+as continually growing and adapting
+to incorporate new modeling ideas
+and new empirical results confirming,
+refuting, or constraining parts of the model.
+The current presentation of Sermo
+was developed independently,
+primarily informed by the literature
+summarized in Chapter~???.
+We hope that upon first presentation,
+feedback from researchers will
+fill in missing pieces of the model,
+and clarify existing pieces,
+making the development of Sermo
+a collaborative effort.
 
-??? there's also a bunch of prosodic stuff;
-this could be added (see comments below)
-
-% Aside from phonemes, we also represent pitch and volume.
-% Neither of these features are useful
-% as an absolute quantity---most humans are poor
-% at judging absolute pitch and volume ???cite---so
-% we aim to represent relative pitch and volume.
-% In both of these cases,
-% we must determine a baseline pitch or volume,
-% and a method for comparing the current
-% pitch or volume to the baseline.
-
-% In speech, baseline pitch is primarily determined
-% by speaker identity.
-% Each speaker has a baseline pitch,
-% determined in part by the shape of their vocal folds,
-% so it is likely that we learn
-% and remember the baseline pitch
-% of speakers that we interact with frequently.
-% On the other hand,
-% changes in baseline pitch
-% (e.g., through illnesses affecting the vocal tract)
-% require little to no adaptation period,
-% so the mechanism through which we determine
-% a speaker's baseline pitch
-% is likely to be relatively simple
-% and flexible.
-% In this work,
-% we will not posit a neural mechanism
-% for determining baseline pitch,
-% and will instead compute it
-% from the data offline and provide it as input.
-
-% Given the baseline pitch as input,
-% relative pitch will be computed
-% primarily through neural inhibition.
-% See section ???implementation
-% for how this is accomplished.
-
-% Unlike pitch, baseline volume
-% is not speaker specific;
-% it is easy to notice when a speaker
-% talks louder or quieter
-% than the norm.
-% ???baseline is the overall activity
-% of a long-timescale filtered version
-% of the current moment's power spectrum?
-% ???relative volume is that minus a
-% short-timescale filtered version?
-% So it's basically just a derivative?
-% ???not sure if we even care about volume
-% to be honest...
-% % http://www.sengpielaudio.com/calculator-loudness.htm
-
-??? the only productive way around this is to
-collaborate on the development of the model,
-both conceptually and concretely.
-We assert that
-the traditional publication system
-is just one piece of how science should progress.
-Modern tools for visualizing
+However, it should be noted that
+organizing a collaborative effort
+like Sermo brings additional challenges.
+To enable easier collaboration,
+we will use modern Internet-based tools
+for visualizing
 and disseminating information,
-and proposing and discussing changes
-are another piece of puzzle.
-I have been using these tools
-to track my personal progress,
-and upon publication
-will release these tools
-in order to overcome these limitations.
+in addition to the traditional
+scientific publication system.
+These tools provide mechanisms
+for proposing and discussing changes
+to a shared repository of materials,
+which will include text, figures, and code.
+
+A second issue that directly opposes
+the idea that this model must be
+developed through a large collaborative effort
+is that Sermo's insistence on
+using mechanistic models that
+can be implemented with spiking neural networks
+limits the number of researchers
+that have the background necessary
+to contribute models that implement
+Sermo subsystems.
+However, we believe that with the growing
+interest in neuromorphic hardware (??? cite)
+and the development of deep learning approaches
+in spiking neural networks (??? cite),
+interest and expertise in spiking neural networks
+will steadily develop in the coming decades.
+In the same vein, it may be argued that
+the constraints placed on candidate Sermo models
+are too stringent given our current understanding
+of the human speech system,
+and spiking neural networks in general;
+we are ``not there yet,'' to put it colloquially.
+I believe that the models presented
+in the rest of this thesis
+will serve as evidence that
+progress can be made with
+the tools currently available.
+As interest and expertise in
+the modeling techniques used
+in the rest of the thesis grows,
+so will the possibility
+that all of the components in Sermo
+can be implemented efficiently.

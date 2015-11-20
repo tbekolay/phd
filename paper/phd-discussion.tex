@@ -86,3 +86,58 @@ when things go wrong.
 However, since we've implemented everything
 with the NEF and SPA,
 we can just use the REACH model.
+
+??? there's also a bunch of prosodic stuff;
+this could be added (see comments below)
+
+% Aside from phonemes, we also represent pitch and volume.
+% Neither of these features are useful
+% as an absolute quantity---most humans are poor
+% at judging absolute pitch and volume ???cite---so
+% we aim to represent relative pitch and volume.
+% In both of these cases,
+% we must determine a baseline pitch or volume,
+% and a method for comparing the current
+% pitch or volume to the baseline.
+
+% In speech, baseline pitch is primarily determined
+% by speaker identity.
+% Each speaker has a baseline pitch,
+% determined in part by the shape of their vocal folds,
+% so it is likely that we learn
+% and remember the baseline pitch
+% of speakers that we interact with frequently.
+% On the other hand,
+% changes in baseline pitch
+% (e.g., through illnesses affecting the vocal tract)
+% require little to no adaptation period,
+% so the mechanism through which we determine
+% a speaker's baseline pitch
+% is likely to be relatively simple
+% and flexible.
+% In this work,
+% we will not posit a neural mechanism
+% for determining baseline pitch,
+% and will instead compute it
+% from the data offline and provide it as input.
+
+% Given the baseline pitch as input,
+% relative pitch will be computed
+% primarily through neural inhibition.
+% See section ???implementation
+% for how this is accomplished.
+
+% Unlike pitch, baseline volume
+% is not speaker specific;
+% it is easy to notice when a speaker
+% talks louder or quieter
+% than the norm.
+% ???baseline is the overall activity
+% of a long-timescale filtered version
+% of the current moment's power spectrum?
+% ???relative volume is that minus a
+% short-timescale filtered version?
+% So it's basically just a derivative?
+% ???not sure if we even care about volume
+% to be honest...
+% % http://www.sengpielaudio.com/calculator-loudness.htm
