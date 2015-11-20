@@ -1,0 +1,12 @@
+LIBRARY 
+EXPORTS
+vtlInitialize
+vtlGetVersion
+vtlGetConstants
+vtlGetTractParamInfo
+vtlGetGlottisParamInfo
+vtlGetTractParams
+vtlSynthBlock
+vtlApiTest
+vtlGesToWav
+vtlClose

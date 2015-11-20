@@ -5,4 +5,4 @@ import brian  # Raises a bunch of warnings, no thanks
 warnings.simplefilter("default")
 
 from .gestures import ges_path
-from . import filters, plots, processes, sermo
+from . import filters, plots, processes, sermo, vtl
