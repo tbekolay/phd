@@ -8,7 +8,7 @@ presented in the subsequent chapters.
 
 \section{Auditory feature extraction}
 
-As summarized in Section~??? model sect,
+As summarized in Section~??? model section,
 the auditory feature extraction system
 is based on the feature extraction pipeline
 used as the frontend
@@ -136,34 +136,80 @@ we limit our model to producing
 MFCC and delta-MFCC-like features
 in spiking neural networks.
 
-\subsection{Auditory periphery models}
+\subsection{Spectral analysis with auditory periphery models}
 
-While most ASR frontends do an ideal
+While the analogy
+between the frontend of ASR systems
+and the human auditory system
+is usually just an analogy,
+many systems have experimented with
+more physiologically accurate
+auditory periphery models
+to replace the idealized spectral analysis step
+in the feature extraction pipeline.
 
-??? figure like izhikevic, with auditory model + efficiency?
+??? tchorz1999.pdf
+??? DimitrioMar...pdf,
+??? 10.1.1.298.4746.pdf,
+and ??? 10.1.1.151.1803.pdf
+have separately proposed variants of MFCCs
+that use Gammatone filters
+to do the spectral analysis step in an ASR system.
+??? tchorz1999.pdf
+??? Dimitrio ...
+??? 10.1.1.298.4746.pdf ...
+and ??? 10.1.1.151.1803.pdf .... ? brief explanation of each.
+All three of these studies
+found that using Gammatone filters
+lowered word or phone error rates
+on recognition tasks in which
+noise was added to speech samples.
+Other studies has achieved similar results;
+see ??? ICSIhearingis12.pdf for a review.
 
-??? summary table with phenomena captured, etc
+While all of these systems
+have been applied successfully
+for in ASR,
+they are not suitable
+for inclusion in Sermo in their current form.
+None of the methods currently available,
+to our knowledge, produce spiking behavior
+that could therefore
+be easily integrated with the rest of Sermo.
+Additionally, these networks compute
+functions of the filter output that
+may be difficult for neurons to implement.
+??? Tchorz, for example,
+implements short-term adaption
+through loops that perform
+a lowpass filter and a division.
+Division is, in general,
+difficult to approximate with spiking neural networks.
+A full neural implementation
+may be possible,
+but not trivial.
 
-??? Mention artificial neuromorphic cochleas
+On the other hand,
+silicon cochlea models face the opposite problem.
+??? more, summarize some papers
+These systems produce spikes
+that emulate the spikes
+traveling down the auditory nerve,
+and since they are implemented in hardware,
+they run much quicker than software solutions.
+However, because they produce spikes,
+they have not been used
+as the frontend to any ASR systems,
+to our knowledge,
+and therefore we cannot
+be certain that they are useful
+for word and phone recognition.
 
-??? go over some papers that have used these for ASR,
-but note that they still do windowing etc
+\section{Syllable sequencing and production}
 
-\section{Speech synthesis}
+\subsection{Serial working memory}
 
-\subsection{Articulatory speech synthesis}
-
-??? summary table with different vocal tract models
-
-??? summary table with different acoustic models
-
-??? in the tables, also note available implementations
-(so we can justify writing our own).
-Include programming language in this
-
-??? include online vs batch in table
-
-\subsection{Speech motor control}
+\subsection{Trajectory generation}
 
 ??? note that many art. synths consider this part of their
 synthesizer (control model).
@@ -179,3 +225,21 @@ But with SPA stuff on top.
 ??? also mention near the end that people haven't
 yet connected the Saltzman task dynamics stuff
 to the brain; that'll be one of our contributions
+
+\subsection{Articulatory speech synthesis}
+
+??? summary table with different vocal tract models
+
+??? summary table with different acoustic models
+
+??? in the tables, also note available implementations
+(so we can justify writing our own).
+Include programming language in this
+
+??? include online vs batch in table
+
+\section{Syllable recognition}
+
+\subsection{Trajectory classification}
+
+% \section{Syllable consolidation}

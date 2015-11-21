@@ -846,6 +846,83 @@ articulator positions are decoded,
 and then gesture scores are estimated
 from those articulator positions.
 
+\subsection{Auditory periphery modeling}
+
+Most ASR frontends do an ideal
+power spectral analysis
+with variants of the Fourier transform,
+mimicking the function
+of the human auditory periphery.
+However, as discussed in Section~??? bg,
+the human ear's frequency decomposition
+is far from ideal.
+Some differences in how the ear
+analyzes the frequencies in sound
+are due to the continuous nature
+of the real world;
+it is not possible for the ear
+to maintain a perfect history
+of the past 50 milliseconds of sound.
+Some differences are due to
+the nature of biological computation,
+which is distributed, analog, and noise robust,
+but not easily emulated with digital computers.
+Finally, some differences
+occur because they are advantageous
+for some aspect of hearing
+(possibly speech),
+and have evolved over time through natural selection.
+Unfortunately, it is difficult to know
+the reason for each difference.
+Historically, auditory periphery models
+have attempted to reproduce
+the auditory periphery as closely as possible,
+whether or not that difference is advantageous
+for speech recognition.
+
+Several approaches to auditory periphery modeling
+have progress in parallel over the past century.
+Detailed mechanical models
+like those reviewed in ??? 159637.pdf
+aim to model ear physiology
+as accurately as possible.
+Unfortunately, efficient implementations
+of these models are not readily available.
+Phenomological models, on the other hand,
+aim to reproduce the output
+of the human ear
+as closely as possible
+using simplified mathematical models;
+efficient implementations of these
+models are freely available
+??? cite Brian hears.
+In the remainder of this thesis,
+we will focus only on phenomenological
+models of the auditory periphery.
+
+Generally, phenomenological auditory periphery models
+are made up of a cascade of linear and nonlinear filters.
+Together, the filters can model
+how the sound pressure level
+is transformed through the middle ear,
+how it deflects the basilar membrane,
+how those deflection are transduced
+into electrical signals
+by the inner hair cells,
+and how those signals result in
+action potentials traveling down
+the auditory nerve.
+Not all models include all of these stages.
+For reviews of prominent
+auditory periphery models and
+the auditory-nerve response characteristic
+reproduced by those models,
+see ???lopez-poveda2005
+and ???lyon2010.pdf.
+The auditory periphery models used
+in this thesis will be discussed
+in further detail in Section~???.
+
 \section{Human speech production}
 
 We limit our coverage
