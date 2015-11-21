@@ -33,6 +33,7 @@ from scipy.io.wavfile import read as read_wav
 from scipy.io.wavfile import write as write_wav
 
 from ..cache import cache_file
+from ..utils import rescale
 
 # For finding files in `src`
 root = os.path.abspath(os.path.dirname(__file__))
@@ -74,12 +75,6 @@ def hz2st(hz, reference=16.35159783):
 def st2hz(st, reference=16.35159783):
     """Convert semi-tones to hertz, relative to musical note C0."""
     return reference * np.power(2, st / 12.)
-
-
-def rescale(val, old_min, old_max, new_min, new_max):
-    old_range = old_max - old_min
-    new_range = new_max - new_min
-    return (((val - old_min) * new_range) / old_range) + new_min
 
 
 class VTL(object):
