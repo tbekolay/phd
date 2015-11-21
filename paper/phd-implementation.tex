@@ -14,7 +14,7 @@ we also present analogous non-neural models
 that could be incorporated in
 non-neural speech recognition and synthesis systems.
 
-\section{Neural cepstral coefficients}
+\section{Auditory feature extraction}
 
 \probbox{A raw audio waveform has high temporal resolution,
   but low spatial resolution, as it is a one-dimensional signal.
@@ -41,6 +41,8 @@ by the organization of the human auditory system
 and are implemented the same basic computational units
 as the human auditory system,
 spiking neural networks.
+
+\section{Neural cepstral coefficients}
 
 ??? NCC pipeline, like AuditoryBasedFeatureVectors.pdf
 or KumarKimSternICA11.pdf
@@ -282,9 +284,10 @@ That is, for an MFCC $y_k$
 at frame $t$, the corresponding delta is
 \begin{equation}
   \label{dcc}
-  \delta_k(t) = y_k(t+n) - y_k(t-n),
+  \delta_k(t) = \frac{\sum_{n=1}^N y_k(t+n) - y_k(t-n)}{
+    2 \sum_{n=1}^N n^2},
 \end{equation}
-where $n$ is a small number of frames
+where $N$ is a small number of frames
 (typically between one and three).
 The double delta applies the same operation
 to the $\delta_k$ vectors.
@@ -448,6 +451,8 @@ explain it here
 since the SVM should manage these,
 so if they don't help then I will
 just use the derivatives
+
+??? Use TIMIT utterances
 
 % From earlier iteration
 

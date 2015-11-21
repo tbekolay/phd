@@ -1,17 +1,144 @@
 \chapter{Previous work}
 
-In making early steps toward
-an integrated speech recognition and synthesis system,
-we are applying techniques
-in artificial intelligence and control theory
-to the speech domain reviewed in the previous section.
-There is a long history of applying these techniques
-to this domain;
-in this section we review prior modeling efforts
-and contrast them with the model we will describe
-in future chapters.
+In this chapter, we review
+existing complete or partial solutions
+to the ???three/four problems
+solved by the models
+presented in the subsequent chapters.
 
-\section{Auditory periphery models}
+\section{Auditory feature extraction}
+
+As summarized in Section~??? model sect,
+the auditory feature extraction system
+is based on the feature extraction pipeline
+used as the frontend
+of automatic speech recognition (ASR) systems.
+The pipeline pictured in Figure~???
+is similar across most systems.
+
+\subsection{Mel-frequency cepstral coefficients (MFCCs)}
+
+The most common feature extracted
+and used in ASR systems
+is called Mel-frequency cepstral coefficients (MFCCs).
+It has been widely used
+in both hidden Markov model-based (HMM; ??? cites)
+and deep learning-based
+(??? cites) ASR systems,
+including those that achieve
+the lowest error rates
+on the popular corpus TIMIT.
+It has also been shown that
+MFCCs are well suited
+for both speech and music inputs
+(??? loganpaper.pdf).
+
+Mel-frequency coefficients are inspired
+by the human auditory system,
+in the sense that they perform
+frequency decomposition
+of the audio signal
+in order to determine the relative power
+at frequencies distributed over the mel scale.
+A simple algorithm for computing an
+mel-frequency cepstral vector
+for a frame of audio is as follows.
+
+\begin{enumerate}
+  \item Compute the discrete Fourier transform
+    of the audio frame.
+  \item Take the log of the power spectrum.
+  \item Convolve the power spectrum
+    with triangular filters distributed
+    according to the Mel scale.
+  \item Apply the inverse discrete cosine transform (iDCT)
+    to the triangular filter outputs.
+\end{enumerate}
+The resulting coefficients obtained from
+the iDCT are called ``cepstral'' coefficients.\footnote{
+  The term ``cepstrum'' comes from
+  the word ``spectrum'' with the first four letters reversed,
+  as the spectrum is obtained with the Fourier transform
+  and the cepstrum is obtained with the inverse Fourier transform.
+  Similarly, the domain of the cepstrum is not frequency,
+  but ``quefrency.''}
+
+Recall from Section~??? that the Mel scale
+describes the relationship between
+absolute frequency and perceived pitch;
+it is a logarithm of the frequency.
+The triangular filters are spaced
+equidistantly on the Mel scale,
+resulting in more filters
+at lower frequencies than at higher frequencies.
+Typically, at least twenty triangular filters
+are used in order to ensure that all frequencies
+are captured in more than one filter
+(i.e., there is overlap between adjacent filters).
+The inverse discrete cosine transform
+is designed to decorrelate the signal,
+which results in the same amount
+of information being represented
+with fewer coefficients;
+typically, the first thirteen coefficients
+are used in the feature vector
+of ASR systems.
+
+\subsection{Delta MFCCs}
+
+In addition to the thirteen MFCCs,
+many ASR systems,
+both HMM-based (??? cites)
+and deep learning-based (??? cites),
+also append the first,
+and sometimes the second,
+temporal derivatives of the MFCC
+to the feature vector.
+
+The justification for including derivatives
+in the feature vector is typically
+a practical one,
+in that most ASR systems
+achieve higher accuracy with
+derivative information than without.
+Theoretically,
+most sources justify time derivatives
+by noting that the derivatives
+incorporate dynamics into the state representation.
+However,
+even recurrent deep learning systems
+use MFCC derivatives
+despite the fact that
+state information from many previous frames
+is available at the current timestep
+(??? cite).
+It therefore seems likely that
+a sufficiently sophisticated machine learning algorithm
+would learn that temporal derivatives
+are a useful feature;
+incorporating it into the feature vector
+is not necessary,
+but it effectively bootstraps the learning process
+by providing it a feature
+that would otherwise
+have to be learned.
+
+Temporal derivatives are not the only
+MFCC transformation that are done in ASR frontends.
+Some systems apply an additional transformation
+analogous to low-pass filtering
+called ``liftering'' that emphasizes
+the lower part of the cepstrum.
+However, while we are confident
+that these other transforms
+can be computed with spiking neural networks,
+we limit our model to producing
+MFCC and delta-MFCC-like features
+in spiking neural networks.
+
+\subsection{Auditory periphery models}
+
+While most ASR frontends do an ideal
 
 ??? figure like izhikevic, with auditory model + efficiency?
 
@@ -19,23 +146,8 @@ in future chapters.
 
 ??? Mention artificial neuromorphic cochleas
 
-\subsection{Automatic speech recognition with auditory periphery models}
-
-Another aspect of modern ASR
-that does not match biology
-is the use of ideal frequency analysis
-to generate the feature vectors
-which serve as the input to ASR systems.
-
-??? P. 78 of Kollmeier: evidence of amplitude modulation senstivity
-in the auditory brain
-
-- p. 67, Kollmeier: expliain modulation filterbank,
-  as this seems like it is an important part of the model...
-
-- link that to spectro-temporal receptive fields
-
-??? biologically inspired stuff
+??? go over some papers that have used these for ASR,
+but note that they still do windowing etc
 
 \section{Speech synthesis}
 
