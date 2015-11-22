@@ -207,36 +207,455 @@ for word and phone recognition.
 
 \section{Syllable sequencing and production}
 
+Currently,
+we are aware of only two existing models
+explaining how sequences of syllables
+might be represented
+and translated to trajectories of
+production information in the brain.
+However, there have been many attempts
+to solve similar problems
+and could be applicable to speech;
+specifically,
+models of song generation in songbirds
+and serial working memory.
+
+\subsection{Song generation in songbirds}
+
+The avian song system
+exhibits remarkable similarities
+to the human speech system
+(??? cite twitter evolution paper).
+As such, models of song sequencing
+and generation in birds
+may be applicable to models of speech.
+
+??? 1224.full.pdf presented a model
+of birdsong sensorimotor learning
+in which song sequencing is broken
+into two subproblems:
+syllable learning,
+in which the system learns
+to associate an ensemble of neurons
+with a top-down syllable representation,
+and sequence learning,
+in which the activation
+of an ensemble of neurons
+associated with a particular syllable
+is linked to the next syllable
+in the learned sequence.
+The end result of the model
+that activating a particular
+ensemble of syllable-specific neurons
+begins a sequence of activations
+representing a particular syllable sequence
+associated with a target song.
+
+The model uses a
+simple associative learning rule
+to learn sensory predictions
+of motor representations,
+and motor predictions
+of sensory representations.
+The sequence of syllables is produced
+by a motor representation
+making a prediction of the
+sound that will be produced,
+which is associated with
+the next motor action to be produced,
+which activates a sensory prediction,
+and so on.
+
+??? figure of all the sequences being the same?
+
+While the learning method
+may be useful for future iterations of Sermo,
+the rest of the model is not suitable for Sermo
+because it does allow for
+flexible temporal dynamics
+in the motor trajectories within and between syllables,
+which is one of the hallmarks of human speech.
+In ??? cite, all syllables are assumed
+to take the same amount of time,
+and activate all of the neurons
+within the ensemble for the entirety
+of the syllable activation.
+The time taken for each syllable
+is not easily modifiable since
+it is defined by the amount of time
+it takes for the motor action
+to activate the sensory prediction
+and switch to the next motor action,
+which is an intrinsic property
+of the synapse connecting the neuron models.
+
+??? 2697.full.pdf presented a model
+which learns to associate specific neural ensembles
+to particular sensory inputs,
+similar to ??? prev,
+but also to sequences of sensory inputs.
+For example, given syllables A and B,
+some neurons would activate
+when syllable A is presented,
+some when syllable B is presented,
+and some only when syllable B is presented
+immediately following syllable A.
+Since the temporal sequence is
+coded in the connections between
+these ensembles,
+??? authors hypothesized that
+sequences could be generated,
+rather than recognized,
+but delivering a generic timing pulse
+which emulated hearing all possible sensory
+inputs at once.
+The first time the pulse is delivered,
+ensembles sensitive to a single sound
+would activate.
+On the next time the pulse is delivered,
+ensembles representing sequences of length two
+would activate, and so on for longer sequences
+(??? see Figure~???).
+Ensembles representing sequences of length one
+are not active on the second timing pulse
+due to the intrinsic properties
+of the neurons in the ensembles;
+specifically, after spiking
+for the previous timing pulse,
+they enter a refractory period
+in which they become insensitive to further input.
+
+??? figure 7 from papaer?
+
+While this approach is more temporally flexible
+than ??? prev because
+the timing pulse could arrive at any moment,
+it only moves the responsibility for flexible timing
+from the neurons involved in the sequence
+to whatever mechanism generates the timing pulse.
+In the paper, the timing pulse is provided
+by the experimenter;
+they note that the spacing of syllables
+can be controlled by varying the frequency
+of timing pulses,
+but do not provide any mechanism
+for generating the pulses
+or for how frequency could be varied.
+Additionally, the length of the sequence
+is extremely limited,
+both in terms of the total length of time
+and the number of syllables.
+The refractory period of each neuron
+is only long enough to be insensitive
+to the next timing pulse;
+therefore, for sequence of length three,
+??? authors added inhibitory connections
+from sequence-specific ensembles
+to non-sequence-specific ensembles.
+The connectivity patterns required
+for sequences of longer lengths
+are not obvious,
+and depends on the refractory period,
+which is abnormally long.
+We therefore do not think that
+this model is useful for Sermo.
+
+While other models for songbird generation exist
+(e.g., ??? Fee et al),
+none exhibit the temporal flexibility
+that is required for speech.
+As shown in ??? 362.full.pdf,
+cooling a part of the avian brain
+that projects to motor cortex
+results in slowing the trajectory
+in proportion to the temperature.
+Therefore, birds may not possess
+the ability to flexibly time their songs
+in the same manner that humans time speech,
+meaning we must look elsewhere for
+more temporally flexible models.
+
 \subsection{Serial working memory}
 
-\subsection{Trajectory generation}
+We assume that a sequence of syllables
+is likely to be represented
+in a similar manner
+as sequences of other static representations.
+Therefore, a useful paradigm for studying
+how humans represent sequences
+is to investigate serial working memory tasks;
+e.g., a subject is asked to remember
+a list of numbers,
+and then later recall that list,
+or elements from that list.
+Several models have been proposed
+to solve these tasks
+in biologically plausible ways.
+The most sophisticated such model
+is the ordinal serial encoding model,
+which has been incorporated into
+Spaun (??? cite Spaun, Xuan thesis).
 
-??? note that many art. synths consider this part of their
-synthesizer (control model).
-But we will consider it separately because
-it is a primary contribution of this thesis.
+The model takes inspiration from
+earlier serial working memory models,
+namely CADAM, TODAM, and TODAM2
+(see ??? xuan thesis for more details),
+which are all based on
+vector symbolic architectures
+(see ??? methods sect).
+Unlike these models,
+??? Choo's model
+is able to remember and recall
+lists of up to seven items,
+and exhibits primacy and recency effects,
+meaning that items at the beginning
+and end of a list are more likely
+to be recalled.
+His model is also implemented
+in a spiking neural network,
+making it applicable to Sermo.
+Interestingly,
+the OSE model does not exhibit
+the primacy and recency effects
+that are seen in humans
+unless the model
+is implemented in spiking neurons;
+rate-based models or direct simulation
+of the model's differential equations
+??? ask Xuan what happens.
 
-??? Saltzman stuff on task dynamics
-is highly related to what we want to do.
-But with SPA stuff on top.
+The ordinal serial encoding model,
+then, is well suited for representing
+discrete sequences of syllables in Sermo,
+which typically have few elements
+if we assume that most syllable sequences
+correspond to words in one's lexicon.
+However, the model is limited to
+discrete sequences,
+and therefore cannot be used
+for detailed trajectory generation.
+Additionally,
+while the model is temporally flexible,
+in that it can be queried for
+a list element at any time,
+there is a slight lag between
+when the next element is queried
+and when it has been recalled.
+Syllables, however, are voiced in quick succession,
+sometimes even blending into one another slightly.
+In Sermo, we will use a separate but interacting model
+for trajectory generation,
+and will present a solution
+to the issue of pauses between items
+in Section~???.
 
-??? also hosung nam's work
+\subsection{Task dynamics}
 
-??? also mention near the end that people haven't
-yet connected the Saltzman task dynamics stuff
-to the brain; that'll be one of our contributions
+A line of research encompassing work by
+several investigators at Haskins Laboratories
+developed a set of techniques
+under the name Task Dynamics
+for generating temporal sequences
+of production information
+and using that information to drive
+an articulatory synthesizer
+??? cite TADA.
 
-\subsection{Articulatory speech synthesis}
+The key insight in Task Dynamics
+is to dissociate the task state
+from the motor trajectory
+along that state.
+By doing this, the dynamics of the task state
+can be considered separately from motor trajectories,
+while trajectories can be implemented
+as a function of the task state.
+In the initial publication of task dynamics
+(??? SR076...pdf),
+two types of task dynamics are presented.
+Point attractor dynamics,
+modeled by critically damped mass-spring systems,
+are useful for one-time actions.
+Cyclic attractor dynamics,
+modeled by harmonic oscillators
+with a nonlinear escapement function,
+are useful for repetitive actions.
+Initially, these task dynamics were then
+related to articulator trajectories
+for a two degree-of-freedom arm model
+by mapping the task space
+to body-centered coordinates,
+joint coordinates,
+and finally articulator positions,
+called the task network.
+In a subsequent publication,
+??? SR099...pdf
+applied task dynamics to speech production
+using a simplified mapping,
+from task space
+to gesture space,
+and then to articular space,
+similar to that described in Sermo
+(see Section~???).
+Realistic articulatory trajectories
+were achieved
+by associating a task dynamic network
+with point attractor dynamics
+with each speech gesture.
+Each gesture defines
+the point which the task dynamic network
+is attracted to.
+The state of each gesture network
+influences one or more articulator positions.
+The final articulator trajectory
+is the combined effect
+of all of the gesture networks
+on all of the articulators.
 
-??? summary table with different vocal tract models
+Given a complete gesture trajectory
+for an utterance,
+the task dynamic approach
+generate articular position trajectories
+which can be synthesized
+by the ??? HLSyn synthesizer, cite.
+While this model has not been
+modified since its introduction in ??? year,
+the same group has done significant work
+in automatically generating gesture scores
+with a similar approach.
+In this extension,
+instead of knowing \textit{a priori}
+when each gesture should occur,
+the point attractors associated
+with each gesture are coupled
+to one another,
+such that the timing of each gesture
+is controlled by the state
+of the gestures to which it is coupled
+(??? 10.1.1.307.1650.pdf).
+Task dynamic gestural timing
+is able to capture precise timing
+in syllables with complex onsets
+and codas (??? p15.2253.pdf).
+Perhaps more importantly,
+it allows for the articulatory synthesizer
+??? HLSyn to accept text as input,
+which is converted to a gesture score
+by looking up a syllabification
+of the word in a database
+and using gestural coupling rules
+defined by linguists
+to create a system of coupled oscillators
+whose activities represent a gestural score
+??? goldsteinetalbeijing, TADA pub.
 
-??? summary table with different acoustic models
+In all, the task dynamic approach
+to inter-gestural and inter-articulator timing
+is the most temporally flexible
+syllable sequencing and production system
+currently published
+(to our knowledge).
+The dynamical systems approach
+also makes it a natural fit for Sermo,
+as it is defined in continuous time,
+and can be readily implemented
+in spiking neural networks,
+though we are not aware of any
+neural implementations currently available.
 
-??? in the tables, also note available implementations
-(so we can justify writing our own).
-Include programming language in this
+\subsection{REACH}
 
-??? include online vs batch in table
+The final model informing
+the Sermo syllable sequencing
+and production model presented
+in this thesis is the
+Recurrent Error-driveen Adaptive Control Hierarchy (REACH)
+model ??? cite dewolf.
+In particular, we use REACH's
+neural implementation
+of dynamic movement primitives (DMPs).
+
+The REACH model is a general motor control
+model implemented in spiking neurons.
+It uses DMPs to generate trajectories
+for the system to follow;
+these trajectories are mapped into
+motor space using operational space control,
+and unexpected changes in system dynamics
+are accounted for online
+using nonlinear adaptive control
+??? cite something for that.
+The model is able to control
+a nonlinear three-link arm model
+in handwriting and reaching tasks,
+even when an unknown force field
+is applied to the end effector.
+
+DMPs are a method of generating motor trajectories;
+they will be discussed in more detail
+in Section~???.
+DMPs are similar to Task Dynamics in many respects.
+Both define methods to generate trajectories
+for one-time and rhythmic actions.
+Both dissociate the temporal dynamics
+of the task from trajectories
+in motor space,
+allowing them to advance the system state
+at variable rates,
+and compute the trajectory
+as a function of the system state.
+
+The primary difference between DMPs and Task Dynamics
+is how each system is implemented.
+While both are useful for high degree-of-freedom
+control problems,
+they go about this differently.
+In Task Dynamics,
+a separate attractor is assigned
+to each degree-of-freedom;
+when the timing of different
+dimensions depends on other dimensions,
+the states are coupled,
+as was done in
+the inter-gestural planning model
+described above.
+In DMPs,
+it is assumed that the system state
+is shared by all dimensions,
+but the function computed
+from the system state can
+have arbitrary dimensionality.
+While this assumption makes it
+difficult to time actions
+as a function of other actions,
+it does not limit the temporal flexibility
+of DMPs, as actions that should occur
+simultaneously or in quick succession
+can do so by defining the temporal relationship
+in the function computed from the system state,
+since both dimensions share the same system state.
+For example,
+if the glottis should begin phonating
+right after the lips are closed,
+Task Dynamics would couple these two gestures.
+With DMPs, the function specifying the gestures
+would effect the glottal phonation
+a short time after the lip closure.
+
+Another difference between the two is that
+for one-time actions,
+DMPs use an integrator (i.e., ramp signal)
+as the system state,
+rather than a point attractor.
+Both, however, use cyclic attractors
+for rhythmic actions.
+A final important difference for Sermo
+is that DMPs have been implemented
+in spiking neural networks successfully
+(??? cite thesis).
+We will explain DMPs in more detail
+in Section~??? and present a model
+using rhythmic DMPs for syllable production
+in ???.
 
 \section{Syllable recognition}
 
