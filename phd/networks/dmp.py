@@ -1,9 +1,9 @@
 import nengo
 import numpy as np
 from nengo.dists import Choice, ClippedExpDist
-from scipy import stats
 
 from ..utils import rescale
+
 
 def radial_f(func):
     def _radial_f(x):
@@ -16,6 +16,7 @@ def traj2func(traj, dt=0.001):
     traj_ix = np.unique(np.nonzero(traj)[1])
     traj = traj[:, traj_ix]
     t_end = traj.shape[0] * dt
+
     def _trajf(x):
         # x goes from 0 to 1; normalize by t_end
         # But give a bit of 0 at the start...
@@ -48,8 +49,9 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
 
         # --- Drive the oscillator to a starting position
         net.reset = nengo.Node(size_in=1)
+        d_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
         net.diff_inhib = nengo.Ensemble(20, dimensions=1,
-                                        intercepts=ClippedExpDist(0.15, -0.5, 0.1),
+                                        intercepts=d_intercepts,
                                         encoders=Choice([[1]]))
         net.diff = nengo.Ensemble(n_per_d, dimensions=2)
         nengo.Connection(net.reset, net.diff_inhib, transform=-1, synapse=None)
@@ -60,8 +62,9 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
         nengo.Connection(net.diff, net.osc, function=lambda x: reset_goal - x)
 
         # --- Inhibit the oscillator by default
+        i_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
         net.inhibit = nengo.Ensemble(20, dimensions=1,
-                                     intercepts=ClippedExpDist(0.15, -0.5, 0.1),
+                                     intercepts=i_intercepts,
                                      encoders=Choice([[1]]))
         nengo.Connection(net.inhibit.neurons, net.osc.neurons,
                          transform=-np.ones((n_per_d * 2, 20)))

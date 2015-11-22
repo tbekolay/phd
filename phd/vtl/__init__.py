@@ -33,7 +33,7 @@ from scipy.io.wavfile import read as read_wav
 from scipy.io.wavfile import write as write_wav
 
 from ..cache import cache_file
-from ..utils import rescale
+from ..utils import hz2st, rescale
 
 # For finding files in `src`
 root = os.path.abspath(os.path.dirname(__file__))
@@ -63,18 +63,6 @@ def repair_wavheader(path):
         fp.write(WAVHEADER)
         fp.write(content[68:])
     os.remove("%s.bak" % path)
-
-
-def hz2st(hz, reference=16.35159783):
-    """Convert hertz to semi-tones, relative to musical note C0."""
-    if hz < 1.0:
-        return 1.0
-    return 12 * np.log2(hz / reference)
-
-
-def st2hz(st, reference=16.35159783):
-    """Convert semi-tones to hertz, relative to musical note C0."""
-    return reference * np.power(2, st / 12.)
 
 
 class VTL(object):

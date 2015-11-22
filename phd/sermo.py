@@ -1,8 +1,11 @@
 import nengo
+import soundfile as sf
 from nengo.dists import Choice, ClippedExpDist
 from nengo.networks import EnsembleArray
-from nengo.utils.compat import iteritems
+from nengo.utils.compat import is_array, is_string, iteritems
 
+from . import params
+from .mfcc import mfcc
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
     Cepstra,
@@ -13,7 +16,7 @@ from .networks import (  # noqa: F401
     SyllableSequence,
 )
 from .networks.dmp import traj2func
-from . import params
+from .processes import ArrayProcess
 
 
 class ParamsObject(object):
@@ -51,6 +54,24 @@ class ParamsObject(object):
 # Model 1: Neural cepstral coefficients
 # #####################################
 
+class MFCCParams(ParamsObject):
+    audio = params.NdarrayParam(default=None, shape=('*', 1))
+    fs = params.NumberParam(default=16000)
+    dt = params.NumberParam(default=0.01)
+    window_dt = params.NumberParam(default=0.025)
+    n_cepstra = params.IntParam(default=13)
+    n_filters = params.IntParam(default=26)
+    n_fft = params.IntParam(default=512)
+    minfreq = params.NumberParam(default=0)
+    maxfreq = params.NumberParam(default=6000)
+    preemph = params.NumberParam(default=0)
+    lift = params.NumberParam(default=0)
+    energy = params.BoolParam(default=False)
+
+    def __call__(self):
+        return mfcc(**self.kwargs())
+
+
 class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=None, shape=('*',))
     sound_process = params.ProcessParam(default=None)
@@ -65,15 +86,83 @@ class CepstraParams(ParamsObject):
     n_cepstra = params.IntParam(default=13)
 
 
-class Features(object):
+class FeedforwardDerivParams(ParamsObject):
+    n_neurons = params.IntParam(default=30)
+    tau_fast = params.NumberParam(default=0.005)
+    tau_slow = params.NumberParam(default=0.1)
+
+
+class IntermediateDerivParams(ParamsObject):
+    n_neurons = params.IntParam(default=30)
+    tau = params.NumberParam(default=0.1)
+
+
+class AudioFeatures(object):
     def __init__(self):
         self.config = nengo.Config(
             nengo.Ensemble, nengo.Connection, nengo.Probe)
+        self.mfcc = MFCCParams()
         self.periphery = PeripheryParams()
         self.cepstra = CepstraParams()
+        self.derivatives = []
 
-    def add_derivative(self):
-        pass
+    @property
+    def audio(self):
+        assert self.mfcc.audio is self.sound_process.array
+        return self.mfcc.audio
+
+    @audio.setter
+    def audio(self, audio_):
+        if is_string(audio_):
+            # Assuming this is a wav file
+            audio_, fs = sf.read(audio_)
+            self.fs = fs
+        assert is_array(audio_)
+        if audio_.ndim == 1:
+            audio_ = audio_[:, np.newaxis]
+        self.mfcc.audio = audio_
+        self.periphery.sound_process = ArrayProcess(audio_)
+
+    @property
+    def fs(self):
+        assert self.mfcc.fs == self.periphery.fs
+        return self.mfcc.fs
+
+    @fs.setter
+    def fs(self, fs_):
+        self.mfcc.fs = fs_
+        self.periphery.fs = fs_
+
+    @property
+    def freqs(self):
+        assert self.mfcc.minfreq == self.periphery.freqs[0]
+        assert self.mfcc.maxfreq == self.periphery.freqs[-1]
+        assert self.mfcc.n_filters == self.periphery.freqs.size
+        return self.periphery.freqs
+
+    @freqs.setter
+    def freqs(self, freqs_):
+        self.periphery.freqs = freqs_
+        self.mfcc.minfreq = freqs_[0]
+        self.mfcc.maxfreq = freqs_[-1]
+        self.mfcc.n_filters = freqs_.size
+
+    @property
+    def n_cepstra(self):
+        assert self.mfcc.n_cepstra == self.cepstra.n_cepstra
+        return self.mfcc.n_cepstra
+
+    @n_cepstra.setter
+    def n_cepstra(self, n_cepstra_):
+        self.mfcc.n_cepstra = n_cepstra_
+        self.cepstra.n_cepstra = n_cepstra_
+
+    def add_derivative(self, klass="IntermediateDeriv", **kwargs):
+        deriv = globals()["%sParams" % klass]()
+        for k, v in iteritems(kwargs):
+            setattr(deriv, k, v)
+        self.derivatives.append(deriv)
+        return deriv
 
     def build(self, net=None):
         if net is None:
@@ -126,6 +215,7 @@ class SyllableParams(ParamsObject):
         return {'n_per_d': self.n_per_d,
                 'freq': self.freq,
                 'tau': self.tau}
+
 
 class ProductionInfoParams(ParamsObject):
     n_per_d = params.IntParam(default=60)

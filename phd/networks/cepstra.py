@@ -29,7 +29,6 @@ def idct(n, size_out):
     return idct_matrix[:size_out]
 
 
-
 def Cepstra(n_neurons, n_freqs, n_cepstra, net=None):
     if net is None:
         net = nengo.Network("Cepstra")
