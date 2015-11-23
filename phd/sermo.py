@@ -1,4 +1,5 @@
 import nengo
+import numpy as np
 import soundfile as sf
 from nengo.dists import Choice, ClippedExpDist
 from nengo.networks import EnsembleArray
@@ -108,7 +109,7 @@ class AudioFeatures(object):
 
     @property
     def audio(self):
-        assert self.mfcc.audio is self.sound_process.array
+        assert self.mfcc.audio is self.periphery.sound_process.array
         return self.mfcc.audio
 
     @audio.setter
@@ -156,6 +157,10 @@ class AudioFeatures(object):
     def n_cepstra(self, n_cepstra_):
         self.mfcc.n_cepstra = n_cepstra_
         self.cepstra.n_cepstra = n_cepstra_
+
+    @property
+    def t_audio(self):
+        return self.audio.size / float(self.fs)
 
     def add_derivative(self, klass="IntermediateDeriv", **kwargs):
         deriv = globals()["%sParams" % klass]()

@@ -1,4 +1,5 @@
 import numpy as np
+from nengo.utils.compat import is_iterable, is_string
 
 
 def rescale(val, old_min, old_max, new_min, new_max):
@@ -27,3 +28,11 @@ def hz2st(hz, reference=16.35159783):
 def st2hz(st, reference=16.35159783):
     """Convert semi-tones to hertz, relative to musical note C0."""
     return reference * np.power(2, st / 12.)
+
+
+def ensuretuple(val):
+    if val is None:
+        return val
+    if is_string(val) or not is_iterable(val):
+        return tuple([val])
+    return tuple(val)
