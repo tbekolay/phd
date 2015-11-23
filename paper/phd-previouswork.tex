@@ -659,6 +659,127 @@ in ???.
 
 \section{Syllable recognition}
 
+Syllable recognition, in general,
+is a task that can be solved
+by most ASR systems
+using a labeled acoustic data set.
+In the sensorimotor integration system
+in Sermo, however,
+we aim to classify syllables
+based only on production information
+which is decoded from acoustic information.
+It should be noted that we do not expect
+this system to perform perfectly,
+as the dominant speech decoding system
+will be linguistic;
+however, we are nevertheless able
+to hear infrequent syllables
+and voice them.
+The ability to differentiate
+between frequent and infrequent syllables
+may depend on whether they
+can be classified
+on the basis of production information.
+
+One of the few attempts to classify speech
+solely on the basis production information
+is ??? p3041mitra.pdf.
+??? authors were able to
+decode continuous production information
+from auditory information
+using MFCCs and Gammatone filter-based
+cepstral features (??? normalized...pdf),
+and were able to use a combined feature vector
+consisting of MFCCs and production information
+to lower word error rates
+in various noisy environments.
+However, word error rates
+when using only continuous production information
+as the feature vector
+were high ($\sim$70\% with no noise).
+
+The apparent difficulty
+in classifying sounds based on
+production information alone
+could be due to several factors.
+For one, the details of the decoding mechanism
+in ??? p3041...pdf are not clear.
+The authors note that they use a
+``deep neural network''
+with as many as six hidden layers;
+however, the choice of neural activation function,
+optimization procedure,
+and many other hyperparameters
+can affect how well the network learns.
+In particular, it does not seem as though
+the network has recurrent connections,
+which are commonly used in
+current state-of-the-art ASR systems.
+
+Alternatively, the statistical approach
+used in most ASR systems
+may not be well suited to
+trajectories of production information.
+In order to broaden our search
+for other types of techniques,
+we investigated general solutions
+for trajectory classification
+which are used in applications
+such as gesture recognition
+and automatic video analysis.
+
 \subsection{Trajectory classification}
+
+Unsurprisingly, many of the existing
+solutions for trajectory classification
+are based on generative statistical models,
+in particular Hidden Markov Models
+as has been dominant in speech recognition
+(see ??? paper1.pdf, TIP-traj...pdf
+and ??? survey...handrecog.pdf,
+Mitra - gesture...pdf
+and RR-7212.pdf for reviews).
+Given the failure of the statistical approach
+in ??? p3041,
+we instead focused on systems
+that recognize trajectories
+through tracking the trajectory
+either in comparison to some known template,
+or as the state in a dynamical system.
+We identify ??? such systems
+that provide inspiration
+for the trajectory classification model
+described in Section~???.
+
+??? clean up later...
+
+??? kilibozgud...pdf
+
+??? 06376438.pdf
+
+??? documentocompleto.pdf
+
+??? caramiaux...pdf
+presented an algorithm called the
+Gesture Variation Follower (GFV).
+The goal of the algorithm is to match
+an input gesture sequence
+with a set of predefined template gestures.
+GFV views the trajectory as a dynamical system,
+where the state of the system is
+the time-varying gesture sequence.
+The state evolves over time according to
+a non-linear state transition function,
+and generates an observation on each timestep
+according to a non-linear observation function
+that depends on both system state
+and a template gesture.
+The system state essentially tracks
+relative time along the template gesture
+and the speed at which time is moving.
+A state estimate is determined
+on each timestep by an inference procedure
+based on particle filtering,
+.... ??? more
 
 % \section{Syllable consolidation}
