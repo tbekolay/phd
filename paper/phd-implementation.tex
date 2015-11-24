@@ -656,12 +656,35 @@ the same syllable to be voiced
 twice in a row,
 and some forms of singing
 feature rhythmic repetitions
-of the same syllable.
-Therefore, we use a hybrid approach
-in which syllable DMPs can be used rhythmically
-or discretely as needed.
+of the same syllable,
+so we use rhythmic DMPs.
 
-Each DMP consists of a point attractor
+The use of rhythmic DMPs
+means that when a syllable
+is only voiced once,
+it must be explicitly stopped
+once the DMPs traverses
+its limit cycle once.
+At the same time,
+the DMP for the next syllable must begin,
+or have already begun.
+We accomplish this precise timing
+by detecting when the current syllable
+is nearing completion
+and starting a control network
+that transitions smoothly
+between the currently active syllable
+and the next active syllable.
+When a syllable is repeated,
+the end result should appear as though
+the limit cycle continued undisturbed.
+The implementation of this network
+depends heavily on neural inhibition,
+and therefore will be discussed
+in Section~???.
+
+As reviewed in ??? Methods sect,
+DMPs typically consist of a point attractor
 and a forcing function.
 Currently, we do not implement
 separate point attractors for each DMP,
@@ -688,13 +711,15 @@ and not gestures? It's worth looking into...
 
 ??? Neural model figure
 
+??? zoom in on sequencer also
+
 SPA modules implemented in Nengo are used
 to robustly iterate through
 the syllable sequence list.
 The input sequence is represented
 in a \textit{state} module,
 which does not modify the sequence.
-The current position pointer
+The current and next position pointers
 is tracked by two interconnected
 \textit{working memory} modules,
 as was done in ??? eliasmith2012.
@@ -702,28 +727,67 @@ The current syllable is computed
 by binding the \textit{state}
 with the inverse of the
 current pointer represented
-in \textit{working memory}.
-That syllable is sent to
-a \textit{temporal associative memory},
-which associates a DMP network
-with each syllable in the model vocabulary.
+in \textit{working memory};
+similarly for the next pointer,
+which is stored in another
+working memory module.
+Both the current and next syllable
+representations are cleaned up with
+\textit{associative memories}.
+While the cleaned up semantic pointer
+associated with syllables are available,
+they are not used;
+instead, the activity of the ensemble
+that is associated with the syllable
+disinhibits the oscillator
+associated with a DMP network
+whose forcing function
+follows the production information trajectory
+for that syllable.
+A timing network that we call
+a \textit{sequencer} ensures
+that only one syllable DMP
+is active at one time,
+and that syllables transition
+immediately and smoothly.
 
-The binding operation is computed
-in a straightforward manner
-(see ??? something for details),
-but the two working memory modules
-warrant further explanation
-in regard to how they
-calculate the next position pointer.
-This calculation
-uses the current position
-(see equation~\eqref{nextpos}),
-so the straightforward approach
+\subsubsection{SPA modules}
+
+Networks for representing semantic pointers
+and doing common cognitively relevant
+manipulations on those pointers
+have been previously created
+for Spaun.
+This model uses those networks
+as described in ??? cite.
+
+The binding module computes
+circular convolution,
+implemented as multiplication
+in the Fourier domain.
+The design of this network
+is described in more detail in
+???.
+
+The working memory module
+maintains a memory trace
+through recurrent connections
+implementing an integrator.
+While the general design of the working memory
+is described in more detail elsewhere
+(??? choo),
+how the two two working memory modules
+interact warrants further explanation.
+In order to calculate the next position,
+we require the current position
+(see equation~\eqref{nextpos});
+the straightforward approach
 of computing this in a single recurrent loop
+from one working memory to itself
 fails because one of the two pointers
 being used in the computation
 is also the result of the computation.
-Instead, we exploit the fact that
+To remedy this situation, we exploit the fact that
 each working memory module is gated
 such that it operates in two regimes.
 In the ``acquisition'' regime,
@@ -766,7 +830,8 @@ This process repeats for each position
 in the syllable sequence;
 each time the gating signal
 is turned on and off,
-the position pointer increments.
+the position pointer
+in the first working memory increments.
 
 This method of incrementing the position pointer
 is both robust and fast.
@@ -775,7 +840,7 @@ a new memory state,
 and that state can be maintained
 for several seconds.
 Since syllables take
-on the order of hundred of milliseconds
+on the order of hundreds of milliseconds
 to be voiced,
 the circuit can go through a syllable sequence
 fast enough for spirited conversation.
@@ -790,33 +855,24 @@ few to no discernible pauses between syllables.
 Therefore, the next syllable to be voiced
 must follow the current syllable very quickly,
 even overlapping when appropriate.
+The \textit{sequencer} network,
+discussed in Section~???,
+facilitates this.
 
-To facilitate this,
-we use the trajectory generating DMPs
-to also generate control signals
-to switch the working memories
-to the next syllable,
-and to initiate the next syllable's DMP oscillator.
-Since the DMP is already involved in
-temporally coordinating
-the vocal tract movements
-producing the syllable itself,
-it is ideally suited to
-ensure that the next syllable
-is timed appropriately.
-Since it is only providing control signals
-to the working memory modules,
-it can transition to the next syllable
-without needing to know
-what syllable will be voiced next.
-
-Like non-temporal associative memories
-(see ??? stewart2011.pdf),
-the temporal associative memory
-contains an ensemble
+The associative memories
+map possibly noisy input pointers
+to clean output pointers.
+While the input pointers
+can be associated with arbitrary
+output pointers,
+in our case inputs and outputs
+are both the syllable pointers;
+this is called an autoassociative memory,
+or a cleanup memory.
+These memories contain an ensemble
 for each semantic pointer
-in the memory's vocabulary
-that is responsible for computing
+in the vocabulary;
+the ensemble is responsible for computing
 the similarity between
 that semantic pointer
 and some input signal.
@@ -850,80 +906,35 @@ representing similarity for the
 semantic pointer represented by
 the input signal being active.
 
-In non-temporal associative memories,
-the similarity ensembles
-project either the same (autoassociative)
-or another (heteroassociative) semantic pointer
-to a \textit{state} module,
-which therefore represents
-a static cleaned up version of the pointer
-associated with
-the original noisy input signal.
-In temporal associative memories,
-we instead associate each similarity ensemble
-with a DMP network so that
-the \textit{state} module
-represents a continuous trajectory
-in some vector space.
-In our case, the vector space of interest
-consists of 48 dimensions,
-each representing a vocal tract gesture.
+\subsubsection{DMP networks}
 
-As previously mentioned,
-our DMP networks can be used in either
-a discrete or rhythmic way.
-Normally, discrete DMP networks
-are created by decoding the forcing function
-off of a one-dimensional ramp,
-playing out the trajectory defined by the forcing function
-as the ramp climbs from zero to one.
-Rhythmic DMPs are created by
-decoding the forcing function
-off of a controlled two-dimensional oscillator,
-playing out the trajectory defined by the forcing function
-as the oscillator's angle moves from
-$0$ to $2\pi$.
-The ability to climb the ramp
-at different velocities
-or drive the oscillator
+The rhythmic DMP networks
+generate repetitive
+production information trajectories.
+The networks are based on
+the general design
+presented in ??? dewolf thesis,
+with some modifications
+to enable interactions between
+the DMP networks
+and the SPA modules
+by way of the sequencer network.
+
+The core of the network
+is an oscillatory ensemble
+that represents the system state.
+As the oscillator traverses
+the limit cycle,
+the multidimensional forcing function
+is decoded from the system state,
+resulting in the predefined
+production information trajectory
+playing out as
+the oscillator's angle moves from $0$ to $2\pi$.
+The ability to drive the oscillator
 at different frequencies
-is what enables the DMP
-to generate trajectories at different timescales.
-
-In our DMP networks,
-we enable discrete or rhythmic behavior
-by using a two-dimensional oscillator
-which has a ``dead zone'' in
-phase space such that,
-without intervention,
-it will perform only one incomplete cycle,
-allowing for a discrete trajectory to
-be decoded from the oscillator.
-However, unlike discrete trajectories
-that use ramps,
-providing a short stimulus as the oscillator
-reaches the dead zone can allow it
-to complete another oscillatory cycle;
-discrete trajectories using ramps must
-be completely inhibited before another
-trajectory can be generated,
-which would cause disfluencies
-when repeating syllables.
-However, the ability to operate
-both discretely and rhythmically
-comes at the cost of robustness
-and frequency range.
-Typical rhythmic DMPs
-can operate at high frequencies.
-High frequencies could cause our DMPs
-to have enough momentum to pass through
-the dead zone and continue oscillating.
-In general, the size of the dead zone
-can be used to balance the tradeoff
-between how much of the phase space
-can be used for the forcing function,
-and how high the frequency can be pushed
-before unwanted rhythmic behavior occurs.
+enables the DMP to generate trajectories
+at different timescales.
 
 The forcing function of each DMP
 interpolates a vector representation of
@@ -945,6 +956,92 @@ a gesture score from the neurally generated
 vector representation over time,
 which can then be synthesized
 by VocalTractLab.
+
+??? start here
+
+To facilitate this,
+we use the trajectory generating DMPs
+to also generate control signals
+to switch the working memories
+to the next syllable,
+and to initiate the next syllable's DMP oscillator.
+Since the DMP is already involved in
+temporally coordinating
+the vocal tract movements
+producing the syllable itself,
+it is ideally suited to
+ensure that the next syllable
+is timed appropriately.
+Since it is only providing control signals
+to the working memory modules,
+it can transition to the next syllable
+without needing to know
+what syllable will be voiced next.
+
+
+
+\subsubsection{Sequencer network}
+
+In non-temporal associative memories,
+the similarity ensembles
+project either the same (autoassociative)
+or another (heteroassociative) semantic pointer
+to a \textit{state} module,
+which therefore represents
+a static cleaned up version of the pointer
+associated with
+the original noisy input signal.
+In temporal associative memories,
+we instead associate each similarity ensemble
+with a DMP network so that
+the \textit{state} module
+represents a continuous trajectory
+in some vector space.
+In our case, the vector space of interest
+consists of 48 dimensions,
+each representing a vocal tract gesture.
+
+To facilitate this,
+we use the state of both working memories
+to disinhibit syllable DMPs,
+and track the combined state of all syllable DMPs
+with a separate timing ensemble
+(see Figure~???).
+Because of the way the working memories
+are gated, there are two possible
+situations.
+At the start of a syllable,
+both working memories represent the same syllable,
+as the first working memory is in
+the acquisition regime.
+In order to start the oscillator
+associated with a rhythmic DMP,
+a small amount of input must be delivered
+to push it into its limit cycle;
+since both working memories represent
+the same syllable, the currently active
+syllable will
+
+The timing of
+the signal that starts
+the next syllable's oscillator
+and the gating signal that
+switches working memory regimes
+and therefore disinhibits
+the next syllable to be voiced
+must be precise.
+In terms of the DMP oscillator,
+the
+
+
+??? note that we are doing a lot of stuff
+here with inhibition.
+While it is possible to do this stuff
+without neurons in a similar manner,
+the ability to directly inhibit ensembles
+improves the robustness of the network,
+which we take as a concrete benefit
+of neurally implementing the algorithm
 
 \subsection{Vocal tract parameters}
 
