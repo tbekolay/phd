@@ -6,4 +6,4 @@ warnings.simplefilter("default")
 
 from .dtw import dtw
 from .gestures import ges_path
-from . import filters, plots, processes, sermo, timit, vtl
+from . import experiments, filters, plots, processes, sermo, timit, vtl
