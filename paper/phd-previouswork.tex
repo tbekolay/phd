@@ -730,6 +730,12 @@ and automatic video analysis.
 
 \subsection{Trajectory classification}
 
+??? list some desirable qualities of a traj classifier
+from later on; e.g.,
+speed invariance (works regardless of how fast
+the traj is playing out),
+online classification, ...
+
 Unsurprisingly, many of the existing
 solutions for trajectory classification
 are based on generative statistical models,
@@ -746,25 +752,104 @@ that recognize trajectories
 through tracking the trajectory
 either in comparison to some known template,
 or as the state in a dynamical system.
-We identify ??? such systems
+We identify three such systems
 that provide inspiration
 for the trajectory classification model
 described in Section~???.
 
-??? clean up later...
-
-??? kilibozgud...pdf
-
-??? 06376438.pdf
+??? kilibozgud...pdf proposed
+a gesture recognition system
+for 2D trajectories
+using a finite state machine approach.
+Finite state machines are composed of
+discrete states and a set of state-specific
+functions that transition between states.
+During a learning phase,
+a target trajectory is played
+several times,
+and one or more finite state machines
+are constructed such that
+the target trajectory
+causes the state machine
+to transition to a final accepting state.
+During recognition,
+the continuous input trajectory
+is presented to all finite state machines
+in the system;
+the first to reach the accepting state is recognized.
+The system attains a 73\% accuracy rate
+in a real-world user study.
+As the system operates continuously online,
+part of the system is applicable to Sermo;
+however, the discrete state space and
+gesture sequence representation
+cannot be easily adapted to speech.
+Each timestep in the gesture trajectory
+is represented by a string denoting whether the
+end effector has moved significantly
+in the $x$ or $y$ direction since the last frame;
+the overall trajectory is represented
+by a regular expression generalized from
+the strings seen in the learning phase.
+It is not clear that this representation scheme
+would scale to $n$-dimensional spaces,
+as is required for production information trajectories.
 
 ??? documentocompleto.pdf
+proposed a system called competitive neural classifiers (CNC)
+that can recognize arabic number hand gestures
+using small training sets (three examples per gesture).
+CNC uses a collection of sub-classifiers
+that compete in order to collectively
+classify the overall trajectory.
+The trajectory is segmented
+into a set of subtrajectories,
+each of which is evaluated by
+a sub-classifier neural network
+whose output neural activations
+represent the probability that
+the subtrajectory is produced by
+the gesture associated with that output neuron.
+The overall classification aggregates the results
+across of all sub-classifiers,
+producing the correct classification
+in 98\% of test cases.
+However, the system's impressive results
+are partly due to an elaborate preprocessing step
+in which a recorded trajectory
+is normalized and resampled
+such that the actual trajectory used as input
+has a fixed number of sample points
+uniformly distributed over
+the total length of the trajectory
+(see Figure~???).
+This type of preprocessing
+requires knowledge of the whole trajectory,
+and therefore could not be implemented
+in an online manner.
+Additionally, the operations done
+on the neural network outputs
+are difficult to implement
+with spiking neural networks
+(e.g., division, argmax),
+making this system unsuitable
+for use in Sermo.
 
+??? figure 1 from documentocompleto.pdf
+
+Finally,
 ??? caramiaux...pdf
 presented an algorithm called the
-Gesture Variation Follower (GFV).
+Gesture Variation Follower (GFV),
+based on an online HMM-based
+trajectory tracking technique
+called Gesture Following (GF)
+??? cite 02bfe50e...pdf,
+10.1.1.401.4611.pdf.
 The goal of the algorithm is to match
 an input gesture sequence
 with a set of predefined template gestures.
+Unlike the HMM-based GF algorithm,
 GFV views the trajectory as a dynamical system,
 where the state of the system is
 the time-varying gesture sequence.
@@ -781,5 +866,9 @@ A state estimate is determined
 on each timestep by an inference procedure
 based on particle filtering,
 .... ??? more
+
+GVF has been used successfully...
+
+??? TODO: use, implement, experiment with
 
 % \section{Syllable consolidation}
