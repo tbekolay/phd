@@ -287,7 +287,8 @@ at frame $t$, the corresponding delta is
 \begin{equation}
   \label{dcc}
   \delta_k(t) = \frac{\sum_{n=1}^N y_k(t+n) - y_k(t-n)}{
-    2 \sum_{n=1}^N n^2},
+    2 \sum_{n=1}^N n},
+    % 2 \sum_{n=1}^N n^2},  % wrong I think...
 \end{equation}
 where $N$ is a small number of frames
 (typically between one and three).
@@ -776,7 +777,7 @@ implementing an integrator.
 While the general design of the working memory
 is described in more detail elsewhere
 (??? choo),
-how the two two working memory modules
+how the two working memory modules
 interact warrants further explanation.
 In order to calculate the next position,
 we require the current position
@@ -946,41 +947,180 @@ articulatory synthesizer ??? cite.
 While a full speech production system
 would also include a mapping from
 the gesture score to
-vocal tract parameter changes,
-this mapping would be identical
-for all syllables
-and so we leave the neural implementation
-of this mapping as future work.
-Instead, we automatically generate
+vocal tract parameter changes
+(i.e., Sermo's motor expansion system),
+we leave the neural implementation
+of this mapping as future work,
+and instead automatically generate
 a gesture score from the neurally generated
 vector representation over time,
 which can then be synthesized
 by VocalTractLab.
 
-??? start here
+We have made two modifications
+to the DMP network design
+in ??? dewolf
+to allow multiple DMPs
+to operate in quick succession.
+The first modification
+is that the oscillator is inhibited
+by default.
+Usually, the oscillatory ensemble
+has intercepts distributed away from zero,
+causing a ``dead zone'' in the part of the
+two-dimensional vector space represented
+by the ensemble.
+The dead zone forces the initial input
+to the oscillator
+to be sufficiently
+in order to kick it out of its dead zone;
+however, it eliminates the problem
+of the oscillator randomly
+oscillating without receiving input.
+While the DMP networks used in this model
+still have a dead zone,
+we also include the inhibition
+because the signal that
+starts the oscillator is provided
+to all DMPs simultaneously.
+All DMPs receive this signal
+for efficiency and scalability reasons.
+The inhibitory signal is inhibited
+(and thus the oscillator is disinhibited)
+by the syllable similarity ensembles
+associated with the DMP
+in the two associative memories,
+which requires around 400 connections
+if the memory and inhibitory ensembles
+contain 20 neurons each.
+The alternative would be to
+set up a routing network
+that would route the oscillator starting signal
+to the correct oscillators depending on
+the state of the two associative memories.
+While such a routing network can be implemented,
+it would take more neurons and connection
+to implement than the approach used here,
+and may introduce delays that
+would be detrimental to smooth sequencing.
 
-To facilitate this,
-we use the trajectory generating DMPs
-to also generate control signals
-to switch the working memories
-to the next syllable,
-and to initiate the next syllable's DMP oscillator.
-Since the DMP is already involved in
-temporally coordinating
-the vocal tract movements
-producing the syllable itself,
-it is ideally suited to
-ensure that the next syllable
-is timed appropriately.
-Since it is only providing control signals
-to the working memory modules,
-it can transition to the next syllable
-without needing to know
-what syllable will be voiced next.
+The second modification is a more robust
+method for starting the oscillator.
+Previously, we noted that the DMP's oscillator
+requires a start signal to begin
+the oscillation.
+Typically, this signal is a short pulse
+of driving force pushing the oscillator
+toward a part of the state space;
+in our case, we aim to push the oscillator
+to $[-1, 0]$, or $\theta=\pi$.
+With a short pulse of driving force,
+the oscillator typically does not
+make it to $[-1, 0]$ exactly,
+as the intrinsic dynamics of the oscillator
+quickly take over,
+beginning the oscillator.
+Additionally, the pulse
+must be presented for a sufficiently short time
+such that it does not affect
+the oscillator state as it traverse
+its limit cycle.
 
-
+In order to overcome the limitations
+of the usual starting pulse,
+we instead continuously drive
+the oscillator to the target state
+until the starting pulse is released.
+To implement this continuous drive,
+we add an additional ensemble
+to the DMP which receives input
+from the oscillator
+and provides output to oscillator;
+the output to the oscillator
+computes the difference between
+the current oscillator state
+and the target state,
+which in our case is $[-1, 0]$.
+Like the oscillator itself,
+we only want this difference
+to be computed when the start pulse
+is active.
+Therefore, we provide a constant
+inhibitory signal to the differencing ensemble,
+which is inhibited by
+the starting pulse,
+effectively disinhibiting the differencing ensemble
+and driving the oscillator
+to the $[-1, 0]$ state.\footnote{
+  Note that we set to goal state of the
+  differencing ensemble to be the target state
+  plus a small vector that counteracts the
+  intrinsic dynamics of the oscillator.
+  Since those dynamics depend on the frequency
+  of oscillation, the vector added depends
+  on the DMP's frequency (i.e., speed).
+  Currently, we use oscillators with
+  fixed frequency and therefore add a fixed vector
+  to the target state.
+  If controlled oscillators are used,
+  it would be ideal to also modify
+  the vector accordingly,
+  though the gain in accuracy may not be significant.}
+Since the differencing signal is active
+as long as the starting pulse is active,
+the start pulse effectively ``resets''
+the oscillator to the target state
+until the pulse is released,
+at which point it starts
+traversing the limit cycle.
+We therefore overcome the issues with
+the starting pulse,
+as the oscillator will be driven
+to the target state even
+with the intrinsic dynamics,
+and the timing pulse can
+last as long as is needed
+(though its timing is still critical
+for natural speech trajectories).
 
 \subsubsection{Sequencer network}
+
+The structure of the SPA modules
+and the modifications to the DMP networks
+described to this point
+allow the associative memories
+that emit the current and next syllables
+to disinhibit the rhythmic DMPs
+associated with those syllables.
+All that remains is to generate
+the timing signals that switch
+the regimes of the working memories,
+and that drive any disinhibited DMPs
+to the target initial state.
+The sequencer network
+accomplishes these two functions.
+
+The main idea of the sequencer network
+is that we keep track of
+how far along we are in the
+production of a syllable,
+and when we are sufficiently
+close to being done producing a syllable,
+we initiate the starting pulse
+and transition to producing
+the next syllable.
+Note that this assumes that
+only one syllable can be the
+``active'' syllable at any one time,
+but syllables can still
+blend into one another
+during the time of
+the starting pulse.
+??? START HERE
+??? explain sequencer
+
+??? something about how we'll call this a
+temporal associative memory
 
 In non-temporal associative memories,
 the similarity ensembles
@@ -1043,13 +1183,15 @@ improves the robustness of the network,
 which we take as a concrete benefit
 of neurally implementing the algorithm
 
-\subsection{Vocal tract parameters}
+% \subsection{Vocal tract parameters}
 
-??? Instead of gestures, we could instead
-generate parameters. Pro: continuous, lower dimension.
-Con: can't optimize the mapping between
-gesture and parameters.
-However, worth trying out?
+% ??? Instead of gestures, we could instead
+% generate parameters. Pro: continuous, lower dimension.
+% Con: can't optimize the mapping between
+% gesture and parameters.
+% However, worth trying out?
+
+% Or, obvious next step!
 
 \subsection{Evaluation}
 
