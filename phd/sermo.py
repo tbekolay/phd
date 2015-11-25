@@ -68,10 +68,11 @@ class MFCCParams(ParamsObject):
     preemph = params.NumberParam(default=0)
     lift = params.NumberParam(default=0)
     energy = params.BoolParam(default=False)
+    n_derivatives = params.IntParam(default=0)
+    deriv_spread = params.IntParam(default=2)
 
     def __call__(self):
         return mfcc(**self.kwargs())
-
 
 class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=None, shape=('*',))
@@ -106,6 +107,8 @@ class AudioFeatures(object):
         self.periphery = PeripheryParams()
         self.cepstra = CepstraParams()
         self.derivatives = []
+        # Set dummy audio so that pickling doesn't fail
+        self.audio = np.zeros(1)
 
     @property
     def audio(self):
@@ -123,6 +126,10 @@ class AudioFeatures(object):
             audio_ = audio_[:, np.newaxis]
         self.mfcc.audio = audio_
         self.periphery.sound_process = ArrayProcess(audio_)
+
+    @property
+    def dimensions(self):
+        return self.n_cepstra * (1 + len(self.derivatives))
 
     @property
     def fs(self):
@@ -167,6 +174,7 @@ class AudioFeatures(object):
         for k, v in iteritems(kwargs):
             setattr(deriv, k, v)
         self.derivatives.append(deriv)
+        self.mfcc.n_derivatives += 1
         return deriv
 
     def build(self, net=None):
@@ -175,6 +183,8 @@ class AudioFeatures(object):
         with net, self.config:
             self.build_periphery(net)
             self.build_cepstra(net)
+            if len(self.derivatives) > 0:
+                self.build_derivatives(net)
         return net
 
     def build_periphery(self, net):
@@ -184,6 +194,25 @@ class AudioFeatures(object):
         net.cepstra = Cepstra(n_freqs=net.periphery.freqs.size,
                               **self.cepstra.kwargs())
         nengo.Connection(net.periphery.an.output, net.cepstra.input)
+        # If no derivatives, our output is the cepstral coefficients
+        net.output = net.cepstra.output
+
+    def build_derivatives(self, net):
+        net.output = nengo.Node(size_in=self.dimensions)
+        nengo.Connection(net.cepstra.output, net.output[:self.n_cepstra],
+                         synapse=None)
+
+        net.derivatives = []
+        target = net.cepstra  # First, do the derivative of the cepstra
+        for i, deriv in enumerate(self.derivatives):
+            derivnet = deriv.net(dimensions=self.n_cepstra, **deriv.kwargs())
+            nengo.Connection(target.output, derivnet.input, synapse=None)
+            nengo.Connection(
+                derivnet.output,
+                net.output[(i+1)*self.n_cepstra:(i+2)*self.n_cepstra],
+                synapse=None)
+            target = derivnet  # Then do derivative of derivatives
+            net.derivatives.append(derivnet)
 
 
 # ############################

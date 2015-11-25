@@ -1,6 +1,7 @@
 import os
 import shutil
 import tarfile
+import warnings
 
 import numpy as np
 import soundfile as sf
@@ -279,6 +280,10 @@ class TIMIT(object):
             sample = utt.word_samples(words, rms=rms)
             for word in words:
                 samples[word].extend(sample[word])
+        for word in words:
+            if len(samples[word]) == 0:
+                del samples[word]
+                warnings.warn("Word '%s' not found in corpus." % word)
         return samples
 
     def phn_samples(self, phonemes, rms=0.5, corpus="train"):
@@ -287,6 +292,10 @@ class TIMIT(object):
             sample = utt.phn_samples(phonemes, rms=rms)
             for phone in phonemes:
                 samples[phone].extend(sample[phone])
+        for phone in phonemes:
+            if len(samples[phone]) == 0:
+                del samples[phone]
+                warnings.warn("Phone '%s' not found in corpus." % phone)
         return samples
 
     def in_audio(self, words=None, phonemes=None):

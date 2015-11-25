@@ -22,6 +22,11 @@ def cache_file(key=None, ext='pkl'):
     return os.path.join(cache_dir, "%s.%s" % (key, ext))
 
 
+def cache_file_exists(key=None, ext='pkl'):
+    path = cache_file(key, ext)
+    return os.path.exists(path)
+
+
 def generic_key(obj):
     h = hashlib.sha1()
     h.update(dill.dumps(obj))

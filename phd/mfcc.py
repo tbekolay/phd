@@ -17,7 +17,7 @@ from .utils import hz2mel, mel2hz
 
 def mfcc(audio, fs=16000, window_dt=0.025, dt=0.01, n_cepstra=13,
          n_filters=26, n_fft=512, minfreq=0, maxfreq=None, preemph=0.97,
-         lift=22, energy=True):
+         lift=22, energy=True, n_derivatives=0, deriv_spread=2):
     """Compute MFCC features from an audio signal.
 
     Parameters
@@ -51,11 +51,18 @@ def mfcc(audio, fs=16000, window_dt=0.025, dt=0.01, n_cepstra=13,
     energy : bool, optional
         If this is true, the zeroth cepstral coefficient is replaced with the
         log of the total frame energy. Default: True
+    n_derivatives : int, optional
+        The number of derivatives to include in the feature vector.
+        Affects the shape of the returned array. Default: 0
+    deriv_spread : int, optional
+        The spread of the derivatives to includ in the feature vector.
+        Greater spread uses more frames to compute the derivative.
+        Default: 2
 
     Returns
     -------
-    A numpy array of shape (audio.shape[0], n_cepstra) containing features.
-    Each row holds 1 feature vector.
+    A numpy array of shape (audio.shape[0], n_cepstra * (1 + n_derviatives)
+    containing features. Each row holds 1 feature vector.
     """
     feat, energy_ = fbank(
         audio, fs, window_dt, dt, n_filters, n_fft, minfreq, maxfreq, preemph)
@@ -65,7 +72,29 @@ def mfcc(audio, fs=16000, window_dt=0.025, dt=0.01, n_cepstra=13,
     if energy:
         # replace first cepstral coefficient with log of frame energy
         feat[:, 0] = np.log(energy_)
-    return feat
+
+    target = feat
+    derivs = []
+    for i in range(n_derivatives):
+        derivs.append(derivative(target, deriv_spread))
+        target = derivs[-1]
+    return np.hstack([feat] + derivs)
+
+
+def derivative(feat, spread):
+    assert feat.ndim == 2
+    if feat.shape[0] == 1:
+        # Can't do derivative of one sample
+        return feat
+    spread = min(spread, feat.shape[0] - 1)
+    out = np.zeros_like(feat)
+    for i in range(1, spread + 1):
+        plus = np.roll(feat, -i, axis=0)
+        plus[-i:] = plus[-i-1]
+        minus = np.roll(feat, i, axis=0)
+        minus[:i] = 0.
+        out += plus - minus
+    return out / (2 * np.sum(np.arange(1, spread + 1)))
 
 
 def fbank(audio, fs=16000, window_dt=0.025, dt=0.01,
