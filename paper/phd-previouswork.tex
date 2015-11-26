@@ -851,24 +851,125 @@ an input gesture sequence
 with a set of predefined template gestures.
 Unlike the HMM-based GF algorithm,
 GFV views the trajectory as a dynamical system,
-where the state of the system is
-the time-varying gesture sequence.
+and uses a Particle Filtering algorithm
+to learn a set of weights
+that denote the importance of
+each randomly generated particle
+(i.e., dynamical system state)
+to overall recognition accuracy.
+
+The overall flow of the algorithm
+is as follows.
+First, a set of predefined example trajectories
+are defined in the system.
+Second, a set of particles
+are randomly generated
+in an $n$-dimensional space
+with a uniform distribution,
+and a set of weights are initialized
+with each particle weighted equally.
+In the main loop of the algorithm,
+a random sample is drawn
+according to each particle's position
+in state space,
+and the weights associated with each particle
+are updated based on the distance
+between the particle's sample
+and the observed input.
+If too many particles have small weights
+associated with them,
+then a resampling procedure is done
+based on the current weights.
+
+What differentiates this algorithm from
+other particle filtering algorithms
+is the structure of the state space.
+Briefly, the state space that each particle is in
+encodes the target gesture that this particle
+is associated with,
+and a probability distribution
+over the phase of the trajectory
+(i.e., how far along the trajectory
+we currently are),
+and the speed of the trajectory
+(i.e., how far along the trajectory
+do we expect to be on the next timestep).
 The state evolves over time according to
-a non-linear state transition function,
-and generates an observation on each timestep
-according to a non-linear observation function
-that depends on both system state
-and a template gesture.
-The system state essentially tracks
-relative time along the template gesture
-and the speed at which time is moving.
-A state estimate is determined
-on each timestep by an inference procedure
-based on particle filtering,
-.... ??? more
+predefined state transition functions,
+and on each timestep,
+each particle emits an observation
+according to a possibly non-linear function.
 
-GVF has been used successfully...
+A useful analogy for this algorithm
+is that it implements an online version of an HMM.
+Like HMMs, it maintains some internal representation
+that can be used to estimate the probability
+of a particular sequence
+by forming a prediction
+of the next observation.
+The system is queried by providing
+an observation,
+which changes the internal representation
+such that the next observation
+is processed in the context of
+the sequence of past observations.
 
-??? TODO: use, implement, experiment with
+GVF has been used successfully
+in music generation systems
+in which the music sample,
+volume, and speed are
+controlled by gestures
+that are tracked by the GVF algorithm.
+It achieves over 98\% accuracy
+in a 2D gesture recognition task
+with 16 possible gestures,
+and was employed successfully
+in a 3D hand gesture user study
+with 10 participants.
 
-% \section{Syllable consolidation}
+While GVF is one of the most promising
+algorithms for doing trajectory recognition
+in Sermo,
+it has two main weaknesses in its current formulation.
+First, while the classifier can be used online,
+it is formulated in discrete time;
+this weakness should be possible to overcome,
+however, as continuous time particle filtering
+has been done in the past
+??? ctpf.pdf.
+Second, while the dynamical system
+at the core of GVF is well suited
+to be implemented in spiking neurons,
+the resampling process is not.
+On each step of the algorithm,
+each particle represents a probability
+distribution over the system state,
+which is sampled
+(sampling has been shown to be
+possible with spiking neurons;
+see ??? plotbuesing...pdf).
+However, when the importance weights
+of a sufficient number of particles
+is below a particular threshold,
+a new set of particles
+is randomly generated
+to replace those with low importance weights.
+This procedure would translate to
+a significant reorganization
+of the neurons implementing
+the sampling procedure,
+which we believe
+would not be chosen if
+procedures that do not require
+reorganization exist.
+
+We will propose a trajectory classification technique
+in Section~??? that shares many of the positive
+characteristics of the GVF algorithm,
+but can be implemented in a spiking neural network.
+Like GVF, it is also based on the idea
+of inferring internal dynamical system state
+based on observations;
+however, it performs the inference
+in a manner that we relate to
+DMPs (see Section~???).
