@@ -1079,9 +1079,9 @@ as the oscillator will be driven
 to the target state even
 with the intrinsic dynamics,
 and the timing pulse can
-last as long as is needed
-(though its timing is still critical
-for natural speech trajectories).
+last as long as is needed,
+though its timing is still critical
+for natural speech trajectories.
 
 \subsubsection{Sequencer network}
 
@@ -1116,72 +1116,120 @@ but syllables can still
 blend into one another
 during the time of
 the starting pulse.
-??? START HERE
-??? explain sequencer
 
-??? something about how we'll call this a
-temporal associative memory
-
-In non-temporal associative memories,
-the similarity ensembles
-project either the same (autoassociative)
-or another (heteroassociative) semantic pointer
-to a \textit{state} module,
-which therefore represents
-a static cleaned up version of the pointer
-associated with
-the original noisy input signal.
-In temporal associative memories,
-we instead associate each similarity ensemble
-with a DMP network so that
-the \textit{state} module
-represents a continuous trajectory
-in some vector space.
-In our case, the vector space of interest
-consists of 48 dimensions,
-each representing a vocal tract gesture.
-
-To facilitate this,
-we use the state of both working memories
-to disinhibit syllable DMPs,
-and track the combined state of all syllable DMPs
-with a separate timing ensemble
+The core of the sequencer network
+is a \textit{timer} ensemble
+that receives input from
+all of the rhythmic DMP ensembles.
+If the assumption that
+at any given time
+only one syllable is active holds,
+then the timer ensemble effectively
+represents the state of the oscillator
+for the currently active syllable.
+The timer is used to
+switch the regimes of the working memories,
+and to initiate the starting pulse
+for the next syllable.
+As it turns out, the timing
+of these two signals is strongly linked;
+the ideal time to switch the regimes
+of the working memories
+is right after the timing pulse starts,
+and right after it ends
 (see Figure~???).
-Because of the way the working memories
-are gated, there are two possible
-situations.
-At the start of a syllable,
-both working memories represent the same syllable,
-as the first working memory is in
-the acquisition regime.
-In order to start the oscillator
-associated with a rhythmic DMP,
-a small amount of input must be delivered
-to push it into its limit cycle;
-since both working memories represent
-the same syllable, the currently active
-syllable will
+This timing is ideal because
+we want both associative memories
+to emit the ``next'' syllable
+during the starting pulse,
+but for the ``current'' and ``next'' syllables
+to be disinhibited for the rest
+of the time so that when the next
+starting pulse occurs,
+the next syllable is already dinsinhibited
+and read to be voiced,
+rather than needing to be disinhibited
+before it can be driven by the starting pulse.
 
-The timing of
-the signal that starts
-the next syllable's oscillator
-and the gating signal that
-switches working memory regimes
-and therefore disinhibits
-the next syllable to be voiced
-must be precise.
-In terms of the DMP oscillator,
-the
+Note, however, that we aim to
+have a slight delay between
+when the timing pulse starts
+and the working memory switch occurs,
+and the switch will effectively
+inhibit the ``current'' syllable,
+which we wish to be active
+while the next syllable is being
+driven to the initial state.
+Since the current syllable's trajectory
+is bringing it near the initial state,
+the additional drive resulting
+from the starting pulse
+does not adversely affect the
+trajectory.\footnote{
+  If the trajectory is adversely affected,
+  then the forcing function can be modified
+  such that the predefined trajectory is
+  warped in time to accommodate for the
+  increased speed at the end of the trajectory.}
+Similarly, we aim to switch
+the working memories again
+slightly before the starting pulse ends
+to limit the amount of time
+that the previous and current syllables overlap.
+Unlike phonemes, syllables are not
+typically coarticulated;
+the overlap that we achieve by the
+delay between the timing pulse
+and the first working memory switch
+is to reduce the delay between
+successive syllables,
+not necessarily to allow them
+to coarticulate,
+though some slight overlap is possible.
+Figure~??? illustrates the timeline
+of events at the end of a syllable trajectory.
 
+??? conceptual figure of when switching
+should happen
 
-??? note that we are doing a lot of stuff
-here with inhibition.
-While it is possible to do this stuff
-without neurons in a similar manner,
-the ability to directly inhibit ensembles
-improves the robustness of the network,
-which we take as a concrete benefit
-of neurally implementing the algorithm
+The network as has been described to this point
+has a critical flaw ??? look into a better
+way to deal with the DMP reset,
+otherwise copy in the catch 22 text
+
+\subsubsection{Temporal output associative memory}
+
+For ease of reference in the rest
+of the thesis, we will refer to
+the combination of an associative memory,
+and DMP networks
+for each input-output pair in the memory
+as a temporal output associative memory.
+Since we use sequences of syllables
+as an input, we use the sequencer network
+to control sequence timing;
+however, temporal output associative memories
+can also be used in other situations,
+including those that allow for
+motor synergies to be
+flexibly weighted rather than
+the all-or-nothing nature
+of syllables.
+The key innovation here is
+the association of
+a possibly noisy semantic pointer
+with an arbitrary time-varying trajectory.
+Many applications of this kind of association
+can be seen in human behavior;
+here, we associate static syllable representations
+with production information trajectories
+that will drive a motor system
+to produce that syllable over time.
+A similar mapping could produce
+other types of motor behavior
+(e.g., a reach)
+from static representations
+of congitive intentions.
 
 % \subsection{Vocal tract parameters}
 
@@ -1196,6 +1244,12 @@ of neurally implementing the algorithm
 \subsection{Evaluation}
 
 ??? compare original VTG -> audio to Nengo -> VTG -> audio
+
+??? important: scaling. Show that adding new syllables
+to the syllabary doesn't affect the voicing
+of a given sequence; show how many neurons are added.
+
+??? test how long of a sequence we can get to work
 
 ??? The goal of a syllable production system
 is to generate an audio waveform
@@ -1215,151 +1269,17 @@ provided by Bernd Kr\"{o}ger.
 Go from a vocal tract gesture score
 to a syllable semantic pointer, in neurons.
 
+??? try to work in the temporal associative memory term in here,
+or use one to clean up to a static syllable?
+Yeah, that should be doable actually,
+and hook it up to a working memory
+so that the recognized syllable sticks around.
+SO then you can just hook up the output
+of the prod network to the recog network!
+
 \subsection{Neural model}
 
 \subsection{Evaluation}
-
-\section{Syllable consolidation}
-
-Go from vocal tract gesture score
-to audio signal, in neurons.
-
-Learn a syllable recognition
-and a syllable production
-network from this.
-
-Contrast this to syllable production because it's
-an infrequently voiced syllable.
-
-\subsection{Bootstrapped syllable learning}
-
-??? A full picture of speech development involves:
-learning vocal tract gestures
-through reinforced motor babbling,
-learning basic syllables
-through mimicry?,
-and scaling up to the elements of this model.
-While we think that our model
-is a useful starting point for such
-a developmental model,
-as it provides an end-target,
-we don't claim to do this kind of structural learning.
-However, we believe that error-based learning
-could result in this kind of system;
-to show that this is a possibility,
-we consider a minimal learning situation:
-learning voice a new syllable
-given a set of existing syllables.
-This type of thing probably happens
-in second language acquisition,
-when novel combinations of phonemes
-are encountered,
-or even during first language acquisition
-as pronunciation is refined over
-the course of one's life;
-words that were once awkward combinations
-of many syllables are compressed into
-nearly equivalent sequences of fewer,
-more complex syllables.
-
-As opposed to conversational shadowing,
-which highlights the high-level strengths
-of the integrated speech system,
-syllable learning highlights
-the low-level strengths of this system.
-Syllable learning involves
-learning a novel set of gestures
-and associated articulator trajectories
-that will voice a syllable
-that is encountered for the first time.
-
-We call our syllable learning system ``bootstrapped''
-because we assume that our system
-has an existing repertoire of syllables
-that it is already able to voice.
-These existing syllables will be
-used in learning the new syllable.
-Bootstrapped syllable learning contrasts with
-the type of syllable learning
-done as an infant and toddler,
-which uses reinforced speech babbling
-to learn novel syllables.
-While we believe that learning syllables
-from babbling is an important research direction
-that can be explored in this system,
-it has also been explored in many other systems
-(???cite Diva etc),
-and so we have chosen to leave this type of learning
-for future work.
-
-The bootstrapped syllable learning system
-learns new syllables in three steps.
-
-\begin{enumerate}
-\item Initialize the new syllable from the most
-  similar existing syllable.
-  For example, when learning to voice
-  the syllable /ba/, the system should
-  start from the syllable /fa/ if it is known.
-\item Swap compatible speech gestures.
-  For example, vowel producing gestures
-  would be compatible, allowing for modifying
-  a /ba/ to a /bu/, and so on.
-  The choice of which gesture to swap and
-  how to swap it will be informed by
-  ???figure out.
-\item Fine-tune the voiced syllable
-  until it can be recognized as the
-  syllable to be learned.
-  ???more
-\end{enumerate}
-
-??? NB: the oscillator being learned should exist outside of
-the normal speech system so that they can both run
-at the same time, but there should be a switch kind of thing
-to put the new syllable through.
-
-??? hypothesis (not sure where to put this):
-the mapping between phoneme to gesture
-is such that is not advantageous
-to represent in the synthesis
-(maybe also recognition?) system(s).
-Therefore, it may be the case that
-not all people have phoneme representations.
-However, we propose that phonemes
-are a useful construct for learning to voice
-novel syllables in a second-language learning situation.
-
-These steps require several systems
-that have already been implemented
-in the recognition and synthesis systems separately;
-for example, the ability to compare
-voiced syllables to those already known
-is one of the primary goals of the recognition system itself,
-so it can be leveraged when trying to learn new syllables.
-However, these steps also point to new systems
-that must be implemented.
-First, the system requires a method
-to transfer a syllable-producing function
-from one ensemble to another.
-Second, some knowledge of which gestures
-are compatible must be built into the system.
-Finally, ???fine-tuning.
-
-It has been shown that in second-language learning,
-slowing down the syllable can have
-a significant increase in learning effectiveness
-???cite.
-We believe that our system emulates
-how a native speaker of one language
-would learn to voice novel syllables in a second language.
-Therefore, we predict that slowing down
-the speed at which the syllables are heard
-and uttered will improve ???learning speed
-and / or quality of learned syllable.
-
-??? Mental syllabary (1-s2.0-S009394X...pdf)
-supports our architecture
 
 \subsection{Network diagram}
 

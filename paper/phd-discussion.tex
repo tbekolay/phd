@@ -2,6 +2,30 @@
 
 \section{Reflection on results}
 
+\subsection{Syllable sequencing and production}
+
+??? note that we are doing a lot of stuff
+here with inhibition.
+While it is possible to do this stuff
+without neurons in a similar manner,
+the ability to directly inhibit ensembles
+improves the robustness of the network,
+which we take as a concrete benefit
+of neurally implementing the algorithm
+
+??? temporal output associative memories
+provide a robust link between the discrete,
+symbolic world of high-level representations
+that can be flexibly combined (see, e.g., Dan's RPM work)
+and the continuous, subsymbolic world
+of low-level representations that must
+be precisely timed (see e.g., Travis's work).
+
+??? temporal input associative memories
+provide an analogous link between
+continuously varying low-level sensory inputs
+and high-level symbolic representations
+
 \section{Comparison to existing models}
 
 \section{Contributions}
@@ -26,7 +50,9 @@ for a ton of worthwhile future research.
 ??? additionally, while my stuff is applied to speech,
 the various networks and ideas (the sequencer network,
 trajectory classification, etc) are useful/necessary
-for dealing with any temporally varying stuff in spaun, e.g. gestures, etc
+for dealing with any temporally varying stuff in spaun, e.g. gestures, etc.
+I.e., temporal working memories are likely to be
+a big part of future iterations of Spaun.
 
 \subsection{Contributions to computer science}
 
@@ -159,3 +185,148 @@ this could be added (see comments below)
 % ???not sure if we even care about volume
 % to be honest...
 % % http://www.sengpielaudio.com/calculator-loudness.htm
+
+\section{Syllable consolidation}
+
+??? I didn't get to this,
+but it can definitely be done.
+
+Go from vocal tract gesture score
+to audio signal, in neurons.
+
+Learn a syllable recognition
+and a syllable production
+network from this.
+
+Contrast this to syllable production because it's
+an infrequently voiced syllable.
+
+\subsection{Bootstrapped syllable learning}
+
+??? A full picture of speech development involves:
+learning vocal tract gestures
+through reinforced motor babbling,
+learning basic syllables
+through mimicry?,
+and scaling up to the elements of this model.
+While we think that our model
+is a useful starting point for such
+a developmental model,
+as it provides an end-target,
+we don't claim to do this kind of structural learning.
+However, we believe that error-based learning
+could result in this kind of system;
+to show that this is a possibility,
+we consider a minimal learning situation:
+learning voice a new syllable
+given a set of existing syllables.
+This type of thing probably happens
+in second language acquisition,
+when novel combinations of phonemes
+are encountered,
+or even during first language acquisition
+as pronunciation is refined over
+the course of one's life;
+words that were once awkward combinations
+of many syllables are compressed into
+nearly equivalent sequences of fewer,
+more complex syllables.
+
+As opposed to conversational shadowing,
+which highlights the high-level strengths
+of the integrated speech system,
+syllable learning highlights
+the low-level strengths of this system.
+Syllable learning involves
+learning a novel set of gestures
+and associated articulator trajectories
+that will voice a syllable
+that is encountered for the first time.
+
+We call our syllable learning system ``bootstrapped''
+because we assume that our system
+has an existing repertoire of syllables
+that it is already able to voice.
+These existing syllables will be
+used in learning the new syllable.
+Bootstrapped syllable learning contrasts with
+the type of syllable learning
+done as an infant and toddler,
+which uses reinforced speech babbling
+to learn novel syllables.
+While we believe that learning syllables
+from babbling is an important research direction
+that can be explored in this system,
+it has also been explored in many other systems
+(???cite Diva etc),
+and so we have chosen to leave this type of learning
+for future work.
+
+The bootstrapped syllable learning system
+learns new syllables in three steps.
+
+\begin{enumerate}
+\item Initialize the new syllable from the most
+  similar existing syllable.
+  For example, when learning to voice
+  the syllable /ba/, the system should
+  start from the syllable /fa/ if it is known.
+\item Swap compatible speech gestures.
+  For example, vowel producing gestures
+  would be compatible, allowing for modifying
+  a /ba/ to a /bu/, and so on.
+  The choice of which gesture to swap and
+  how to swap it will be informed by
+  ???figure out.
+\item Fine-tune the voiced syllable
+  until it can be recognized as the
+  syllable to be learned.
+  ???more
+\end{enumerate}
+
+??? NB: the oscillator being learned should exist outside of
+the normal speech system so that they can both run
+at the same time, but there should be a switch kind of thing
+to put the new syllable through.
+
+??? hypothesis (not sure where to put this):
+the mapping between phoneme to gesture
+is such that is not advantageous
+to represent in the synthesis
+(maybe also recognition?) system(s).
+Therefore, it may be the case that
+not all people have phoneme representations.
+However, we propose that phonemes
+are a useful construct for learning to voice
+novel syllables in a second-language learning situation.
+
+These steps require several systems
+that have already been implemented
+in the recognition and synthesis systems separately;
+for example, the ability to compare
+voiced syllables to those already known
+is one of the primary goals of the recognition system itself,
+so it can be leveraged when trying to learn new syllables.
+However, these steps also point to new systems
+that must be implemented.
+First, the system requires a method
+to transfer a syllable-producing function
+from one ensemble to another.
+Second, some knowledge of which gestures
+are compatible must be built into the system.
+Finally, ???fine-tuning.
+
+It has been shown that in second-language learning,
+slowing down the syllable can have
+a significant increase in learning effectiveness
+???cite.
+We believe that our system emulates
+how a native speaker of one language
+would learn to voice novel syllables in a second language.
+Therefore, we predict that slowing down
+the speed at which the syllables are heard
+and uttered will improve ???learning speed
+and / or quality of learned syllable.
+
+??? Mental syllabary (1-s2.0-S009394X...pdf)
+supports our architecture
