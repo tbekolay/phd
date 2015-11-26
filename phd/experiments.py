@@ -8,6 +8,7 @@ import nengo
 import nengo.utils.numpy as npext
 import numpy as np
 import scipy
+from nengo.cache import NoDecoderCache
 from nengo.utils.compat import range
 from nengo.utils.stdlib import Timer
 from sklearn.svm import LinearSVC
@@ -57,7 +58,10 @@ class AuditoryFeaturesExperiment(object):
                 net = self.model.build(nengo.Network(seed=self.seed))
                 with net:
                     pr = nengo.Probe(net.output, synapse=0.01)
-                sim = nengo.Simulator(net, dt=0.001)
+                # Disable the decoder cache for this network
+                _model = nengo.builder.Model(
+                    dt=0.001, decoder_cache=NoDecoderCache())
+                sim = nengo.Simulator(net, model=_model)
                 sim.run(self.model.t_audio, progress_bar=False)
                 if self.zscore:
                     # TRY: take the zscore for each block separately
@@ -95,7 +99,9 @@ class AuditoryFeaturesExperiment(object):
         net = model.build(nengo.Network(seed=seed))
         with net:
             pr = nengo.Probe(net.output, synapse=0.01)
-        sim = nengo.Simulator(net, dt=0.001)
+        # Disable decoder cache for this model
+        _model = nengo.builder.Model(dt=0.001, decoder_cache=NoDecoderCache())
+        sim = nengo.Simulator(net, model=_model)
         sim.run(model.t_audio, progress_bar=False)
         model.audio = np.zeros(1)
         return sim.data[pr]
@@ -208,7 +214,7 @@ class AuditoryFeaturesExperiment(object):
     def run(self):
         key = cache.generic_key(self)
         if cache.cache_file_exists(key, ext='npz'):
-            log("'%s.npz' in the cache. Loading." % key)
+            log("%s.npz in the cache. Loading." % key)
             result = AuditoryFeaturesResult.load(key)
         else:
             log("==== Training ====")

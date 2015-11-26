@@ -169,7 +169,7 @@ class AudioFeatures(object):
     def t_audio(self):
         return self.audio.size / float(self.fs)
 
-    def add_derivative(self, klass="IntermediateDeriv", **kwargs):
+    def add_derivative(self, klass="FeedforwardDeriv", **kwargs):
         deriv = globals()["%sParams" % klass]()
         for k, v in iteritems(kwargs):
             setattr(deriv, k, v)
@@ -232,9 +232,9 @@ class SequencerParams(ParamsObject):
     n_per_d = params.IntParam(default=120)
     timer_tau = params.NumberParam(default=0.05)
     timer_freq = params.NumberParam(default=2.)
-    reset_time = params.NumberParam(default=0.7)
+    reset_time = params.NumberParam(default=0.65)
     reset_threshold = params.NumberParam(default=0.5)
-    reset_to_gate = params.NumberParam(default=-0.7)
+    reset_to_gate = params.NumberParam(default=-0.65)
     gate_threshold = params.NumberParam(default=0.4)
 
 
@@ -260,7 +260,7 @@ class ProductionInfoParams(ParamsObject):
 class ExperimentParams(ParamsObject):
     dt = params.NumberParam(default=0.001)
     sequence = params.StringParam(default=None)
-    t_release = params.NumberParam(default=0.2)
+    t_release = params.NumberParam(default=0.14)
 
 
 class Production(object):
