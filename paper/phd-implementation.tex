@@ -1350,6 +1350,41 @@ whose estimated state is closest
 to the upper range of the actual system state
 is chosen as the classified syllable.
 
+It is important to note that
+the $c$ and $f$ parameters
+used in the iDMP cannot be chosen
+in the same way as in DMPs.
+In the DMP,
+the $c$ and $f$ parameters
+control how quickly
+the DMP is moving through
+the state space,
+and therefore controls
+the temporal scale
+of the trajectory.
+In the iDMP, however,
+$c$ and $f$ stay fixed,
+and instead represent
+the maximum speed that
+we expect the iDMP to
+move through the state space,
+or perhaps slightly higher than
+the maximum speed.
+If $c$ and $f$ are too low
+and the estimated state
+lags behind the actual state,
+then the predictions will
+diverge from the observations,
+leading to poor tracking
+(false negatives).
+If $c$ and $f$ are too high,
+then the iDMP may advance
+too far in the state space,
+making an improper classification
+(false positives).
+Choosing a good $c$ or $f$
+is critical to the success of an iDMP.
+
 While we believe that the iDMP
 is well suited to a wide range
 of trajectory classification problems,
@@ -1400,10 +1435,87 @@ Each syllable is also associated
 with a randomly generated semantic pointer,
 which should be the same semantic pointer
 used by the syllable production system
-to producing that syllable.
+to produce that syllable.
 
 \subsection{Neural model}
 
-??? connection to assoc mem
+??? figure of organization
 
-??? etc
+The spiking neural implementation of
+the syllable recognition model
+is organized much like the production model.
+Each syllable has an associated
+iDMP network that aims to recognize
+that syllable.
+The output of each iDMP is associated
+with an ensemble in
+an SPA associative memory,
+which produces a cleaned up version
+of the semantic pointer
+associated with the recognized syllable.
+Finally, a \textit{temporal classification}
+network is used to monitor the
+state of the associative memory
+and route control signals to
+the rest of the model
+to ensure robust performance
+(it is analogous to the sequencing
+and production model's
+sequencer network).
+
+\subsubsection{iDMP networks}
+
+??? depends on what works
+
+\subsubsection{Associative memory}
+
+The associative memory is a standard
+SPA associative memory,
+mapping from a set of input semantic pointers
+to a set of output semantic pointers.
+In the recognition network, however,
+we do not provide any semantic pointer input;
+instead, we use the iDMP networks
+to drive the ensembles associated
+with each syllable semantic pointer directly.
+Specifically, the dimension or dimensions
+representing the system state
+are connected to the similarity sensitive ensembles.
+
+One benefit of using the associative memory
+is that it separates the state tracking function
+of the iDMP networks
+from the winner-take-all mutual inhibition
+of the associative memory,
+which makes the iDMP network easier to implement.
+Another important benefit is that
+it provides a point for
+sensorimotor information
+(provided by the iDMPs)
+to integrate with top-down
+linguistic information.
+Since neuron naturally sum
+input from multiple sources,
+the ensemble representing syllable similarity
+can receive input from both sources,
+and achieve faster or more correct classification
+as a result.
+
+??? assoc memory figure
+
+While we did not go into detail on
+the mutual inhibition present in the associative memory
+in Section~???,
+it is important for the operation
+of the syllable recognition network,
+so we provide that detail here.
+Figure~??? shows all of the
+ensembles and connections present
+??? for each input/output semantic pointer pair.
+There are, in fact, two ensembles created
+for each semantic pointer association
+in order to suppress
+??? figure out what bias is for
+??? explain winner-take-all stuff
+
+\subsubsection{Temporal classification network}
