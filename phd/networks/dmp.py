@@ -73,7 +73,3 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
         net.disinhibit = nengo.Node(size_in=1)
         nengo.Connection(net.disinhibit, net.inhibit, transform=-1)
     return net
-
-
-def InverseDMP():
-    pass

@@ -12,6 +12,7 @@ from .networks import (  # noqa: F401
     Cepstra,
     FeedforwardDeriv,
     IntermediateDeriv,
+    InverseRhythmicDMP,
     RhythmicDMP,
     Sequencer,
     SyllableSequence,
@@ -238,7 +239,7 @@ class SequencerParams(ParamsObject):
     gate_threshold = params.NumberParam(default=0.4)
 
 
-class SyllableParams(ParamsObject):
+class ProdSyllableParams(ParamsObject):
     n_per_d = params.IntParam(default=120)
     label = params.StringParam(default=None)
     freq = params.NumberParam(default=3.)
@@ -257,7 +258,7 @@ class ProductionInfoParams(ParamsObject):
     threshold = params.NumberParam(default=0.3)
 
 
-class ExperimentParams(ParamsObject):
+class ProductionTrialParams(ParamsObject):
     dt = params.NumberParam(default=0.001)
     sequence = params.StringParam(default=None)
     t_release = params.NumberParam(default=0.14)
@@ -271,10 +272,10 @@ class Production(object):
         self.sequencer = SequencerParams()
         self.syllables = []
         self.production_info = ProductionInfoParams()
-        self.experiment = ExperimentParams()
+        self.trial = ProductionTrialParams()
 
     def add_syllable(self, **kwargs):
-        syll = SyllableParams()
+        syll = ProdSyllableParams()
         for k, v in iteritems(kwargs):
             setattr(syll, k, v)
         self.syllables.append(syll)
@@ -287,7 +288,7 @@ class Production(object):
             self.build_sequencer(net)
             self.build_syllables(net)
             self.build_connections(net)
-            self.build_experiment(net)
+            self.build_trial(net)
         return net
 
     def build_syllables(self, net):
@@ -301,7 +302,7 @@ class Production(object):
                                             intercepts=intercepts)
 
         net.syllables = []
-        dt = self.experiment.dt
+        dt = self.trial.dt
         for syllable in self.syllables:
             forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
             dmp = RhythmicDMP(forcing_f=forcing_f, **syllable.kwargs())
@@ -332,29 +333,111 @@ class Production(object):
             nengo.Connection(curr_ens, dmp.disinhibit)
             nengo.Connection(next_ens, dmp.disinhibit)
 
-    def build_experiment(self, net):
+    def build_trial(self, net):
         # At the start of of the experiment...
         vocab = net.sequence.vocab
 
         # initial position is POS1,
         net.init_idx = nengo.Node(lambda t: vocab.parse('POS1').v
-                                  if t < self.experiment.t_release + 0.1
+                                  if t < self.trial.t_release + 0.1
                                   else vocab.parse('0').v)
         nengo.Connection(net.init_idx, net.sequence.pos.input)
 
         # the sequence is as given,
-        net.seq_input = nengo.Node(vocab.parse(self.experiment.sequence).v)
+        net.seq_input = nengo.Node(vocab.parse(self.trial.sequence).v)
         nengo.Connection(net.seq_input, net.sequence.sequence.input)
 
         # the dmps are reset,
         net.init_reset = nengo.Node(
-            lambda t: 1.0 if t < self.experiment.t_release else 0.0)
+            lambda t: 1.0 if t < self.trial.t_release else 0.0)
         nengo.Connection(net.init_reset, net.sequencer.reset)
 
         # the timer is started.
         nengo.Connection(net.init_reset, net.sequencer.timer,
                          transform=[[-1], [0]])
 
-        # Shouldn't be needed
-        # init_gate = nengo.Node(output=lambda t: -1.0 if t < 0.2 else 0.0)
-        # nengo.Connection(init_gate, gate)
+
+# #############################
+# Model 3: Syllable recognition
+# #############################
+
+# --- Same as Production; copied here for reference
+#
+# class SyllableParams(ParamsObject):
+#     n_per_d = params.IntParam(default=120)
+#     label = params.StringParam(default=None)
+#     freq = params.NumberParam(default=3.)
+#     trajectory = params.NdarrayParam(shape=('*', 48))
+#     tau = params.NumberParam(default=0.025)
+#
+#     def kwargs(self):
+#         return {'n_per_d': self.n_per_d,
+#                 'freq': self.freq,
+#                 'tau': self.tau}
+class RecogSyllableParams(ParamsObject):
+    n_per_d = params.IntParam(default=120)
+    freq = params.NumberParam(default=3.)
+    trajectory = params.NdarrayParam(shape=('*', 48))
+    tau = params.NumberParam(default=0.05)
+    similarity_th = params.NumberParam(default=0.6)
+    freq_scale = params.NumberParam(default=2.0)
+
+    def kwargs(self):
+        args = super(RecogSyllableParams, self).kwargs()
+        del args['trajectory']
+        return args
+
+
+class ControlParams(ParamsObject):
+    # Something to do with resetting the dmps
+    pass
+
+
+class RecognitionTrialParams(ParamsObject):
+    dt = params.NumberParam(default=0.001)
+    trajectory = params.NdarrayParam(default=None, shape=('*', 48))
+
+
+class Recognition(object):
+    def __init__(self):
+        self.config = nengo.Config(
+            nengo.Ensemble, nengo.Connection, nengo.Probe)
+        self.syllables = []
+        self.trial = RecognitionTrialParams()
+
+    def add_syllable(self, **kwargs):
+        syll = RecogSyllableParams()
+        for k, v in iteritems(kwargs):
+            setattr(syll, k, v)
+        self.syllables.append(syll)
+
+    def build(self, net=None):
+        if net is None:
+            net = nengo.Network("Sermo syllable recognition")
+        with net, self.config:
+            self.build_input(net)
+            self.build_output(net)
+            self.build_syllables(net)
+        return net
+
+    def build_input(self, net):
+        assert self.trial.trajectory is not None, "Must define trajectory"
+        net.trajectory = EnsembleArray(80, n_ensembles=48)
+        # Sneaky: override the net.trajectory.input node output
+        net.trajectory.input.output = ArrayProcess(self.trial.trajectory)
+        net.trajectory.input.size_in = 0
+
+    def build_output(self, net):
+        pass
+
+    def build_syllables(self, net):
+        assert len(self.syllables) > 0, "No syllables added"
+
+        net.syllables = []
+        dt = self.trial.dt
+        for syllable in self.syllables:
+            forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
+            dmp = InverseRhythmicDMP(forcing_f=forcing_f, **syllable.kwargs())
+
+            nengo.Connection(net.trajectory.output[gesture_ix], dmp.input)
+            net.syllables.append(dmp)

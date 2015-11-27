@@ -9,7 +9,7 @@ import nengo.utils.numpy as npext
 import numpy as np
 import scipy
 from nengo.cache import NoDecoderCache
-from nengo.utils.compat import range
+from nengo.utils.compat import iteritems, range
 from nengo.utils.stdlib import Timer
 from sklearn.svm import LinearSVC
 from scipy.interpolate import interp1d
@@ -24,6 +24,35 @@ def log(msg):
         print(msg)
         sys.stdout.flush()
 
+
+class ExperimentResult(object):
+    saved = []
+
+    def __init__(self, **kwargs):
+        for key in saved:
+            setattr(self, key, kwargs.pop(key, default=None))
+        # kwargs should be empty now
+        for key in kwargs:
+            raise TypeError("got an unexpected keyword argument '%s'" % key)
+
+    def save_dict(self):
+        return {k: getattr(self, k) for k in self.saved}
+
+    @classmethod
+    def load(cls, key):
+        path = cache.cache_file(key, ext='npz')
+        with np.load(path) as data:
+            out = cls(**data)
+        return out
+
+    def save(self, key):
+        path = cache.cache_file(key, ext='npz')
+        np.savez(path, **self.kwargs())
+
+
+# #####################################
+# Model 1: Neural cepstral coefficients
+# #####################################
 
 class AuditoryFeaturesExperiment(object):
     def __init__(self, model, phonemes=None, words=None,
@@ -228,11 +257,9 @@ class AuditoryFeaturesExperiment(object):
         return result
 
 
-class AuditoryFeaturesResult(object):
-    def __init__(self, mfcc_pred, ncc_pred, y):
-        self.mfcc_pred = mfcc_pred
-        self.ncc_pred = ncc_pred
-        self.y = y
+class AuditoryFeaturesResult(ExperimentResult):
+
+    data = ['mfcc_pref', 'ncc_pred', 'y']
 
     @property
     def mfcc_acc(self):
@@ -242,16 +269,20 @@ class AuditoryFeaturesResult(object):
     def ncc_acc(self):
         return np.mean(self.ncc_pred == self.y)
 
-    @classmethod
-    def load(cls, key):
-        path = cache.cache_file(key, ext='npz')
-        with np.load(path) as data:
-            out = cls(data['mfcc_pred'], data['ncc_pred'], data['y'])
-        return out
 
-    def save(self, key):
-        path = cache.cache_file(key, ext='npz')
-        np.savez(path,
-                 mfcc_pred=self.mfcc_pred,
-                 ncc_pred=self.ncc_pred,
-                 y=self.y)
+# ############################
+# Model 2: Syllable production
+# ############################
+
+class ProductionExperiment(object):
+    def __init__(self):
+        pass
+
+
+# #############################
+# Model 2: Syllable recognition
+# #############################
+
+class RecognitionExpermient(object):
+    def __init__(self):
+        pass
