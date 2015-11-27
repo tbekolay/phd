@@ -14,7 +14,7 @@ we also present analogous non-neural models
 that could be incorporated in
 non-neural speech recognition and synthesis systems.
 
-\section{Auditory feature extraction}
+\section{Neural cepstral coefficients}
 
 \probbox{A raw audio waveform has high temporal resolution,
   but low spatial resolution, as it is a one-dimensional signal.
@@ -41,8 +41,6 @@ by the organization of the human auditory system
 and are implemented the same basic computational units
 as the human auditory system,
 spiking neural networks.
-
-\section{Neural cepstral coefficients}
 
 ??? NCC pipeline, like AuditoryBasedFeatureVectors.pdf
 or KumarKimSternICA11.pdf
@@ -434,81 +432,6 @@ to compute the desired derivative.
 ??? make an appendix with a simplified Nengo model
 and a table of parameters and typical values
 
-\subsection{Evaluation}
-
-We hypothesize that NCCs and DNCCs
-are suitable feature vectors
-for traditional ASR systems
-and for more biologically plausible
-models of the human speech system like Sermo.
-In order to evaluate their effectiveness
-in these situations,
-we compare MFCCs with and without DCCs
-and DDCCs to NCCs and DNCCs
-on phoneme and word classification tasks.
-
-??? choose an SVM implementation and
-explain it here
-
-??? we don't use dynamic time warping
-ref DTWmyths.pdf
-
-??? it's not clear if the derivatives will help
-since the SVM should manage these,
-so if they don't help then I will
-just use the derivatives
-
-??? Use TIMIT utterances
-
-% From earlier iteration
-
-% ??? Functional evaluation: can we decode downstream features?
-% How well do we do compared to other systems?
-% We don't have to do as well as them,
-% but we have to do well enough that it's not ridiculous.
-
-% ??? for phonemes: our gold standard is a set of labels
-% over time with the proper phoneme.
-% If the system categorizes to that label in that period,
-% then it's correct. Or maybe what's more important
-% is that the phonemes are all in the same order,
-% and we also have some kind of timing information?
-
-% ??? Neural evaluation: One thing that's commonly measured
-% in auditory neuroscience is the spectro-temporal receptive field
-% of auditory neurons. We can make these for our downstream feature
-% neurons and compare them to published STRFs and see if they look similar.
-% Note that it would be easy to make neurons that can replicate STRFs,
-% as we would just use the temporal transformations that matter.
-% But, we make our choice of transformations based on what would
-% be best to decode certain features;
-% being able to also replicate STRFs gives an indication that
-% we made good choices, and that this system is engineered
-% in a similar way to how the system developed and evolved (maybe?)
-
-% ??? should we talk about the experiments from the results section here?
-
-% ??? Nonsense CVCs: cite Allen 94;
-
-% ``Typical ASR systems start with a `front-end' that transforms
-% the speech signal into a `feature vector' which is then processed
-% by a `back-end' classifier. These systems frequently place a
-% heavy emphasis on word and language models as a method of
-% increasing the recognition scores.''
-
-% ``Because of confusion and misunderstanding based on
-% coarticulation arguments, only a small amount of research
-% has been done on the automatic recognition of nonsense CVCs.
-% From the work of Fletcher and Steinberg, it should be clear
-% that the real challenge in machine recognition today is
-% human-like performance for phones and nonsense CVC
-% under conditions of typical channel distortions.
-% Since the human performance is well-known under
-% these conditions [15], [19], nonsense CVCs
-% represent an excellent database. Decreasing
-% the error rates for these elementary signals would have
-% a major impact on overall system performance and robustness.''
-
 \section{Syllable sequencing and production}
 
 \probbox{Once the intention to voice a syllable sequence
@@ -533,6 +456,14 @@ that control an articulatory synthesizer.\footnote{
   in collaboration with Bernd Kr\"{o}ger.
   A preliminary version of the model was presented
   in ??? cite kroger.2014.pdf}
+We employ several modules in the semantic pointer architecture
+to iterate though the syllable sequence,
+and use DMPs to generate production information trajectories.
+We propose a novel combination of an associative memory
+and a set of DMP networks
+that we call a \textit{temporal output associative memory}.
+
+\subsection{Model overview}
 
 A sequence of syllables is represented
 by a semantic pointer
@@ -1241,46 +1172,79 @@ of congitive intentions.
 
 % Or, obvious next step!
 
-\subsection{Evaluation}
-
-??? compare original VTG -> audio to Nengo -> VTG -> audio
-
-??? important: scaling. Show that adding new syllables
-to the syllabary doesn't affect the voicing
-of a given sequence; show how many neurons are added.
-
-??? test how long of a sequence we can get to work
-
-??? The goal of a syllable production system
-is to generate an audio waveform
-that is perceptually classified
-by a listener as corresponding to
-the intended syllable sequence.
-While it is possible to quantify
-whether this goal is achieved
-by ...
-
-??? For testing, we use gesture scores
-for German syllables
-provided by Bernd Kr\"{o}ger.
-
 \section{Syllable recognition}
 
-Go from a vocal tract gesture score
-to a syllable semantic pointer, in neurons.
+\probbox{Speech production information is decoded
+  from integrated auditory
+  and non-auditory sensory information.
+  Yet, we perceive the continuous production information
+  trajectory as a single speech unit.
+  How can we recognize a trajectory of production information
+  as having been produced by a static syllable representation?}
 
-??? try to work in the temporal associative memory term in here,
-or use one to clean up to a static syllable?
-Yeah, that should be doable actually,
-and hook it up to a working memory
-so that the recognized syllable sticks around.
-SO then you can just hook up the output
-of the prod network to the recog network!
+Syllable recognition is in many ways
+the inverse of syllable production.
+Rather than expand a discrete, static representation
+to a continuous, dynamic one,
+we do the opposite and collapse
+a continuous, dynamic representation
+to a discrete, static one.
+As such, we theorize that the sensorimotor integration system
+is also organized at the level of syllables.
+We propose a syllable recognition network
+using a novel technique based on DMPs,
+which we call
+inverse dynamic movement primitives
+(iDMPs).
+We use iDMPs to recognize production information trajectories,
+and then connect these iDMPs
+to associative memories
+in order to produce semantic pointer representations
+for recognized syllables.
+We call the novel combination of
+iDMPs and associative memories
+\texit{temporal input associative memories}
+to emphasize the similarities
+between the syllable production
+and recognition systems.
+
+\subsection{Model overview}
+
+The first part of the model is to
+recognize incoming production information trajectories
+with inverse DMPs.
+Recall that in the DMP framework,
+the state of the system
+is represented by $x$,
+and the motor trajectory
+is generated by defining
+a function $f(x) = \mathbf{y}$ that
+emits the motor trajectory
+for that point in the state space.
+In the discrete case,
+the intrinsic dynamics
+of the state act
+as a one-dimensional ramp;
+in the rhythmic case,
+the intrinsic dynamics
+of the state act
+as a two-dimensional oscillator.
+
+In inverse DMPs, we aim to learn the inverse function,
+which maps from the motor trajectory
+back to the system state that generated that
+trajectory; i.e., we aim to approximate
+$f(\mathbf{y}) = x$.
+Unfortunately, we cannot do this approximation directly
+as there is no guarantee of a one-to-one mapping
+from $x$ to $\mathbf{y}$;
+i.e., the same motor command can occur
+at multiple points in the trajectory.
+Therefore, we use an approach
+inspired by HMMs and GVF
+(see Section~???)
+to approximate this function.
+
+
 
 \subsection{Neural model}
-
-\subsection{Evaluation}
-
-\subsection{Network diagram}
-
-\subsection{Evaluation}
