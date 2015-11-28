@@ -1,6 +1,7 @@
 import nengo
 import numpy as np
 import soundfile as sf
+from nengo import spa
 from nengo.dists import Choice, ClippedExpDist
 from nengo.networks import EnsembleArray
 from nengo.utils.compat import is_array, is_string, iteritems
@@ -10,9 +11,11 @@ from .mfcc import mfcc
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
     Cepstra,
+    DeadzoneDMP,
+    DMP,
     FeedforwardDeriv,
     IntermediateDeriv,
-    InverseRhythmicDMP,
+    InverseDMP,
     RhythmicDMP,
     Sequencer,
     SyllableSequence,
@@ -247,9 +250,10 @@ class ProdSyllableParams(ParamsObject):
     tau = params.NumberParam(default=0.025)
 
     def kwargs(self):
-        return {'n_per_d': self.n_per_d,
-                'freq': self.freq,
-                'tau': self.tau}
+        args = super(ProdSyllableParams, self).kwargs()
+        del args['trajectory']
+        del args['label']
+        return args
 
 
 class ProductionInfoParams(ParamsObject):
@@ -305,6 +309,7 @@ class Production(object):
         dt = self.trial.dt
         for syllable in self.syllables:
             forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
+            forcing_f.__name__ = syllable.label
             dmp = RhythmicDMP(forcing_f=forcing_f, **syllable.kwargs())
             nengo.Connection(dmp.output, net.production_info.input[gesture_ix])
             net.syllables.append(dmp)
@@ -361,36 +366,41 @@ class Production(object):
 # Model 3: Syllable recognition
 # #############################
 
-# --- Same as Production; copied here for reference
-#
-# class SyllableParams(ParamsObject):
-#     n_per_d = params.IntParam(default=120)
-#     label = params.StringParam(default=None)
-#     freq = params.NumberParam(default=3.)
-#     trajectory = params.NdarrayParam(shape=('*', 48))
-#     tau = params.NumberParam(default=0.025)
-#
-#     def kwargs(self):
-#         return {'n_per_d': self.n_per_d,
-#                 'freq': self.freq,
-#                 'tau': self.tau}
 class RecogSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=120)
-    freq = params.NumberParam(default=3.)
     trajectory = params.NdarrayParam(shape=('*', 48))
+    n_per_d = params.IntParam(default=400)
+    label = params.StringParam(default=None)
+    similarity_th = params.NumberParam(default=0.85)
+    scale = params.NumberParam(default=0.67)
+    reset_scale = params.NumberParam(default=2.5)
     tau = params.NumberParam(default=0.05)
-    similarity_th = params.NumberParam(default=0.6)
-    freq_scale = params.NumberParam(default=2.0)
 
     def kwargs(self):
         args = super(RecogSyllableParams, self).kwargs()
         del args['trajectory']
+        del args['label']
         return args
 
 
-class ControlParams(ParamsObject):
-    # Something to do with resetting the dmps
-    pass
+class CleanupParams(ParamsObject):
+    dimensions = params.IntParam(default=64)
+    threshold = params.NumberParam(default=0.9)
+    wta_inhibit_scale = params.NumberParam(default=3.0)
+
+    def kwargs(self):
+        args = super(CleanupParams, self).kwargs()
+        del args['dimensions']
+        return args
+
+
+class MemoryParams(ParamsObject):
+    neurons_per_dimension = params.IntParam(default=60)
+    feedback = params.NumberParam(default=0.82)
+
+
+class ClassifierParams(ParamsObject):
+    reset_th = params.NumberParam(default=0.9)
+    inhib_scale = params.NumberParam(default=1)
 
 
 class RecognitionTrialParams(ParamsObject):
@@ -403,6 +413,9 @@ class Recognition(object):
         self.config = nengo.Config(
             nengo.Ensemble, nengo.Connection, nengo.Probe)
         self.syllables = []
+        self.cleanup = CleanupParams()
+        self.memory = MemoryParams()
+        self.classifier = ClassifierParams()
         self.trial = RecognitionTrialParams()
 
     def add_syllable(self, **kwargs):
@@ -416,8 +429,10 @@ class Recognition(object):
             net = nengo.Network("Sermo syllable recognition")
         with net, self.config:
             self.build_input(net)
-            self.build_output(net)
+            self.build_cleanup(net)
             self.build_syllables(net)
+            self.build_classifier(net)
+            self.build_connections(net)
         return net
 
     def build_input(self, net):
@@ -427,9 +442,6 @@ class Recognition(object):
         net.trajectory.input.output = ArrayProcess(self.trial.trajectory)
         net.trajectory.input.size_in = 0
 
-    def build_output(self, net):
-        pass
-
     def build_syllables(self, net):
         assert len(self.syllables) > 0, "No syllables added"
 
@@ -437,7 +449,46 @@ class Recognition(object):
         dt = self.trial.dt
         for syllable in self.syllables:
             forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
-            dmp = InverseRhythmicDMP(forcing_f=forcing_f, **syllable.kwargs())
-
+            forcing_f.__name__ = syllable.label
+            dmp = InverseDMP(forcing_f=forcing_f, **syllable.kwargs())
+            # Sensitive gestures: pass on to state
             nengo.Connection(net.trajectory.output[gesture_ix], dmp.input)
+            # Non-sensitive gestures: reset the state
+            n_gestures = net.trajectory.output.size_in
+            not_gesture_ix = np.delete(np.arange(n_gestures, dtype=int),
+                                       gesture_ix)
+            nengo.Connection(net.trajectory.output[not_gesture_ix], dmp.reset,
+                             transform=np.ones((1, not_gesture_ix.size)))
             net.syllables.append(dmp)
+
+    def build_cleanup(self, net):
+        net.vocab = spa.Vocabulary(dimensions=self.cleanup.dimensions)
+        net.vocab.parse(" + ".join(s.label for s in self.syllables))
+        net.cleanup = spa.AssociativeMemory(net.vocab,
+                                            wta_output=True,
+                                            threshold_output=True,
+                                            **self.cleanup.kwargs())
+        net.memory = spa.State(dimensions=self.cleanup.dimensions,
+                               vocab=net.vocab, **self.memory.kwargs())
+        nengo.Connection(net.cleanup.output, net.memory.input)
+
+    def build_classifier(self, net):
+        intercepts = ClippedExpDist(0.15, self.classifier.reset_th, 1.0)
+        net.classifier = nengo.Ensemble(20, dimensions=1,
+                                        encoders=Choice([[1]]),
+                                        neuron_type=nengo.AdaptiveLIF(),
+                                        intercepts=intercepts)
+
+        for dmp in net.syllables:
+            transform = -self.classifier.inhib_scale * np.ones(
+                (dmp.state.n_neurons, net.classifier.n_neurons))
+            nengo.Connection(net.classifier.neurons, dmp.state.neurons,
+                             transform=transform, synapse=0.01)
+
+    def build_connections(self, net):
+        for i, dmp in enumerate(net.syllables):
+            # Connect syllables to associative memory
+            nengo.Connection(dmp.state[0], net.cleanup.am.am_ensembles[i])
+            # Classifier is driven by the associative memory
+            nengo.Connection(net.cleanup.am.thresh_ens.output[i],
+                             net.classifier, synapse=0.01)

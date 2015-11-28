@@ -25,8 +25,8 @@ def similarity(v1, v2):
     return dot
 
 
-def InverseDMP(n_per_d, forcing_f,
-               scale=0.7, similarity_th=0.6, tau=0.05, net=None):
+def InverseDMP(n_per_d, forcing_f, scale=0.7, reset_scale=2.5,
+               similarity_th=0.6, tau=0.05, net=None):
     if net is None:
         net = nengo.Network(label="Inverse Rhythmic DMP")
 
@@ -57,6 +57,6 @@ def InverseDMP(n_per_d, forcing_f,
         nengo.Connection(net.diff_inhib.neurons, net.diff.neurons,
                          transform=-np.ones((n_per_d, 20)))
         nengo.Connection(net.state[0], net.diff)
-        nengo.Connection(net.diff, net.state[0], transform=-2.5)
+        nengo.Connection(net.diff, net.state[0], transform=-reset_scale)
 
     return net
