@@ -1264,6 +1264,7 @@ Then, we define a similarity function
 to compare the observation to
 the prediction; specifically,
 \begin{equation}
+  \label{imdp-similarity}
   s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) =
     \frac{\hat{\mathbf{y}}(t) \cdot \mathbf{O}}(t)
     {\Vert\hat{\mathbf{y}}(t)\Vert \Vert\mathbf{O}(t)\Vert},
@@ -1290,6 +1291,7 @@ Given some similarity threshold
 $th_s$, the discrete case of iDMPs
 has dynamics
 \begin{equation}
+  \label{idmp-dynamics1}
   \dot{\hat{x}} =
   \begin{cases}
     0 & \text{if } s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) < th_s \\
@@ -1299,6 +1301,7 @@ has dynamics
 and the rhythmic case of iDMPs
 has dynamics
 \begin{align}
+  \label{idmp-dynamics2}
   \dot{\hat{x_1}} &=
   \begin{cases}
     0 & \text{if } s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) < th_s \\
@@ -1443,7 +1446,8 @@ to produce that syllable.
 
 The spiking neural implementation of
 the syllable recognition model
-is organized much like the production model.
+is organized much like the production model,
+but in reverse.
 Each syllable has an associated
 iDMP network that aims to recognize
 that syllable.
@@ -1453,27 +1457,187 @@ an SPA associative memory,
 which produces a cleaned up version
 of the semantic pointer
 associated with the recognized syllable.
-Finally, a \textit{temporal classification}
-network is used to monitor the
+The cleaned up version of the semantic pointer
+is projected a memory module,
+which remembers the recognized syllable
+for a short while in order to
+make it available to other networks.
+Finally, a temporal classification
+ensemble is used to monitor the
 state of the associative memory
-and route control signals to
-the rest of the model
-to ensure robust performance
-(it is analogous to the sequencing
-and production model's
-sequencer network).
+and reset the iDMP state ensembles
+once a classification has been made.
 
 \subsubsection{iDMP networks}
 
-??? depends on what works
+The iDMP associated with each syllable
+is similar in structure to the DMPs
+described in Section~???.
+The core of the iDMP network
+is an ensemble that represents
+the estimated state of the dynamical system.
+A recurrent connection
+from the state to itself
+implements the dynamics
+that updates the estimated state
+based on the current observation
+and prediction
+(see equations~\eqref{idmp-dynamics1}
+and \eqref{idmp-dynamics2}).
 
-\subsubsection{Associative memory}
+Despite the production network using rhythmic DMPs,
+we use discrete iDMPs for syllable recognition.
+A significant amount of effort is taken
+in the production network to ensure that
+the 2D oscillators are reset at the correct time.
+With iDMPs, we cannot be as precise about time,
+as we are estimating the system state;
+it can even be advantageous
+to be less concerned about exact time,
+as it can allow the iDMP to classify a trajectory
+before it is complete.
+As such, we are essentially collecting evidence
+to increase our confidence that the
+observations come from the same syllable
+that the iDMP is created from;
+integrating that evidence over time
+is naturally done with a one-dimensional integrator,
+as is used in the discrete iDMP.
+Additionally, since we do not need to emit
+a classification immediately after
+the last one (we must first accumulate
+trajectory evidence)
+we can safely spend some milliseconds
+resetting all iDMP states
+once a classification is made.
+
+We implement the discrete dynamics
+from equation~\eqref{idmp-dynamics1}
+in a single recurrent connection.
+Typically,
+models that compute the dot product
+(as is done in~\eqref{imdp-similarity})
+do so by computing each 2D product separately,
+as the product is a nonlinear function
+that can be difficult to optimize
+in high-dimensional spaces.
+However, initial experimentation
+showed that the exact dynamics equation
+could be well approximated
+in a single connection
+as long as the observation
+and prediction were reduced in dimensionality.
+In general, this could be done
+with any number of statistical dimensionality
+reduction techniques;
+however, in the case of production information,
+the vector space already has
+orthogonal basis functions
+(there is no coupling between gestures),
+and each syllable uses
+relatively few dimensions
+(usually between four and seven).
+Therefore, for each syllable,
+we only explicitly represent
+the dimensions of the space
+that are actually used for that syllable.
+With this dimensionality reduction,
+we found that a recurrent connection
+specifying exactly equation~\eqref{impd-dynamics1}
+was approximated well enough
+to do trajectory recognition in most cases.
+
+The fact that we implement the dynamics
+in one recurrent connection
+implies that the ensemble
+represents both the system state
+and the observation dimensions
+of interest to that syllable.
+In other words, the state can have
+up to eight dimensions for complex syllables.
+In our case,
+even when high accuracy is required,
+the number of neurons needed
+is reasonable given some assumptions
+about adult vocabularies;
+see Section~??? for more details.
+
+In the previous section, we discussed
+the \textit{trajectory subpath problem},
+which occurs when two syllables
+start with the same trajectory
+but diverge near the end
+(e.g., ??? /ba/ vs /bar/).
+In order to handle this problem,
+we introduce an additional connection
+in the model that explicitly punishes
+gestures that are not
+part of the iDMP's syllable.
+One method to do this would be to
+negatively weight any gestures
+not part of the current syllable;
+however, reducing the dimensionality
+of the observation space makes
+this impossible.
+Instead, we introduce a small \textit{reset} ensemble
+in the iDMP that drives
+the system state back to the initial state
+whenever a gesture that is not part
+of the syllable is active.\footnote{
+  The reset ensemble is similar to the reset ensemble
+  in the syllable production model
+  in its implementation and use,
+  in addition to its name.}
+This ensemble is normally inhibited,
+but an inhibitory connection is made
+from the input signal to the reset ensemble
+such that any gesture
+not part of the syllable will
+disinhibit the reset ensemble,
+pushing the iDMP state back to the initial state.
+As long as the target trajectories
+are normalized to the same length,
+(which is automatically done
+as discrete DMPs and iDMPs
+are defined for $x$ over the range $[0, 1]$)
+punishing these gestures should
+mitigate the trajectory subpath problem
+in most cases.\footnote{
+  It should be noted that humans
+  are not necessarily adept at
+  disambiguating trajectory subpath issues;
+  consonant phonemes can be interpreted
+  as being part of the coda of one syllable
+  or the onset of the subsequent syllable
+  in many syllable sequences.
+  The form of syllable recognition
+  explained by this model would
+  be influenced by linguistic systems,
+  or used primarily in sensorimotor situations
+  like learning to voice new syllables
+  and recognizing infrequently heard syllables
+  in a foreign language.}
+
+As an added benefit,
+punishing gestures not in the sylalble helps
+differentiate between syllables with
+similar trajectory suffixes;
+e.g., ??? /bar/ vs /dar/.
+Without punishing extra gestures,
+it is more likely that the iDMP
+associated with ??? /dar/ will catch up
+to the ??? /bar/ iDMP
+and result in a misclassification
+if the parameters in the model
+are not well-tuned.
+
+\subsubsection{SPA modules}
 
 The associative memory is a standard
 SPA associative memory,
 mapping from a set of input semantic pointers
 to a set of output semantic pointers.
-In the recognition network, however,
+In the recognition model, however,
 we do not provide any semantic pointer input;
 instead, we use the iDMP networks
 to drive the ensembles associated
@@ -1489,33 +1653,175 @@ from the winner-take-all mutual inhibition
 of the associative memory,
 which makes the iDMP network easier to implement.
 Another important benefit is that
-it provides a point for
+it provides a location for
 sensorimotor information
 (provided by the iDMPs)
 to integrate with top-down
 linguistic information.
-Since neuron naturally sum
+Since neurons naturally sum
 input from multiple sources,
-the ensemble representing syllable similarity
+the ensembles representing syllable similarity
 can receive input from both sources,
 and achieve faster or more correct classification
 as a result.
 
 ??? assoc memory figure
 
-While we did not go into detail on
-the mutual inhibition present in the associative memory
-in Section~???,
-it is important for the operation
-of the syllable recognition network,
-so we provide that detail here.
+The mutual inhibition and thresholding options
+are critical to the proper functioning
+of the associative memory
+in the recognition model.
 Figure~??? shows all of the
 ensembles and connections present
 ??? for each input/output semantic pointer pair.
-There are, in fact, two ensembles created
-for each semantic pointer association
-in order to suppress
-??? figure out what bias is for
-??? explain winner-take-all stuff
+When thresholding is used,
+the second layer of ensembles
+only becomes active if
+the first layer of ensembles
+(those that represent semantic pointer similarities)
+is sufficiently active.
+Thresholding is implemented by
+setting ensemble properties in the second layer
+to have encoders of $[1]$,
+and x-intercepts that start around or above
+the chosen threshold.
+In doing so, the second layer of ensembles
+will only become active if the
+first layer ensemble associated with it
+crosses that threshold.
+The soft winner-take-all behavior
+is implemented with inhibitory connection
+between all combinations of ensembles
+in the first layer.
 
-\subsubsection{Temporal classification network}
+In addition to the associative memory module,
+which identifies a unique syllable semantic pointer
+once the iDMP associated with it has crossed threshold,
+the model contains a memory module
+that maintains a decaying memory
+of that pointer.
+The memory is implemented as an ensemble
+for each set of 16 subdimensions
+of the semantic pointer
+(which is 64 dimensional in this model).
+Each ensemble is recurrently connected
+with a weight less than 1
+so that the syllable most recently classified
+is remembered for a few hundred milliseconds,
+which is around the amount of time that we expect
+for the next classification to take place.
+Using a recurrent weight
+with weight less than 1
+is critical in this case,
+as if the memory used recurrent connections
+with weight 1,
+all of the syllable pointers
+encountered in the past would be
+superimposed on one another.
+Therefore, we assume that
+only the most recent syllable classified
+is of interest to downstream systems.
+
+\subsubsection{Temporal classification}
+
+The final part of the model is
+a small \textit{classifier} ensemble
+that resets the iDMP states
+when a classification is made.
+It receives input from all of the
+second (thresholded) layer of ensembles
+in the associative memory.
+When the classifier ensemble is active,
+it directly inhibits
+all of the iDMP state ensembles.
+
+Like the thresholded layer,
+the classifier ensemble's
+x-intercepts are distributed
+near or above a certain threshold;
+critically, this threshold
+is slightly above the threshold
+in the associative memory.
+The difference between these two thresholds
+results in a slight delay between
+when the associative memory
+output becomes active,
+and when the classifier ensemble becomes active.
+The associative memory
+must be active long enough to provide
+semantic pointer input to the
+memory module,
+which will maintain a memory of that pointer
+once the iDMP states are inhibited
+by the classifier ensemble.
+
+Since the classifier directly inhibits
+all of the iDMPs, any neural activity in this population
+will have a large deleterious effect
+on the classification of the current syllable,
+and so we aim to completely inhibit
+the iDMP once the classifier becomes actively.
+However, since the classifier inhibits
+an ensemble that provides it input,
+its activity will quickly cease.
+In order to ensure that its short burst of activity
+is sufficient to completely reset
+the iDMP states,
+we change two parameters from their defaults.
+First, we use synaptic time constants
+that are longer than usual on the connections
+from the associative memory to the classifier,
+and from the classifier to the iDMPs;
+specifically, the time constant is 100 ms,
+which is consistent with some NMDA receptors
+??? cite from Tripp paper.
+Second, we use a different neuron model.
+All other ensembles mentioned in this thesis
+are composed of leaky integrate-and-fire neurons.
+In the classifier ensemble,
+we use an adaptive leaky integrate-and-fire neuron model
+(??? cite Koch, Christof.
+Biophysics of Computation: Information Processing in Single Neurons).
+While a true bursting neuron model
+would be better,
+the adaptive LIF at least will produce
+relatively more spikes given
+sporadic input compared to constant current.
+
+It is worth pointing out that the
+classifier ensemble does not use the
+iDMP reset mechanism to reset the state,
+unlike the connection punishing
+syllables that are not part of the gesture.
+The primary reason is that the reset mechanism
+is too slow to fully reset the state
+in the span of time that the classifier ensemble
+is active.
+The punishment mechanism cannot use inhibition
+because it must only affect the system state,
+not the representation of the observations,
+which are represented in the same ensemble.
+When resetting the iDMP, however,
+the observations are ignored anyhow,
+so inhibiting the ensemble
+is acceptable.
+
+It is also worth explicitly stating
+that this method of temporal classification
+accumulates experience and classifies
+once the estimated state of one iDMP
+passes a threshold.\footnote{
+  This type of decision making is reminiscent
+  of the well known drift diffusion model
+  that has been used to model
+  human behavior in two-alternative forced choice tasks
+  ??? cite.}
+While this classification method
+is straightforward to implement,
+it may make arbitrary choices
+when two syllables are similar,
+as the representations resulting
+from spiking neural networks are noisy.
+More sophisticated classification methods
+could be employed using
+iDMPs to track estimated system states.

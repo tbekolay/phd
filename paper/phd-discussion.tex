@@ -26,6 +26,27 @@ provide an analogous link between
 continuously varying low-level sensory inputs
 and high-level symbolic representations
 
+\subsection{Extensive use of DMPs}
+
+DMPs: they are useful.
+For different things though, depending on the task.
+Here are some guidelines for
+what DMPs are useful for what, and when.
+
+Ramping DMPs: require constant input; discrete.
+Good for inverse case.
+
+Deadzone DMPs: one-time input; discrete.
+Good to effectively call a temporal function.
+
+Rhythmic DMPs: one-time input; rhythmic.
+To do discrete, must explicitly turn off.
+Kind of essential for possibly repetitive action.
+
+Perhaps there's some useful generalization of these?
+I.e., something that has the benefits of all but
+few downsides?
+
 \section{Comparison to existing models}
 
 \section{Contributions}
@@ -92,6 +113,12 @@ consistent. Could be possible, instead, to do this
 hierarchically.
 
 \section{Future work}
+
+??? add bursting neurons in both production
+and recognition systems for better timing
+
+??? more sophisticated classification mechanisms
+in classification section
 
 ??? add speed control to the DMPs;
 pretty easy, just add a dimension to the oscillator.
