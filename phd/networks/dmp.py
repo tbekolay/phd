@@ -29,6 +29,44 @@ def traj2func(traj, dt=0.001):
     return _trajf, traj_ix
 
 
+def DMP(n_per_d, c, forcing_f, tau=0.05, net=None):
+    if net is None:
+        net = nengo.Network(label="DMP")
+
+    out_dims = forcing_f(0.).size
+    with net:
+        # --- Decode forcing_f from oscillator
+        net.state = nengo.Ensemble(n_per_d, dimensions=1,
+                                   label=forcing_f.__name__)
+        nengo.Connection(net.state, net.state, synapse=tau)
+        net.output = nengo.Node(size_in=out_dims)
+        nengo.Connection(net.state, net.output,
+                         function=forcing_f, synapse=None)
+
+        # --- Input is a small biased oscillator to ramp up smoothly
+        net.osc = nengo.Ensemble(n_per_d * 2, dimensions=2, radius=0.01)
+        nengo.Connection(net.osc, net.osc,
+                         transform=np.array([[2, -1], [1, 2]]))  # actually?
+        nengo.Connection(net.osc, net.state, transform=c,
+                         function=lambda x: x[0] + 0.5)
+        # Kick start the oscillator
+        kick = nengo.Node(lambda t: 1 if t < 0.1 else 0)
+        nengo.Connection(kick, net.osc, transform=np.ones((2, 1)))
+
+        # --- Inhibit the state by default
+        i_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
+        net.inhibit = nengo.Ensemble(20, dimensions=1,
+                                     intercepts=i_intercepts,
+                                     encoders=Choice([[1]]))
+        nengo.Connection(net.inhibit.neurons, net.state.neurons,
+                         transform=-np.ones((n_per_d, 20)))
+
+        # --- Disinhibit when appropriate
+        net.disinhibit = nengo.Node(size_in=1)
+        nengo.Connection(net.disinhibit, net.inhibit, transform=-1)
+    return net
+
+
 def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
     if net is None:
         net = nengo.Network(label="Rhythmic DMP")
