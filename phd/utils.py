@@ -10,12 +10,12 @@ def rescale(val, old_min, old_max, new_min, new_max):
 
 def hz2mel(hz):
     """Convert a value in Hertz to Mels."""
-    return 2595 * np.log10(1 + hz / 700.0)
+    return 2595. * np.log10(1 + hz / 700.0)
 
 
 def mel2hz(mel):
     """Convert a value in Mels to Hertz."""
-    return 700 * (10 ** (mel / 2595.0) - 1)
+    return 700. * (10. ** (mel / 2595.0) - 1)
 
 
 def hz2st(hz, reference=16.35159783):

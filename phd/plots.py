@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+
 from matplotlib.colors import LinearSegmentedColormap
 
 
@@ -65,7 +66,8 @@ def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
         cmap = shiftedcmap(cmap, midpoint=midpoint)
 
     plt.pcolormesh(time, freqs, data.T, cmap=cmap)
-    plt.yscale('log')
+    # For some reason, putting this on a log y scale is crashing MPL...
+    # plt.yscale('log')
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (ms)')
     plt.axis('tight')

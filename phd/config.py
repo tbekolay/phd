@@ -5,6 +5,6 @@ but let's not get head of ourselves. This will do.
 """
 
 cache_dir = "/home/tbekolay/Code/phd/cache"
-count_closures = True
 log_experiments = True
+n_processes = 12
 timit_root = "/home/tbekolay/phd_data/timit"

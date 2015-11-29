@@ -182,39 +182,45 @@ class TIMIT(object):
         or will be stored when the data is extracted.
     """
 
-    consonants = ['b', 'd', 'g', 'p', 't', 'k', 'dx', 'q',
+    consonants = ['b', 'd', 'g', 'p', 't', 'k', 'dx',
                   'jh', 'ch',
-                  's', 'sh', 'z', 'zh', 'f', 'th', 'v', 'dh',
-                  'm', 'n', 'ng', 'em', 'en', 'eng', 'nx',
-                  'l', 'r', 'w', 'y', 'hh', 'hv', 'el']
-
-    # Closure intervals of stops are distinguished from the stop release
-    # Option 1: map the closure to the phoneme
-    closure2cons = {'bcl': 'b',
-                    'dcl': 'd',
-                    'gcl': 'g',
-                    'pcl': 'p',
-                    'tck': 't',
-                    'kcl': 'k',
-                    'dcl': 'jh',
-                    'tcl': 'ch'}
-    # Option 2: closure intervals are ignored, considered pauses
-    closure2pause = {'bcl': 'pau',
-                     'dcl': 'pau',
-                     'gcl': 'pau',
-                     'pcl': 'pau',
-                     'tck': 'pau',
-                     'kcl': 'pau',
-                     'dcl': 'pau',
-                     'tcl': 'pau'}
-    substitutions = closure2cons  # Default: option 1
+                  's', 'sh', 'z', 'f', 'th', 'v', 'dh',
+                  'm', 'n', 'ng',
+                  'l', 'r', 'w', 'y', 'hh']
 
     vowels = ['iy', 'ih', 'eh', 'ey',
-              'ae', 'aa', 'aw', 'ay', 'ah', 'ao',
-              'oy', 'ow', 'uh', 'uw', 'ux',
-              'er', 'ax', 'ix', 'axr', 'ax-h']
+              'ae', 'aa', 'aw', 'ay', 'ah',
+              'oy', 'ow', 'uh', 'uw',
+              'er']
 
-    ignores = ['pau', 'epi', 'h#', '1', '2']
+    silence = ['sil']
+
+    phones = consonants + vowels + silence
+
+    # Substitute so that we have 38 phones + silence in the end;
+    # see "Phone Recognition on the TIMIT Database" for details.
+    substitutions = {'ao': 'aa',
+                     'ax': 'ah',
+                     'ax-h': 'ah',
+                     'axr': 'er',
+                     'hv': 'hh',
+                     'ix': 'ih',
+                     'el': 'l',
+                     'em': 'm',
+                     'en': 'n',
+                     'nx': 'n',
+                     'eng': 'ng',
+                     'zh': 'sh',
+                     'ux': 'uw',
+                     'pcl': 'sil',
+                     'tcl': 'sil',
+                     'kcl': 'sil',
+                     'bcl': 'sil',
+                     'dcl': 'sil',
+                     'gcl': 'sil',
+                     'h#': 'sil',
+                     'pau': 'sil',
+                     'epi': 'sil'}
 
     fs = 16000  # TIMIT is always 16 kHz
     dt = 1. / fs
@@ -228,17 +234,6 @@ class TIMIT(object):
     @property
     def timitdir(self):
         return os.path.join(self.datadir, 'timit')
-
-    @property
-    def includeclosures(self):
-        return self.__class__.substitutions is self.__class__.closure2cons
-
-    @includeclosures.setter
-    def includeclosures(self, incl):
-        if incl:
-            self.__class__.substitutions = self.__class__.closure2cons
-        else:
-            self.__class__.substitutions = self.__class__.closure2pause
 
     def untar(self, tgz_path, overwrite=False):
         """Extract the file at `tgz_path` to `datadir`."""

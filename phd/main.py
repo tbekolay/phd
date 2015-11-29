@@ -4,6 +4,12 @@ import os
 import doit
 from doit.action import CmdAction
 
+from .experiments import *  # Load experiment tasks
+
+DOIT_CONFIG = {
+    'default_tasks': [],
+}
+
 
 def task_paper(root='.'):
     d = os.path.join(root, 'paper')

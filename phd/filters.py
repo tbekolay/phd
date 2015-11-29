@@ -2,12 +2,18 @@ import brian as br
 import brian.hears as bh
 import numpy as np
 
+from .utils import hz2mel, mel2hz
+
 dummy_sound = bh.Sound(np.zeros(1))
 
 
 def erbspace(low, high, n_freq):
     """Sample ERB distribution; low and high in Hz."""
     return bh.erbspace(low * br.Hz, high * br.Hz, n_freq)
+
+
+def melspace(low, high, n_freq):
+    return mel2hz(np.linspace(hz2mel(low), hz2mel(high), n_freq))
 
 
 def gammatone(freqs, b=1.019):

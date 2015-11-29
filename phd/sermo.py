@@ -6,7 +6,8 @@ from nengo.dists import Choice, ClippedExpDist
 from nengo.networks import EnsembleArray
 from nengo.utils.compat import is_array, is_string, iteritems
 
-from . import params
+from . import filters, params
+from .filters import melspace
 from .mfcc import mfcc
 from .networks import (  # noqa: F401
     AuditoryPeriphery,
@@ -22,6 +23,7 @@ from .networks import (  # noqa: F401
 )
 from .networks.dmp import traj2func
 from .processes import ArrayProcess
+from .timit import TIMIT
 
 
 class ParamsObject(object):
@@ -61,14 +63,14 @@ class ParamsObject(object):
 
 class MFCCParams(ParamsObject):
     audio = params.NdarrayParam(default=None, shape=('*', 1))
-    fs = params.NumberParam(default=16000)
+    fs = params.NumberParam(default=TIMIT.fs)
     dt = params.NumberParam(default=0.01)
     window_dt = params.NumberParam(default=0.025)
     n_cepstra = params.IntParam(default=13)
-    n_filters = params.IntParam(default=26)
+    n_filters = params.IntParam(default=32)
     n_fft = params.IntParam(default=512)
     minfreq = params.NumberParam(default=0)
-    maxfreq = params.NumberParam(default=6000)
+    maxfreq = params.NumberParam(default=8000)
     preemph = params.NumberParam(default=0)
     lift = params.NumberParam(default=0)
     energy = params.BoolParam(default=False)
@@ -79,12 +81,19 @@ class MFCCParams(ParamsObject):
         return mfcc(**self.kwargs())
 
 class PeripheryParams(ParamsObject):
-    freqs = params.NdarrayParam(default=None, shape=('*',))
+    freqs = params.NdarrayParam(default=melspace(0, 8000, 32), shape=('*',))
     sound_process = params.ProcessParam(default=None)
-    auditory_filter = params.BrianFilterParam(default=None)
+    auditory_filter = params.StringParam(default='gammatone')
     neurons_per_freq = params.IntParam(default=12)
-    fs = params.NumberParam(default=20000)
+    fs = params.NumberParam(default=TIMIT.fs)
     middle_ear = params.BoolParam(default=True)
+    adaptive_neurons = params.BoolParam(default=False)
+
+    def kwargs(self):
+        args = super(PeripheryParams, self).kwargs()
+        klass = getattr(filters, args['auditory_filter'])
+        args['auditory_filter'] = klass(freqs=args['freqs'])
+        return args
 
 
 class CepstraParams(ParamsObject):
@@ -103,7 +112,7 @@ class IntermediateDerivParams(ParamsObject):
     tau = params.NumberParam(default=0.1)
 
 
-class AudioFeatures(object):
+class AuditoryFeatures(object):
     def __init__(self):
         self.config = nengo.Config(
             nengo.Ensemble, nengo.Connection, nengo.Probe)
@@ -147,8 +156,8 @@ class AudioFeatures(object):
 
     @property
     def freqs(self):
-        assert self.mfcc.minfreq == self.periphery.freqs[0]
-        assert self.mfcc.maxfreq == self.periphery.freqs[-1]
+        assert np.allclose(self.mfcc.minfreq, self.periphery.freqs[0])
+        assert np.allclose(self.mfcc.maxfreq, self.periphery.freqs[-1])
         assert self.mfcc.n_filters == self.periphery.freqs.size
         return self.periphery.freqs
 
