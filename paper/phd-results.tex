@@ -14,93 +14,348 @@
 % For each model, have an initial section where subparts are
 % tested to determine parameters for the full experiments
 
+Here,
+we present evaluation metrics for the three models
+described in Chapter~???,
+gather those metrics
+for several experimental conditions,
+and present the results.
+
 \section{Neural cepstral coefficients}
+
+We hypothesize that
+neural cepstral coefficients (NCCs)
+are a suitable feature vector representation
+for traditional ASR systems,
+and biologically grounded systems like Sermo.
+In order to evaluate
+its suitability for speech recognition tasks,
+we compare NCCs to the most common
+feature vector used currently,
+Mel-frequency cepstral coefficients.
 
 \subsection{Evaluation}
 
-We hypothesize that NCCs and DNCCs
-are suitable feature vectors
-for traditional ASR systems
-and for more biologically plausible
-models of the human speech system like Sermo.
-In order to evaluate their effectiveness
-in these situations,
-we compare MFCCs with and without DCCs
-and DDCCs to NCCs and DNCCs
-on phoneme and word classification tasks.
+While different ASR systems
+use the feature vector in different ways,
+the most important quality of the feature vector
+is that audio samples corresponding
+to a particular label
+(e.g., a phone or word)
+takes a similar trajectory
+in the feature vector space
+as other sample corresponding to the same label.
+All samples corresponding to other labels
+should take trajectories that are
+far enough away in the vector space
+to provide a basis for labeling
+a test sample correctly.
+As such, we compare MFCCs and NCCs
+on a purely statistical level,
+rather than using them as a frontend
+in an ASR system,
+which would bias the results
+toward the aspects of the
+feature vector trajectories
+that the ASR system's backend
+is most suitable for detecting.
 
-??? choose an SVM implementation and
-explain it here
+We therefore compare MFCCs and NCCs
+using a linear support vector machine (SVM)
+that is trained on labeled
+examples of feature vector trajectories
+corresponding to phones
+in the TIMIT training corpus,
+and tested on trajectories
+corresponding to phones
+in the TIMIT testing corpus.
 
-??? we don't use dynamic time warping
-ref DTWmyths.pdf
+TIMIT ??? cite is a corpus of read speech
+with time-aligned phone and word transcriptions.
+The corpus contains ten speech samples
+from 630 speakers across eight dialects
+of American English,
+resulting in 6300 utterances in total
+(5.4 hours of continuous speech).
+The utterances are separated into
+a training set
+(3696 sentences; 3.14 hours of speech)
+and a testing set
+(1344 sentences; 0.81 hours of speech),
+allowing for apples-to-apples
+comparisons of ASR systems.
+TIMIT was released in 1990,
+and is still a standard data set used
+for testing ASR systems
+due to the high quality
+manual phone transcriptions,
+diversity of speakers,
+and convenient size,
+as it is small enough to be
+computationally tractable
+but large enough to
+provide a meaningful comparison
+between ASR approaches.
 
-??? it's not clear if the derivatives will help
-since the SVM should manage these,
-so if they don't help then I will
-just use the derivatives
+We will focus on classifying
+phones in the TIMIT data set.
+Phones are voiced
+for a shorter time than words,
+and have high variability
+as phone sounds can be affected
+by the previous and next phones voiced,
+making phone classification
+a more difficult task than word classification;
+(??? word error rate vs phone error rate?).
+Since we are not solving the full
+speech recognition problem,
+and are instead classifying
+pre-segmented speech samples,
+we anticipate that word classification
+would be too simple to meaningfully
+compare MFCCs and NCCs.
 
-??? Use TIMIT utterances
+Additionally, classifying phones
+is advantageous because phones
+are voiced for a similar length of time
+compared to words.
+Another way in which our statistical comparison
+differs from the full speech recognition problem
+is that we must stretch
+feature vector trajectories
+such that all trajectories are the same length,
+due to the constraints of SVM classifiers;
+therefore,
+we aim to minimize the amount
+of stretching done.
 
-% From earlier iteration
+We stretch feature vector trajectories
+to be as long as the longest trajectory
+in the training and testing samples
+using simple linear interpolation.
+An alternative method
+for stretching the trajectory
+would be to use dynamic time warping
+??? cite DTW paper.
+However, dynamic time warping
+involves aligning each speech sample
+to a representative example,
+which would necessitate manually
+determining a suitable example
+for each phone for each experiment.
+Additionally, the manual effort may not
+provide any concrete benefits;
+??? showed that linearly interpolating
+time series data
+produced classification accuracy rates
+statistically indistinguishable
+from accuracy rates on time series data
+aligned using dynamic time warping.
 
-% ??? Functional evaluation: can we decode downstream features?
-% How well do we do compared to other systems?
-% We don't have to do as well as them,
-% but we have to do well enough that it's not ridiculous.
+TIMIT defines a set of 61 phones,
+which include vowels, consonants,
+consonantal closures, pauses and silences.
+??? leehon.pdf identified
+allophones and
+other situation where two phones
+are used interchangeably,
+collapsing the full set of phones
+to a set of 39 phones,
+which are typically used
+instead of the full set.
+Many studies improve error rates
+by further categorizing
+the phones with similar properties;
+e.g., grouping together all
+plosives, fricatives, etc.
+??? cite InTech.
+We will use the reduced set of 39 phones.
+Because vowels are typically voiced
+longer than consonants,
+we will investigate whether
+separating them is necessary
+since we lengthen all samples
+to the longest sample.
 
-% ??? for phonemes: our gold standard is a set of labels
-% over time with the proper phoneme.
-% If the system categorizes to that label in that period,
-% then it's correct. Or maybe what's more important
-% is that the phonemes are all in the same order,
-% and we also have some kind of timing information?
+Support vector machines are a standard
+supervised learning technique
+often applied to classification tasks,
+and are particularly well suited
+to high-dimensional data.
+The SVM algorithm learns a hyperplane
+that separates data
+in one class from other classes,
+which it can subsequently use
+to classify data
+by evaluating where the data point
+lies in vector space compared to the hyperplane.
+When dealing with more than two classes,
+hyperplanes can be learned to separate
+each combination of two classes
+(``one-against-one'' classification)
+or each class from all other classes
+(``one-vs-the-rest'' classification).
+When data is relatively low dimensional,
+the kernel trick can be applied,
+which projects the input data
+into a higher dimensional space
+based on a kernel function.
 
-% ??? Neural evaluation: One thing that's commonly measured
-% in auditory neuroscience is the spectro-temporal receptive field
-% of auditory neurons. We can make these for our downstream feature
-% neurons and compare them to published STRFs and see if they look similar.
-% Note that it would be easy to make neurons that can replicate STRFs,
-% as we would just use the temporal transformations that matter.
-% But, we make our choice of transformations based on what would
-% be best to decode certain features;
-% being able to also replicate STRFs gives an indication that
-% we made good choices, and that this system is engineered
-% in a similar way to how the system developed and evolved (maybe?)
+In the case of speech feature vector trajectories,
+we have relatively many samples,
+classes and features,
+so we use a one-vs-the-rest
+support vector machine classifier
+that does not use the kernel trick
+(i.e., a linear SVM).
+We use LibLinear's fast implementation
+of linear SVMs (??? cite linblinear.pdf),
+exposed to Python through
+the scikit-learn package
+(??? cite scikit-learn).  % http://scikit-learn.org/stable/about.html#citing-scikit-learn
 
-% ??? should we talk about the experiments from the results section here?
-
-% ??? Nonsense CVCs: cite Allen 94;
-
-% ``Typical ASR systems start with a `front-end' that transforms
-% the speech signal into a `feature vector' which is then processed
-% by a `back-end' classifier. These systems frequently place a
-% heavy emphasis on word and language models as a method of
-% increasing the recognition scores.''
-
-% ``Because of confusion and misunderstanding based on
-% coarticulation arguments, only a small amount of research
-% has been done on the automatic recognition of nonsense CVCs.
-% From the work of Fletcher and Steinberg, it should be clear
-% that the real challenge in machine recognition today is
-% human-like performance for phones and nonsense CVC
-% under conditions of typical channel distortions.
-% Since the human performance is well-known under
-% these conditions [15], [19], nonsense CVCs
-% represent an excellent database. Decreasing
-% the error rates for these elementary signals would have
-% a major impact on overall system performance and robustness.''
+The metric that we collect
+in the experiments below
+is classification correctness,
+either in absolute terms,
+or NCC classification correctness
+relative to the baseline correctness
+obtained with NFCCs.
+In the ASR literature,
+phone error rates are often
+reported on TIMIT.
+The phone error rate
+takes into account
+incorrect classifications
+(substitutions),
+a lack of classification
+when there should be one
+(deletions)
+and erroneous classifications
+where there should not be one
+(insertions).
+However, since we pre-segment
+the speech samples into
+those that correspond to some phone,
+we cannot have deletions or insertions,
+only substitutions,
+which corresponds to classification correctness.
+Since we use correctness
+rather than accuracy,
+we can only compare our approach
+to some reported results
+??? cite InTech.pdf,
+but even then the comparison is flawed.
+Hence, we generate both MFCCs
+and NCCs for the same speech samples
+in order to verify that
+NCCs generate feature vector trajectories
+that are at least as statistically separable
+as the equivalent MFCC trajectories.
 
 \subsection{Experiments and results}
 
-Hyperopt the main parameters
+In each experiment,
+we isolate the TIMIT speech samples
+corresponding to the phones
+of interest,
+and generate a feature vector trajectory
+(i.e., MFCC or NCC)
+for that sample.
+MFCCs are generated using frames
+of 25 ms,
+which advance 10 ms on each timestep,
+as is standard in many ASR systems.
+NCCs are generated
+by running the model described in
+Section~??? with a 1 ms simulation timestep.
 
-Consonants and vowels separate vs. together
+All trajectories are
+made to be the same length,
+as is required by the SVM algorithm.
+The number of frames used
+for all samples is
+the number of frames in
+the longest MFCC trajectory
+in the training set.
+Samples that are too short
+(e.g., most MFCC trajectories)
+are lengthened to match the
+target number of frames
+using linear interpolations.
+Samples that are too long
+(e.g., all NCC trajectories)
+are shortened to match the
+target number of frames
+by splitting the trajectory
+into equally spaced time bins
+and taking the average
+for each bin.
+See Figure~??? for
+an illustration of temporal scaling,
+and example MFCC and NCC trajectories.
+
+??? figure: scaling; plot a bunch of
+pcolormeshes of the same phoneme
+in a set, some MFCCs lengthened,
+some NCCs shortened
+
+Each trajectory is then flattened
+to produce a vector of length
+$n_{\text{cepstra}} \times n_{\text{frames}}$.
+Each trajectory is associated with
+the phone label associated with
+the original speech sample,
+producing an input-output pair
+that can be used to do supervised learning
+in the linear SVM.
+
+Finally, the same procedure is done
+with the test set to produce another
+set of input-output pairs.
+The input is fed to the linear SVM
+to generate a predicted phone labels,
+which are compared to the actual phones
+to yield a correctness measure.
+
+\subsubsection{Number of neurons}
+
+??? for Nengo model, ramp up the number of neurons
+in each population to see where it plateaus;
+set that
+
+\subsubsection{Phone groups}
+
+??? Compare consonants and vowels separate vs. together
+
+\subsubsection{Derivatives and z-scoring}
+
+??? compare with deriv to without
+
+??? compare with zscore to without
+
+for subsequent, use the one that was best (number of derivs
+and zscore)
+
+??? Compare different auditory filters, with middle ear and without
+
+??? Compare adaptive neurons to normal LIF
+
+\subsubsection{NCC averaging}
+
+Maybe this worked because the NCCs operate
+at a lower timestep and average.
+Do a run with 0.001 ms MFCCs
+to show that it doesn't matter
 
 \subsection{Scaling}
 
 Give main metrics of the network (number of neurons, etc)
 and discuss scaling
+
+\subsection{Summary}
+
+??? main results
 
 \section{Syllable sequencing and production}
 
@@ -147,12 +402,16 @@ Give main metrics of the network (number of neurons, etc)
 and discuss scaling
 
 - Take the control system and look at how much cortex (neurons, synapses)
-  is taken up by each element (word, syllable, phoneme, etc).
+  is taken up by each element (word, syllable, phone, etc).
 
 - Extrapolate to human sized vocabularies, make sure it'll scale
 
 - Show that if we had a separate oscillator / population
   for each word or syllable that this wouldn't scale
+
+\subsection{Summary}
+
+??? main results
 
 \section{Syllable recognition}
 
@@ -166,3 +425,7 @@ Hyperopt the main parameters
 
 Give main metrics of the network (number of neurons, etc)
 and discuss scaling
+
+\subsection{Summary}
+
+??? main results
