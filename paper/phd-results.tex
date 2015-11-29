@@ -14,148 +14,7 @@
 % For each model, have an initial section where subparts are
 % tested to determine parameters for the full experiments
 
-List of experiments (fill this in as you write other sections!!)
-
-These should maybe be included in the methods?
-
-??? try to reproduce nihms358264 as a recognition effect, not production
-
-\section{Recognition system}
-
-\subsection{Metrics}
-
-Phoneme decode error rate
-
-Pitch error rate
-
-Volume error rate
-
-\subsection{Experiments}
-
-1. Do frequency interacting transformation matter?
-
-- generate networks with N random transformations
-  in preprocessing layer and collect the metrics
-
-- systematically increase the number of interacting
-  transformations and see if it matters
-pp
-2. Vowels: should we use temporal information or just
-   the current moment's info?
-
-3. Vowels: do diphthongs count?
-
-- try having no categories for diphthongs and see if
-  we can get the two components of it
-
-- try having explicit diphthong categories and see
-  if we get better at it
-
-4. Separate vowel / consonant populations, or just one
-
-- See if error rates differ
-
-5. Consonants vs vowels:
-
-- Vary the number of features and/or neurons and see
-  how much is needed for equivalent error rates
-
-  - Should error rates be normalized by the total number
-    of possible outcomes?
-
-6. Synthesized vs natural speech:
-
-- How much easier is synthesized speech compared to natural?
-
-7. Relative pitch experiment:
-
-Find something from the literature to evaluate relative pitch...
-
-8. Relative volume expt:
-
-Find something from the literature to evaluate relative volume...
-
-9. The usefulness of noise
-
-- P. 65 of Kollier et al has a bunch of noise added in.
-  Try injecting noise, see if it helps.
-
-10. Preprocessing choices
-
-- Pool or don't pool
-- Use nonlinear derivative glides, or just pure derivatives
-
-11. Phonemes or gestures
-
-- Try decoding gestures instead of phonemes
-- What's better / easier?
-
-\section{Synthesis system}
-
-\subsection{Metrics}
-
-Speech intelligibility
-
-RMSE between recognized and decoded speech?
-Is that helpful?
-
-Can use the recognition system to evaluate
-this synthesis system relative to other
-synthesis systems.
-In a sense, this is one of the benefits
-of this type of model.
-
-Neural resources used
-
-\subsection{Experiments}
-
-1. Biologically plausible fluctuations.
-
-- Ideal control methods have no variability, they hit things at the same time
-- Record when consonantal closures / releases happen, show that there's
-  a certain amount of variance
-- Hopefully can show that this is similar to biology?
-
-2. Oscillator / trajectory stability
-
-- Show how accurate / fast the coupled oscillators can be
-- Contrast to trajectory generation with Aaron's stuff
-  (if that's possible)
-  - Also contrast to trajectory gen with DMPs?
-
-3. Scalability
-
-- Take the control system and look at how much cortex (neurons, synapses)
-  is taken up by each element (word, syllable, phoneme, etc).
-
-- Extrapolate to human sized vocabularies, make sure it'll scale
-
-- Show that if we had a separate oscillator / population
-  for each word or syllable that this wouldn't scale
-
-\section{Integrated system}
-
-\subsection{Metrics}
-
-\subsection{Experiments}
-
-1. Shadowing proof of concept
-
-- Show it works
-
-??? more
-
-4. Syllable learning proof of concept
-
-- show it works
-
-5. The effect of speed on syllable learning
-
-- Slow it down. Should be better
-
-% ----------------
-
-\section{Neural Cepstral Coefficients}
+\section{Neural cepstral coefficients}
 
 \subsection{Evaluation}
 
@@ -232,9 +91,23 @@ just use the derivatives
 % the error rates for these elementary signals would have
 % a major impact on overall system performance and robustness.''
 
+\subsection{Experiments and results}
+
+Hyperopt the main parameters
+
+Consonants and vowels separate vs. together
+
+\subsection{Scaling}
+
+Give main metrics of the network (number of neurons, etc)
+and discuss scaling
+
 \section{Syllable sequencing and production}
 
 \subsection{Evaluation}
+
+RMSE between recognized and decoded speech?
+Is that helpful?
 
 ??? compare original VTG -> audio to Nengo -> VTG -> audio
 
@@ -257,4 +130,39 @@ by ...
 for German syllables
 provided by Bernd Kr\"{o}ger.
 
+\subsection{Experiments and results}
+
+Hyperopt the main parameters
+
+1. Biologically plausible fluctuations.
+
+- Ideal control methods have no variability, they hit things at the same time
+- Record when consonantal closures / releases happen, show that there's
+  a certain amount of variance
+- Hopefully can show that this is similar to biology?
+
+\subsection{Scaling}
+
+Give main metrics of the network (number of neurons, etc)
+and discuss scaling
+
+- Take the control system and look at how much cortex (neurons, synapses)
+  is taken up by each element (word, syllable, phoneme, etc).
+
+- Extrapolate to human sized vocabularies, make sure it'll scale
+
+- Show that if we had a separate oscillator / population
+  for each word or syllable that this wouldn't scale
+
 \section{Syllable recognition}
+
+\subsection{Evaluation}
+
+\subsection{Experiments and results}
+
+Hyperopt the main parameters
+
+\subsection{Scaling}
+
+Give main metrics of the network (number of neurons, etc)
+and discuss scaling
