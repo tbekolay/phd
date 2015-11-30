@@ -43,7 +43,7 @@ class ExperimentResult(object):
 
     @classmethod
     def load(cls, key):
-        d = cache.load_obj(key, ext='npz', subdir=cls.subdir)
+        data = cache.load_obj(key, ext='npz', subdir=cls.subdir)
         return cls(**data)
 
     def save(self, key):
@@ -98,7 +98,8 @@ def mfcc(model, sample, zscore):
     if zscore and feat.shape[0] > 2:
         # TRY: take the zscore for each block separately
         #      where block is normal, deriv1, deriv2, etc
-        feat = stats.zscore(feat, axis=0)
+        feat = stats.zscore(feat, axis=0)    # If variance is 0, can get nans.
+        feat[np.isnan(feat)] = 0.
     return feat
 
 
@@ -124,10 +125,11 @@ def ncc(model, sample, zscore, seed):
     feat = sim.data[pr]
     if zscore:
         feat = stats.zscore(feat, axis=0)
+        feat[np.isnan(feat)] = 0.  # If variance is 0, can get nans.
     return feat
 
 
-def nccs(model, audio,zscore, seed, parallel=True):
+def nccs(model, audio, zscore, seed, parallel=True):
     out = {label: [] for label in audio}
     if parallel:
         jobs = {label: [] for label in audio}
@@ -137,9 +139,9 @@ def nccs(model, audio,zscore, seed, parallel=True):
         for sample in audio[label]:
             if parallel:
                 jobs[label].append(
-                    pool.apply_async(ncc, [model, sample, seed, zscore]))
+                    pool.apply_async(ncc, [model, sample, zscore, seed]))
             else:
-                out[label].append(ncc(model, sample, seed, zscore))
+                out[label].append(ncc(model, sample, zscore, seed))
 
     if parallel:
         for label in jobs:
@@ -265,14 +267,15 @@ class AuditoryFeaturesExperiment(object):
 
     @property
     def cache_file(self):
-        return cache.cache_file(self.cache_key, ext='npz')
+        return cache.cache_file(self.cache_key, ext='npz', subdir='ncc')
 
     def run(self):
-        if cache.cache_file_exists(self.cache_key, ext='npz'):
-            log("%s.npz in the cache. Loading." % key)
-            result = AuditoryFeaturesResult.load(key)
+        if cache.cache_file_exists(self.cache_key, ext='npz', subdir='ncc'):
+            log("%s.npz in the cache. Loading." % self.cache_key)
+            result = AuditoryFeaturesResult.load(self.cache_key)
         else:
             result = AuditoryFeaturesResult()
+            log("%s.npz not in the cache. Running." % self.cache_key)
             log("==== Training ====")
             mfcc_svm, ncc_svm = self.train(result)
             log("==== Testing ====")
@@ -280,7 +283,7 @@ class AuditoryFeaturesExperiment(object):
             self.test(result, ncc_svm, 'ncc')
             result.save(self.cache_key)
             log("Experiment run saved to the cache.")
-        return result
+        return True
 
 
 class AuditoryFeaturesResult(ExperimentResult):
@@ -320,7 +323,7 @@ class AFNNeuronsTask(ExperimentTask):
         return "periphery:%d" % experiment.model.periphery.neurons_per_freq
 
 task_af_n_neurons = lambda: AFNNeuronsTask(
-    n_neurons=[5, 10, 20, 40], phones=TIMIT.phones)()
+    n_neurons=[2, 3, 5, 10, 20, 40], phones=TIMIT.phones)()
 
 
 class AFPhonesTask(ExperimentTask):
