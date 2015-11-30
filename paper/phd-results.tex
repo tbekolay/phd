@@ -362,73 +362,343 @@ and discuss scaling
 
 \section{Syllable sequencing and production}
 
+The goal of the syllable sequencing and production model
+is to generate a continuous trajectory
+of production information
+that can be used to control
+an articulatory synthesizer,
+given a static representation
+of a sequence of syllables.
+As the quality of generated speech
+is difficult to quantify,
+we evaluate this model
+by generating a gesture score
+for the decoded production information trajectory,
+and comparing it
+to the gesture score that was provided
+to the model as input.
+
 \subsection{Evaluation}
 
-RMSE between recognized and decoded speech?
-Is that helpful?
+While the syllable sequencing and production model
+can be used to control any articulatory synthesizer,
+we use the VocalTractLab synthesizer
+because of its high quality speech
+and available API ??? cite.
+The vocal tract gestures representation
+in VocalTractLab is based on a set of
+predefined articular positions.
+Most gestures correspond to
+a particular shape,
+and the overall vocal tract shape
+is based on linearly interpolating
+between the shapes of
+all currently active gestures.
+Taking into account all of the
+possible shapes and glottal parameters,
+there are 48 possible vocal tract gestures
+(see Table~???) despite having only
+??? articulator sets
+controlling 22??? articulators.\footnote{
+  There is also an f0 gesture which is not included here,
+  as it controls the pitch of the utterance.
+  Since German is not a tonal language,
+  the pitch is not required to voice a syllable,
+  and instead is used for generating
+  varied prosody;
+  we do not consider prosody in this model,
+  though including it would be straightforward.}
 
-??? compare original VTG -> audio to Nengo -> VTG -> audio
+??? table of vocal tract gestures
 
-??? important: scaling. Show that adding new syllables
-to the syllabary doesn't affect the voicing
-of a given sequence; show how many neurons are added.
+As discussed in Section~???,
+the input to the model
+is a semantic pointer
+representing a sequence of syllables.
+Each syllable has an associated DMP
+which is generated using
+a gesture score corresponding to
+a German syllable;
+the gesture scores were provided by
+Bernd Kr\"{o}ger and are available at
+\url{http://www.phonetik.phoniatrie.rwth-aachen.de/bkroeger/research.htm}.\footnote{
+  These German syllable gesture scores are among
+  the few publicly available gesture scores.
+  We were not able to find any gesture scores
+  for English syllables.}
+Each gesture score in VocalTractLab
+is a collection of
+gestures that are parameterized by target value,
+onset time, gesture length,
+and a time constant that determines
+how quickly the gesture becomes active.
 
-??? test how long of a sequence we can get to work
+For each experiment described below,
+we chose a random set of syllables
+as the frequent syllables
+that make up the vocabulary
+of the model
+(i.e., syllables in the mental syllabary).
+A sequence of syllables of a given length
+are randomly chosen and assigned a speed
+sampled from $\mathcal{U}(1, 6)$ Hz,
+which corresponds to syllable trajectories of
+167--1000 ms in length.
+Depending on the number of syllables
+and the randomly sampled lengths,
+in each trial we end up with a syllable sequence
+generating several seconds
+of production information trajectories,
+which in the case of these experiments,
+are 48-dimensional trajectories
+where each dimension is a gesture.
 
-??? The goal of a syllable production system
-is to generate an audio waveform
-that is perceptually classified
-by a listener as corresponding to
-the intended syllable sequence.
-While it is possible to quantify
-whether this goal is achieved
-by ...
+The model is provided the static syllable sequence input,
+and is run for the amount of time that the sequence
+should take to voice (determined by the
+randomly assigned syllable speeds),
+plus a small amount of time to account
+for variability in each model instance.
+The output of the temporal output associative memory
+is recorded.
 
-??? For testing, we use gesture scores
-for German syllables
-provided by Bernd Kr\"{o}ger.
+That output is then converted into a gesture score
+by estimating the gesture parameters
+from the associative memory output.
+Individual gestures are determined by
+taking the absolute value of the temporal derivative
+across each gesture;
+time slices which have high derivatives
+are indicative of the onset or offset of a gesture.
+We make a new gesture for each
+time slice with high derivative
+with the beginning of the gesture as
+the beginning of the first time slice,
+and the end of the gesture
+as the end of the next time slice;
+the last time slice ends at the end
+of the utterance.
+The time constant associated
+with the gesture
+is the length of
+the onset slice with high derivative.
+The value of the gesture is the
+average value between the two
+time slices with high derivatives.
+Every gesture has a neutral value
+representing that the gesture
+is not active;
+identified gestures with values
+sufficiently close to the neutral gestures
+are removed from the gesture score.
+
+??? figure with zoom-in showing start and end of gesture
+
+The gesture score resulting from the model simulation
+is then compared to the original gesture score
+on three criteria.
+First, we calculate the accuracy
+of the model's gesture score
+% using the same formula
+% that is used for phoneme classification accuracy;
+% specifically,
+% \begin{equation}
+%   \text{Acc} = \frac{N_g - S - D - I}{N_g},
+% \end{equation}
+% where $N_g$ is the number of gestures
+% in the original gesture score,
+% $S$ is the number of substitutions,
+% $D$ is the number of deletions,
+% and $I$ is the number of insertions.
+
+% In the case of phonemes,
+% it is easy to calculate accuracy,
+% as we represent the actual and classified labels
+% as strings.
+% For gesture scores,
+% each gesture has a start time and a length;
+% in some cases, gestures should co-occur,
+% so their temporal order is unimportant.
+% For other gestures ...
+
+% try some stuff and then update the commented section.
+
+Second, we calculate the temporal variability
+of co-occurring gestures.
+For most syllables,
+there are one or more pairs of gestures
+that have either begin or end
+at the same time.
+The co-occurring gestures
+are critical to producing
+recognizable speech.
+Therefore, for each pair
+of co-occurring gestures in the
+original gesture score,
+we record the difference
+in the simulated gesture score's
+corresponding co-occurrence pair.
+
+Finally, we synthesize a speech sample
+using VocalTractLab,
+and perform a qualitative evaluation
+of its intelligibility.
+Speech corresponding to the
+original syllable sequence is compared
+to that generated by the model.
+We do not obscure the label
+of the synthesized speech,
+as this measure is reported primarily
+to reinforce the other two measures;
+it is not the primary measure
+by which the model should be judged.
+As such, we evaluate each sample
+as either completely silent,
+unintelligible, partially intelligible,
+or intelligible.
 
 \subsection{Experiments and results}
 
-Hyperopt the main parameters
+??? Hyperopt the main parameters: nneurons
 
-1. Biologically plausible fluctuations.
+??? how much can we crank up the syllable speed?
 
-- Ideal control methods have no variability, they hit things at the same time
-- Record when consonantal closures / releases happen, show that there's
-  a certain amount of variance
-- Hopefully can show that this is similar to biology?
+??? Does adding more syllables to the vocabulary affect anything?
+
+??? How long can the sequences get before things break down?
 
 \subsection{Scaling}
 
-Give main metrics of the network (number of neurons, etc)
-and discuss scaling
+% Give main metrics of the network (number of neurons, etc)
+% and discuss scaling
 
-- Take the control system and look at how much cortex (neurons, synapses)
-  is taken up by each element (word, syllable, phone, etc).
+% - Take the control system and look at how much cortex (neurons, synapses)
+%   is taken up by each element (word, syllable, phone, etc).
 
-- Extrapolate to human sized vocabularies, make sure it'll scale
+% - Extrapolate to human sized vocabularies, make sure it'll scale
 
-- Show that if we had a separate oscillator / population
-  for each word or syllable that this wouldn't scale
+% - Show that if we had a separate oscillator / population
+%   for each word or syllable that this wouldn't scale
+
+% ??? important: scaling. Show that adding new syllables
+% to the syllabary doesn't affect the voicing
+% of a given sequence; show how many neurons are added.
 
 \subsection{Summary}
 
-??? main results
+% ??? main results
 
 \section{Syllable recognition}
 
+The goal of the syllable recognition system
+is to temporally classify syllables
+given a continuous trajectory
+of production information.
+We will evaluate the system
+based on its ability to emit
+correct syllable classifications
+at reasonable times,
+and whether those classifications
+are available in working memory
+between classifications.
+
 \subsection{Evaluation}
+
+The infrastructure for evaluating
+the recognition model
+is similar to that of the production model.
+We use the same library
+of German syllable gesture scores,
+from which we create
+48-dimensional gesture trajectories.
+On each trial,
+we generate a trajectory
+by concatenating the trajectories
+of a randomly chosen sequence
+of trajectories together
+(i.e., we do not use the
+syllable production model
+to generate input for the model).
+That trajectory is provided
+to all of the iDMPs as input,
+and we record the output of the
+temporal input associative memory
+and the memory module.
+
+From the data collected,
+we compute three metrics
+to evaluate performance
+in different situations.
+First, we calculate
+classification accuracy
+using the same formula
+as is used to calculate
+phoneme classification accuracy ??? cite intech.
+Specifically,
+we generate a list of all of the
+syllables classified by the model,
+and compare that list to the
+originally specified list
+using the formula
+\begin{equation}
+  \text{Acc} = \frac{N_g - S - D - I}{N_g},
+\end{equation}
+where $N_g$ is the number of syllables
+in the trajectory,
+$S$ is the number of substitutions,
+$D$ is the number of deletions,
+and $I$ is the number of insertions.
+A substitution occurs when
+the syllable is misclassified.
+A deletion occurs when
+a syllable has occurred,
+but the model does not emit a classification.
+An insertion occurs
+when the model emits a classification
+when no syllable has occurred
+(e.g., it classifies the same syllable twice).
+
+Second, we record the times at which
+syllable classification occur,
+and compare those times
+to the end of the actual syllable trajectory.
+Here, we are attempting to determine
+if the model can classify syllables
+while they are being voiced,
+or if the entire syllable must complete
+before the classification can be made.
+
+Third, we analyze the contents
+of the memory module
+in between syllable presentations.
+Specifically,
+we find the semantic pointer
+with the maximum similarity
+at the midpoint between
+the start and the end of a syllable
+for all syllables in the trajectory.
+The memory representation of the trial
+is perfect if the
+previously classified syllable
+is in memory at the midpoint
+of a syllable.
 
 \subsection{Experiments and results}
 
-Hyperopt the main parameters
+??? Hyperopt the main parameters
+
+??? similar to prod: how much can we crank syllable speed?
+??? will have to modify scale depending on speed... tweaky!
+
+??? does adding more trajectories into vocab affect anything?
+
+??? how long can sequences get? Probably forever, try that
 
 \subsection{Scaling}
 
-Give main metrics of the network (number of neurons, etc)
-and discuss scaling
+% Give main metrics of the network (number of neurons, etc)
+% and discuss scaling
 
 \subsection{Summary}
 
-??? main results
+% ??? main results

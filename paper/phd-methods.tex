@@ -1,49 +1,49 @@
 \chapter{Methods}
 
-Natural speech is not a series of phonemes
-recited as clearly as possible
-to maximize intelligibility.
-Natural speech includes variation in
-pitch and volume in order to transfer
-non-linguistic information between speakers.
-Current automated speech systems
-focus solely on the linguistic content
-of speech;
-by deciphering and reproducing both
-linguistic and non-linguistic content,
-we aim to produce more natural speech
-recognition and production
-than the existing state of the art.
+% Natural speech is not a series of phonemes
+% recited as clearly as possible
+% to maximize intelligibility.
+% Natural speech includes variation in
+% pitch and volume in order to transfer
+% non-linguistic information between speakers.
+% Current automated speech systems
+% focus solely on the linguistic content
+% of speech;
+% by deciphering and reproducing both
+% linguistic and non-linguistic content,
+% we aim to produce more natural speech
+% recognition and production
+% than the existing state of the art.
 
-??? make a little checklist here of what our end goal
-is to motivate the four sections we're looking at
+% ??? make a little checklist here of what our end goal
+% is to motivate the four sections we're looking at
 
 \section{Distributed representations in neural networks}
 
-Issue: localist ANN representations. Solution: NEF
+% Issue: localist ANN representations. Solution: NEF
 
-NEF stuff; emphasize that unlike other models,
-here representations are distributed,
-which makes transformation harder,
-so we have that.
-Then also as a bonus we get dynamics.
+% NEF stuff; emphasize that unlike other models,
+% here representations are distributed,
+% which makes transformation harder,
+% so we have that.
+% Then also as a bonus we get dynamics.
 
 \section{Symbol-like processing with real-valued vectors}
 
-Issue: there are a finite number of syllables
-(especially frequent syllables) but there are an infinite
-number of syllable strings (e.g., words, sentences).
-Need some way to represent temporal information
-with discrete symbols.
-Solution: SPA
+% Issue: there are a finite number of syllables
+% (especially frequent syllables) but there are an infinite
+% number of syllable strings (e.g., words, sentences).
+% Need some way to represent temporal information
+% with discrete symbols.
+% Solution: SPA
 
-The previous section gives us a method to represent
-and manipulate ANN activations (i.e., numerical vectors)
-with distributed, possibly spiking, neurons.
+% The previous section gives us a method to represent
+% and manipulate ANN activations (i.e., numerical vectors)
+% with distributed, possibly spiking, neurons.
 
-??? make links to knowledge representation in CS
+% ??? make links to knowledge representation in CS
 
-??? give general background for the math in methods?
+% ??? give general background for the math in methods?
 
 \section{Nengo: software for the NEF \& SPA}
 

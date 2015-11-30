@@ -16,28 +16,28 @@ As such, not all relevant background can
 be given equal coverage.
 In this chapter, we assume
 that the reader's background
-in in computer science or engineering.
+is in computer science or engineering.
 We therefore spend more time
 reviewing background in linguistics
 and neuroscience as they fall outside
 of the domain of computer science and engineering,
 and so can be considered the problem domain
 that we will apply our assumed knowledge to.
-???yikes reword
+% ???yikes reword
 
-First, we review relevant background
-for the problem domain of interest,
-human speech,
-which we organize
-into background relevant to speech recognition
-and background relevant to speech production.
-Then, we review existing models
-of speech recognition and production,
-focusing on those using
-biologically inspired or constrained methods,
-and concluding with other integrated approaches
-that have incorporated speech recognition
-and production in a single system.
+% First, we review relevant background
+% for the problem domain of interest,
+% human speech,
+% which we organize
+% into background relevant to speech recognition,
+% speech production, and sensorimotor integration.
+% Then, we review existing models
+% of speech recognition and production,
+% focusing on those using
+% biologically inspired or constrained methods,
+% and concluding with other integrated approaches
+% that have incorporated speech recognition
+% and production in a single system.
 
 \section{Human speech recognition}
 
@@ -64,7 +64,7 @@ has evolved to be adept at processing speech;
 psychoacoustics describes many of the ways
 in which the human auditory system
 manipulates sound,
-which we aim to reproduce.???ugh this needs work
+which we aim to reproduce. % ???ugh this needs work
 Auditory neurobiology describes both
 the physical substrate and organization
 of the system that we aim to emulate.
@@ -216,13 +216,13 @@ capturing these differences
 is important for building
 a frontend for speech recognition.
 Therefore, the psychoacoustical findings
-discussed in this chapter will be
-used to evaluate auditory periphery models
-in Section~???.
+discussed in this chapter
+are presented as motivation for the
+auditory periphery models described in Section~???.
 
-??? Either here or in previous section,
-introduce the idea of formants
-and format frequencies...
+% ??? Either here or in previous section,
+% introduce the idea of formants
+% and format frequencies...
 
 \subsubsection{Spatial psychoacoustical effects}
 
@@ -242,8 +242,8 @@ sound pressure level and
 loudness was originally proposed
 by ???Fletcher and Munson,
 and further standardized
-by the international standards organization
-??? can that be cited;
+by the international standards organization;
+% ??? can that be cited;
 see Figure~???.
 In general, perceived loudness,
 as expressed in the phon scale,
@@ -310,7 +310,7 @@ of filters in auditory periphery models.
 ??? ERB figure, Fig 1 of Moore and Glasberg
 % python script, erbspace
 
-Similarly to volume,
+Like volume,
 humans perceive
 the frequency of incoming sounds
 in subjective ways.
@@ -357,8 +357,8 @@ As a result, humans find
 consonant sounds more difficult
 to recognize in situations with background noise
 than vowel sounds,
-as consonants are shorter than vowels
-??? prolly cite everest? or wherever 3-12 came from.
+as consonants are shorter than vowels.
+% ??? prolly cite everest? or wherever 3-12 came from.
 There is evidence that sounds with constant volume
 are perceived as being monotonically louder
 up to approximately 200 ms;
@@ -425,7 +425,7 @@ Brain structures in the primate auditory system
 are organized in several parallel
 hierarchical pathways.
 Information from the auditory periphery
-arrives at the brainstem???more.
+arrives at the brainstem. % ???more.
 That information is relayed to the cortex
 through the medial geniculate nucleus (MGn)
 in the thalamus.
@@ -435,22 +435,22 @@ called the core.
 In the context of auditory cortex,
 the core is a small portion of cortex
 in Heschl's gyrus (???)
-(???size in mm2)
+% (???size in mm2)
 that serves as the first stage
 in the mostly feedforward hierarchy
 of auditory cortical areas.
 The core appears to be made up of
-three subareas, ???A1, R, and RT.
+three subareas, ??? A1, R, and RT.
 The core is surrounded by a set of areas
 called the belt,
 which primarily receives input from
 the core.
-As such, there are ???three
-distinct areas in the belt,
-???.
+% As such, there are ???three
+% distinct areas in the belt,
+% ???.
 The belt provides input
-to the parabelt,
-which is made up of ???.
+to the parabelt.
+% which is made up of ???.
 See Figure~??? for a summary of
 the neuroanatomical structures and connections
 in the auditory hierarchy.
@@ -510,7 +510,7 @@ while higher level regions
 like the parabelt
 are more broadly tuned
 to larger parts of the frequency spectrum.
-???more, cites
+% ???more, cites
 See Figure~??? for visualizations
 of the tonotopic organization
 of primary auditory cortical regions.
@@ -544,13 +544,13 @@ each area are not known.
 In general, STRFs have been found that
 show delays of 5--250 ms
 (see, e.g., ??? Mesgarani et al, supplementary material).
-While ringing can be observed
-in some STRFs, leading some
-(e.g., ???Kollmeier gabor paper)
-to hypothesize Gabor-like filters;
-however, the primary response comes
-after a particular delay
-(see ???kaas; semple and scott for reviews).
+% While ringing can be observed
+% in some STRFs, leading some
+% (e.g., ???Kollmeier gabor paper)
+% to hypothesize Gabor-like filters;
+% however, the primary response comes
+% after a particular delay
+See ???kaas; semple and scott for reviews.
 
 It should be noted
 that the information gleaned from
@@ -564,14 +564,14 @@ in rhesus monkeys respond nonlinearly
 to frequency-modulated sweep stimuli,
 but ???Kowalski et al. 1995
 found that cat A1 responses were linear.
-It is, however, difficult to evaluate
+It is difficult to evaluate
 the responses of cells
 as traditionally the STRF
 is determined using simple stimuli
 like white noise;
-but, see ???Theunissen 2000
-for a method using complex sounds
-and ???Griffiths et al for ?.
+however, see ???Theunissen 2000
+for a method using complex sounds.
+% and ???Griffiths et al for ?.
 ??? Escabi \& Schreiner 2002
 found nonlinear responses
 in approximately 40\%
@@ -584,10 +584,10 @@ Regardless, it is clear that
 nonlinearities are more prevalent
 the higher up you go in the auditory hierarchy,
 though the types of nonlinearities
-at each processin level are still unclear;
-we aim to provide some insight into
-nonlinearities needed in the auditory system
-in the model presented in this thesis.
+at each processin level are still unclear.
+% we aim to provide some insight into
+% nonlinearities needed in the auditory system
+% in the model presented in this thesis.
 
 In sum, we interpret
 the auditory neurobiological literature
@@ -659,6 +659,12 @@ using large corpora of
 lexical and linguistic information
 (see Figure~??? and ??? mjfgNOW.pdf
 and ??? hmm tutorial for reviews).
+The first part of the pipeline
+that produces feature vectors
+is often called the ``frontend;''
+the second part that uses
+statistical methods to infer labels
+is called the ``backend.''
 
 ??? something like fig 2.1 of mjfgnow.pdf
 
@@ -680,15 +686,15 @@ Improvements from then until
 the mid-2000s were modest
 (see ??? InTech...pdf).
 
-From around 2006, a series of learning algorithms
+Since 2006, a series of learning algorithms
 and network structures in artificial neural networks (ANNs)
 that are now referred to as ``deep neural networks'' (DNNs)
-were applied to
+have been applied to
 the domain of automatic speech recognition
 with considerable success
 both in academic research
 and in commercial application.
-By 2013, Google reported
+In 2013, Google reported
 (??? Vanhoucke presentation?)
 phoneme classification error rates on TIMIT
 (a more difficult task than
@@ -696,25 +702,24 @@ the word classification task previous mentioned)
 of 17.7\%,
 significantly better than the most sophisticated
 HMM-based model's error rate of 27.3\%.
-??? probably cite more
+% ??? probably cite more
 
 The architecture of DNN-based systems
 is simpler than that of HMM-based systems
 (see Figure~??? and ??? for a review).
 Instead of distinct steps in which
-acoustic features are extracted
-and combined using an acoustic model,
+an explicit statistical acoustic model
+is evaluated and then combined with language models,
 DNNs map directly from the
 feature vector input representation
 to the output representation of choice
-(typically phonemes or word vectors).
+(typically phonemes or word vectors),
+which can be further refined with a language model.
 This simpler architecture may be
 responsible for much of DNN's success,
 as its internal representations
-are not locked to individual phonemes;
-acoustic realizations
-of phonemes can vary depending on
-the preceding and subsequent context.
+are not locked to specific representations
+like triphones.
 However, the simpler architecture
 does not necessarily mean that
 using DNNs is straightforward;
@@ -746,111 +751,6 @@ and biologically plausible spiking neural networks
 are currently being developed
 ??? cite Hunsberger.
 
-\subsubsection{Automatic speech recognition with production information}
-
-In terms of higher-level biological organization,
-almost all speech recognition DNNs to date
-can be mapped most directly
-to the ventral stream of the human speech system
-(see Section~???),
-as they attempt to decode
-lexical information in order to
-transcribe speech to text.
-In this thesis, we aim to model
-the dorsal stream of the human speech system,
-which we hypothesize follows the
-motor theory of speech recognition,
-meaning that it uses vocal tract gestures
-as the basic unit of representation.
-
-Several labs have investigated
-using measurements
-related to speech production
-as part of a speech recognition system
-(see ??? 00.King...pdf for a review).
-The primary advantage of this approach
-is that speech production information
-is not locked to each phoneme,
-so it is not as sensitive to the
-differing acoustic realizations
-of the same phoneme.
-The existence of large datasets
-with continuous acoustic
-and articulator position recordings
-(e.g., ??? x-ray database, ??? mngu0)
-has spurred development of
-systems that use both
-acoustic and articulatory information
-as input to an ASR system.
-??? Zlokarnik (1995) from 00.King...pdf
-used continuous acoustic and articulatory
-information with an HMM-based system
-and reduced word error rates
-by more 60\% (relative).
-??? Eide (2011) from 00.King...pdf
-augmented the feature vector
-in a standard HMM system
-articulatory features and
-reduced word error rates
-by 34\% (relative).
-While similar studies have been done
-with traditional artificial neural networks
-(e.g., ??? Kirchoff)
-and dynamic Bayesian networks
-(e.g., ??? Stephenson 2000, 2004),
-we are not aware of
-any DNN-based systems using
-continuous articulatory
-information in an ASR task.
-
-However, DNNs have been used for
-a related task,
-acoustic-articulatory speech inversion.
-Here, articulatory information
-is decoded from acoustic information;
-that is, the input of the network
-is still an acoustic feature vector,
-but the desired output
-is articulator positions.
-??? articulatorinversion.pdf
-obtained a root mean square error
-of 0.95 mm on the MNGU0 dataset,
-which is 0.04 mm better than prior
-efforts using Guassian mixture models
-??? ISO90544.pdf.
-The extracted articulatory information
-could be used by another ASR system
-to lower phone or word error rates.
-
-The aforementioned results
-use continuous articulator positions.
-Some work has also been done
-relating this work to
-vocal tract gestures.
-For example,
-??? 04.542...pdf and 05.54200a1...pdf
-showed that the vocal tract gesture score
-can be estimated
-from the continuous articulator positions,
-which can then be used
-to do word classification with
-over 80\% accuracy on a synthesized dataset.
-??? 01.10.1.1.294 and 01.JASMAN...
-showed that a gesture score
-can be estimated from natural speech
-through a landmark-based time alignment procedure;
-however, this model assumed that the
-words in the utterance were known \textit{a priori},
-and applied their technique primarily
-for annotating data sets with time-aligned gesture scores.
-Surprisingly, we have been unable to find any literature
-attempting to extract vocal tract gesture scores
-from acoustic information directly,
-nor through a pipeline in which
-articulator positions are decoded,
-and then gesture scores are estimated
-from those articulator positions.
-
 \subsection{Auditory periphery modeling}
 
 Most ASR frontends do an ideal
@@ -858,7 +758,7 @@ power spectral analysis
 with variants of the Fourier transform,
 mimicking the function
 of the human auditory periphery.
-However, as discussed in Section~??? bg,
+However, as discussed in Section~??? psychoacoustics,
 the human ear's frequency decomposition
 is far from ideal.
 Some differences in how the ear
@@ -901,8 +801,7 @@ using simplified mathematical models;
 efficient implementations of these
 models are freely available
 ??? cite Brian hears.
-In the remainder of this thesis,
-we will focus only on phenomenological
+We will focus only on phenomenological
 models of the auditory periphery.
 
 Generally, phenomenological auditory periphery models
@@ -926,7 +825,7 @@ see ???lopez-poveda2005
 and ???lyon2010.pdf.
 The auditory periphery models used
 in this thesis will be discussed
-in further detail in Section~???.
+in further detail in Section~??? methods.
 
 \section{Human speech production}
 
@@ -1061,22 +960,22 @@ in Section~???.
 
 \subsection{Phonetics and phonology}
 
-???brief intro, explain the difference
-between phonetics and phonology
-% http://www.phon.ox.ac.uk/jcoleman/PHONOLOGY1.htm
-???include phonemic vs phonetic transcription
-??? - phonetics: describing the sounds we use in speaking.
-  Relating to the way we produce them and the way they sound.
-  phonology: more abstract parts of sounds; look at restrictions
-  and regularities in a language by studying syllables;
-  suprasegmental parts (i.e., prosody:
-  things that extend over several segments (phonemes)).
-  - phonemic transcription: just the phonemes. Phonetic transcription:
-    includes diacritics and other marks to differentiate allophones.
+% ???brief intro, explain the difference
+% between phonetics and phonology
+% % http://www.phon.ox.ac.uk/jcoleman/PHONOLOGY1.htm
+% ???include phonemic vs phonetic transcription
+% ??? - phonetics: describing the sounds we use in speaking.
+%   Relating to the way we produce them and the way they sound.
+%   phonology: more abstract parts of sounds; look at restrictions
+%   and regularities in a language by studying syllables;
+%   suprasegmental parts (i.e., prosody:
+%   things that extend over several segments (phonemes)).
+%   - phonemic transcription: just the phonemes. Phonetic transcription:
+%     includes diacritics and other marks to differentiate allophones.
 
 Our treatment of phonetics and phonology
 focuses on the hierarchical levels
-in human linguistic expression,
+in human speech,
 paying particular attention to two
 sets of characteristics in each level
 and in each mapping between two levels:
@@ -1144,12 +1043,12 @@ which describes some movement
 of the articulators in the vocal tract
 ??? Browman \& Goldstein.
 Gestures are pre-linguistic,
-in that a vocal tract gesture itself
+in that a vocal tract gesture
 does not necessarily produce
 a linguistically interesting sound;
 a set of possibly overlapping
 vocal tract gesture can produce a phoneme,
-which is linguistically relevant.
+which is smallest linguistically relevant unit.
 There is evidence that children
 learning to say their first words
 often use the correct gestures,
@@ -1161,7 +1060,7 @@ and are leveraged when
 developing language
 ???refBrowmanGoldstein.
 
-Gestures are stereotypical movements
+Gestures are stereotyped movements
 of sets of articulators in the vocal tract.
 Each gesture has its own temporal dynamics;
 that is, a gesture is a function defined
@@ -1215,8 +1114,8 @@ to produce a linguistically
 relevant sound.
 The vertical axis of a gestural score
 is the articulator set,
-as although one articulator
-can produce multiple gestures,
+as although each set
+can be used for multiple gestures,
 it can only produce one gesture
 at a time.
 The horizontal axis of
@@ -1265,9 +1164,9 @@ in Section~???.
 % determine a complete set of
 % vocal tract gestures.
 
-??? In a sense, vocal tract gestures
-can be thought of a subset of all
-motor synergies ???cite
+% ??? In a sense, vocal tract gestures
+% can be thought of a subset of all
+% motor synergies ???cite
 
 \subsubsection{Phonemes}
 
@@ -1332,7 +1231,7 @@ not a purely objective exercise.
 For example, while most dialects
 of English recognize 24 consonant phonemes,
 General American English has been transcribed
-as having 16 vowel phonemes ???citeWikipedia?,
+as having 16 vowel phonemes ???cite,
 while Received Pronunciation English
 has been transcribed as having 25 vowel phonemes
 ???citeWells1982.
@@ -1342,11 +1241,11 @@ moving through the open vocal tract.
 The shape of the vocal tract determines
 the quality of the sound.
 Three factors influence vowel vocal tract shape:
-openness, backness, and roundedness;
-openness refers to the general position
-of the jaw (open or closed) and tongue (low or high),
+openness, backness, and roundedness.
+Openness refers to the general position
+of the jaw (open or closed) and tongue (low or high);
 backness refers to the position of the
-tongue relative to the back of the mouth,
+tongue relative to the back of the mouth;
 and roundedness refers to
 whether the lips are rounded.
 Roundedness can vary independently
@@ -1364,6 +1263,7 @@ Most of the remaining vowel sounds
 can be expressed as being
 a blend of one of these three vowel sounds
 (see ???fig for a visualization).
+
 Pure vowel phonemes (also called monophthongs)
 occur when the glottis phonates
 and the vocal tract stays
@@ -1432,11 +1332,12 @@ the prior or upcoming vowel sound.
 In the word /bat???/ for example,
 the /b???/ and /t???/ sounds
 occur in the context of /a???/.
-???kroger showed that
+???kroger theorizes that
 each consonant sound is composed
 of speech gestures which force some
 articulators to change in a particular way,
-but allow other articulators
+but allow other articulators,
+like those involved in the vocalic sound,
 to change freely.
 
 The vowels and consonants described so far
@@ -1469,7 +1370,7 @@ Syllables are groups of one or more phonemes
 with a well-specified structure.
 They consist of a loud vocalic center,
 with optional quieter consonantal components
-before and after the center
+before and after the center.
 Unlike other levels of organization,
 the phonemes in a syllable
 may not be strictly sequential;
@@ -1492,8 +1393,7 @@ Note that other ways to describe
 syllables exist
 (cf. ???mora, Chinese model),
 but we adopt this method
-as it is the most common
-(???most widely accepted).
+as it is the most common.
 
 ??? syllable structure figure
 
@@ -1509,7 +1409,8 @@ it is easy to distinguish
 changes in pitch and volume
 within and between two syllables,
 but not between two phonemes,
-because they often occur too quickly.
+because they occur quickly
+and can co-occur.
 
 One aspect of the stress of an utterance
 is the weight of a syllable.
@@ -1563,18 +1464,17 @@ for producing utterances,
 its role in recognizing them
 may be limited.
 
-??? Here or somewhere else, summarize
-the ``mental syllabary'' from Levelt and Wheeldon, 1994
+% ??? Here or somewhere else, summarize
+% the ``mental syllabary'' from Levelt and Wheeldon, 1994
 
 \subsubsection{Tone-units}
+
+??? move to discussion
 
 The final level of organization
 that we will examine is the tone-unit.
 The tone-unit allows us to examine
-suprasegmental aspects of speech;
-specifically, we will use tone-units
-to incorporate stress and intonation
-in our model.
+suprasegmental aspects of speech.
 A tone-unit is made up of a serially ordered
 sequence of syllables.\footnote{Many
   phoneticians consider a tone-unit to be
@@ -1586,8 +1486,6 @@ sequence of syllables.\footnote{Many
   In this thesis we focus on speech
   as a means of conveying linguistic information,
   and therefore ignore the concept of feet.}
-In this thesis, we will consider
-an utterance to be a sequence of tone-units.
 
 The structure of a tone-unit is similar
 to a syllable, except its component parts
@@ -1641,14 +1539,6 @@ Additionally, stress is not a binary quantity;
 English is typically thought to contain
 three stress levels
 (primary stress, secondary stress, and unstressed).
-Deciphering why stress occurs
-in some words and utterances
-is complicated;
-in this thesis,
-we will aim to voice stressed
-in utterances, but will not
-determine where stresses should occur
-given an utterance with no stress markers.
 
 Intonation, on the other hand,
 is a more straightforward phenomenon to model.
@@ -1719,16 +1609,6 @@ pitch trajectories also contributes
 to the varying meanings conveyed
 by the pitch trajectory of a tone-unit.
 
-??? Look into and summarize Generative phonology
-
-??? Look into, maybe mention Autosegmental intonation
-(H = high tone, L = low tone, HL = fall, etc.)
-
-??? Note: constraints and rules aren't necessarily all going to
-be taken into account. However, we do want to be sufficiently
-flexible or inflexible such that were we to take into account
-all rules, we would still scale to biological limits.
-
 Finally, one note about
 the absence of ``words'' in our treatment
 of phonetics and phonology.
@@ -1741,16 +1621,12 @@ to speech recognition and synthesis,
 words are more readily recognized
 than sequences of syllables with no meaning.
 Fortunately, the pioneering work
-of ???allen94 which cites an old work???
+of ???allen94 which summarizes ???
 gives a direct relationship between
-the recognition rates of nonsense syllables and words.
-Therefore, since we have not included
-higher-level linguistic effects in this model,
-the recognition results we achieve
-can be considered as the recognition
-of nonsense syllables,
-and adjusted for linguistic context effect
-accordingly (see Section~??? for details).
+the recognition rates of nonsense syllables and words,
+which can be used to adjust
+recognition rates for
+non-linguistic speech.
 
 \subsection{Neurobiology}
 
@@ -1832,7 +1708,7 @@ for reaching forward and one for
 reaching to the left,
 activating both synergies
 equally could effect
-a reach diagonally forward and left.
+a reach diagonally forward-left.
 Many different variations
 on the idea of motor synergies exist,
 and neurobiological support
@@ -1871,6 +1747,7 @@ They also found that the somatotopic organization
 of vSMC varied for each subject,
 but all subjects' vSMCs were organized
 in dorsal-ventral articulator order.
+
 ??? DeWolf integrated neurobiological research
 into a model of the motor hierarchy
 that involves the interaction of
@@ -1917,7 +1794,7 @@ and non-speech vocalizations.
 They (and others like ???ivry and robertson,
 ``The two sides of perception'')
 hypothesize that the mapping from
-from vocal tract gestures articulator movements
+from vocal tract gestures to articulator movements
 is lateralized such that
 the left anterior insula operates
 discretely on a fast phoneme-level timescale,
@@ -1977,7 +1854,7 @@ after puberty, formal instruction
 is less effective,
 and speaking foreign languages
 without an accent is more difficult
-??? ref something from Converging mech...pdf
+??? ref something from Converging mech...pdf.
 This finding suggests that
 parts of our model
 that include learning
@@ -2062,11 +1939,11 @@ is involved in lexical processing
 (i.e., the meanings of incoming sounds),
 and the dorsal stream
 is involved in sensorimotor action mapping.
-In our model, we only include
-the dorsal pathway,
+In this thesis, we develop
+a model of parts of the dorsal pathway,
 but developing an
 interacting ventral pathway
-would be a logical extension of our model.
+would be a logical extension.
 
 Hickok and Poeppel ???cite
 suggest that the dorsal stream
@@ -2140,7 +2017,7 @@ the direct perception of gestures
 influences how we perceive the sound.
 A well-known demonstration of
 this phenomenon is the McGurk effect
-???cite things from 3.nihm...,
+???cite 3.nihm,
 in which the same audio waveform
 in perceived as representing a different syllable
 when accompanied by a video
@@ -2211,7 +2088,7 @@ vocal tract gestures are responsible
 for effecting movements that produce
 those phonemes.
 While they do not make this link directly,
-??? Science-2014-Mesgarani...pdf
+??? Science-2014-Mesgarani.pdf
 showed support for the motor theory of speech recognition
 by showing that in the STG,
 which is typically thought of
@@ -2232,16 +2109,115 @@ the STG represents vocal tract gestures.
 Given that neurobiological evidence can
 support both theories,
 we therefore adopt the view that
-it is likely that
 the dorsal auditory stream
 represents vocal tract gestures explicitly,
 though this may or may not be the case
 in the ventral stream.
 Our model, which purports to replicate
-the function of the dorsal stream only,
+functions of the dorsal stream only,
 will reflect these two theories
-by explicitly representing vocal tract gestures
-in the speech recognition module.
+by explicitly representing vocal tract gestures.
+
+\subsubsection{Automatic speech recognition with production information}
+
+In terms of higher-level biological organization,
+almost all speech recognition systems
+can be mapped most directly
+to the ventral stream of the human speech system
+(see Section~???),
+as they attempt to decode
+lexical information in order to
+transcribe speech to text.
+In this thesis, we aim to model
+the dorsal stream of the human speech system,
+which we hypothesize follows the
+motor theory of speech recognition,
+meaning that it uses vocal tract gestures
+as the basic unit of representation.
+
+Several labs have investigated
+using measurements
+related to speech production
+as part of a speech recognition system
+(see ??? 00.King.pdf for a review).
+The primary advantage of this approach
+is that speech production information
+is not locked to each phoneme,
+so it is not as sensitive to the
+differing acoustic realizations
+of the same phoneme.
+The existence of large datasets
+with continuous acoustic
+and articulator position recordings
+(e.g., ??? x-ray database, ??? mngu0)
+has spurred development of
+systems that use both
+acoustic and articulatory information
+as input to an ASR system.
+??? Zlokarnik (1995) from 00.King.pdf
+used continuous acoustic and articulatory
+information with an HMM-based system
+and reduced word error rates
+by more 60\% (relative).
+??? Eide (2011) from 00.King.pdf
+augmented the feature vector
+in a standard HMM system
+articulatory features and
+reduced word error rates
+by 34\% (relative).
+Similar studies have been done
+with traditional artificial neural networks
+(e.g., ??? Kirchoff)
+and dynamic Bayesian networks
+(e.g., ??? Stephenson 2000, 2004).
+
+Deep neural networks have been used for
+a related task,
+acoustic-articulatory speech inversion.
+Here, articulatory information
+is decoded from acoustic information;
+that is, the input of the network
+is still an acoustic feature vector,
+but the desired output
+is articulator positions.
+??? articulatorinversion.pdf
+obtained a root mean square error
+of 0.95 mm on the MNGU0 dataset,
+which is 0.04 mm better than prior
+efforts using Guassian mixture models
+??? ISO90544.pdf.
+The extracted articulatory information
+could be used by another ASR system
+to lower phone or word error rates.
+
+The aforementioned results
+use continuous articulator positions.
+Some work has also been done
+relating this work to
+vocal tract gestures.
+For example,
+??? 04.542.pdf and 05.54200a1.pdf
+showed that the vocal tract gesture score
+can be estimated
+from the continuous articulator positions,
+which can then be used
+to do word classification with
+over 80\% accuracy on a synthesized dataset.
+??? 01.10.1.1.294 and 01.JASMAN
+showed that a gesture score
+can be estimated from natural speech
+through a landmark-based time alignment procedure;
+however, this model assumed that the
+words in the utterance were known \textit{a priori},
+and applied their technique primarily
+for annotating data sets with time-aligned gesture scores.
+Surprisingly, we have been unable to find any literature
+attempting to extract vocal tract gesture scores
+from acoustic information directly,
+nor through a pipeline in which
+articulator positions are decoded,
+and then gesture scores are estimated
+from those articulator positions.
 
 \subsection{Integrated recognition and production systems}
 
@@ -2271,7 +2247,7 @@ as it relies on a large corpus
 of recorded speech.
 
 The most well known integrated system
-in called DIVA
+is called DIVA
 (Direction Into Velocities of Articulators;
 see Figure~???) ???cite.
 DIVA consists of an articulator synthesizer,
@@ -2403,7 +2379,7 @@ using self-organizing maps
 (???cite Kohonen),
 which cause
 local clusters of neurons
-in the phonetic map become active
+in the phonetic map to become active
 when incoming auditory information
 (in the form of the first three formants)
 is similar to certain patterns
@@ -2424,7 +2400,7 @@ and learned motor sequences
 will scale better than DIVA's approach
 that does not use an intermediate representation.
 
-??? Update Kroger section for Cao and 2015 paper
+% ??? Update Kroger section for Cao and 2015 paper
 
 In contrast to these two models,
 the model that we present

@@ -2,7 +2,7 @@
 
 In this chapter, we review
 existing complete or partial solutions
-to the ???three/four problems
+to the three problems
 solved by the models
 presented in the subsequent chapters.
 
@@ -149,16 +149,16 @@ to replace the idealized spectral analysis step
 in the feature extraction pipeline.
 
 ??? tchorz1999.pdf
-??? DimitrioMar...pdf,
+??? DimitrioMar.pdf,
 ??? 10.1.1.298.4746.pdf,
 and ??? 10.1.1.151.1803.pdf
 have separately proposed variants of MFCCs
 that use Gammatone filters
 to do the spectral analysis step in an ASR system.
-??? tchorz1999.pdf
-??? Dimitrio ...
-??? 10.1.1.298.4746.pdf ...
-and ??? 10.1.1.151.1803.pdf .... ? brief explanation of each.
+% ??? tchorz1999.pdf
+% ??? Dimitri ...
+% ??? 10.1.1.298.4746.pdf ...
+% and ??? 10.1.1.151.1803.pdf .... ? brief explanation of each.
 All three of these studies
 found that using Gammatone filters
 lowered word or phone error rates
@@ -169,12 +169,12 @@ see ??? ICSIhearingis12.pdf for a review.
 
 While all of these systems
 have been applied successfully
-for in ASR,
+for noisy ASR tasks,
 they are not suitable
 for inclusion in Sermo in their current form.
 None of the methods currently available,
 to our knowledge, produce spiking behavior
-that could therefore
+that could
 be easily integrated with the rest of Sermo.
 Additionally, these networks compute
 functions of the filter output that
@@ -191,7 +191,7 @@ but not trivial.
 
 On the other hand,
 silicon cochlea models face the opposite problem.
-??? more, summarize some papers
+% ??? more, summarize some papers
 These systems produce spikes
 that emulate the spikes
 traveling down the auditory nerve,
@@ -419,10 +419,10 @@ the OSE model does not exhibit
 the primacy and recency effects
 that are seen in humans
 unless the model
-is implemented in spiking neurons;
-rate-based models or direct simulation
-of the model's differential equations
-??? ask Xuan what happens.
+is implemented in spiking neurons.
+% rate-based models or direct simulation
+% of the model's differential equations
+% ??? ask Xuan what happens.
 
 The ordinal serial encoding model,
 then, is well suited for representing
@@ -470,7 +470,7 @@ can be considered separately from motor trajectories,
 while trajectories can be implemented
 as a function of the task state.
 In the initial publication of task dynamics
-(??? SR076...pdf),
+(??? SR076.pdf),
 two types of task dynamics are presented.
 Point attractor dynamics,
 modeled by critically damped mass-spring systems,
@@ -488,7 +488,7 @@ joint coordinates,
 and finally articulator positions,
 called the task network.
 In a subsequent publication,
-??? SR099...pdf
+??? SR099.pdf
 applied task dynamics to speech production
 using a simplified mapping,
 from task space
@@ -546,7 +546,7 @@ and using gestural coupling rules
 defined by linguists
 to create a system of coupled oscillators
 whose activities represent a gestural score
-??? goldsteinetalbeijing, TADA pub.
+??? cite goldsteinetalbeijing, TADA pub.
 
 In all, the task dynamic approach
 to inter-gestural and inter-articulator timing
@@ -568,7 +568,7 @@ The final model informing
 the Sermo syllable sequencing
 and production model presented
 in this thesis is the
-Recurrent Error-driveen Adaptive Control Hierarchy (REACH)
+Recurrent Error-driven Adaptive Control Hierarchy (REACH)
 model ??? cite dewolf.
 In particular, we use REACH's
 neural implementation
@@ -583,14 +583,14 @@ motor space using operational space control,
 and unexpected changes in system dynamics
 are accounted for online
 using nonlinear adaptive control
-??? cite something for that.
+??? cite.
 The model is able to control
 a nonlinear three-link arm model
 in handwriting and reaching tasks,
 even when an unknown force field
 is applied to the end effector.
 
-DMPs are a method of generating motor trajectories;
+DMPs are a general method for generating motor trajectories;
 they will be discussed in more detail
 in Section~???.
 DMPs are similar to Task Dynamics in many respects.
@@ -688,7 +688,7 @@ is ??? p3041mitra.pdf.
 decode continuous production information
 from auditory information
 using MFCCs and Gammatone filter-based
-cepstral features (??? normalized...pdf),
+cepstral features (??? normalized.pdf),
 and were able to use a combined feature vector
 consisting of MFCCs and production information
 to lower word error rates
@@ -703,7 +703,7 @@ in classifying sounds based on
 production information alone
 could be due to several factors.
 For one, the details of the decoding mechanism
-in ??? p3041...pdf are not clear.
+in ??? p3041.pdf are not clear.
 The authors note that they use a
 ``deep neural network''
 with as many as six hidden layers;
@@ -730,11 +730,11 @@ and automatic video analysis.
 
 \subsection{Trajectory classification}
 
-??? list some desirable qualities of a traj classifier
-from later on; e.g.,
-speed invariance (works regardless of how fast
-the traj is playing out),
-online classification, ...
+% ??? list some desirable qualities of a traj classifier
+% from later on; e.g.,
+% speed invariance (works regardless of how fast
+% the traj is playing out),
+% online classification, ...
 
 Unsurprisingly, many of the existing
 solutions for trajectory classification
@@ -742,8 +742,8 @@ are based on generative statistical models,
 in particular Hidden Markov Models
 as has been dominant in speech recognition
 (see ??? paper1.pdf, TIP-traj...pdf
-and ??? survey...handrecog.pdf,
-Mitra - gesture...pdf
+and ??? survey.handrecog.pdf,
+Mitra - gesture.pdf
 and RR-7212.pdf for reviews).
 Given the failure of the statistical approach
 in ??? p3041,
@@ -757,7 +757,7 @@ that provide inspiration
 for the trajectory classification model
 described in Section~???.
 
-??? kilibozgud...pdf proposed
+??? kilibozgud.pdf proposed
 a gesture recognition system
 for 2D trajectories
 using a finite state machine approach.
@@ -838,13 +838,13 @@ for use in Sermo.
 ??? figure 1 from documentocompleto.pdf
 
 Finally,
-??? caramiaux...pdf
+??? caramiaux.pdf
 presented an algorithm called the
 Gesture Variation Follower (GFV),
 based on an online HMM-based
 trajectory tracking technique
 called Gesture Following (GF)
-??? cite 02bfe50e...pdf,
+??? cite 02bfe50e.pdf,
 10.1.1.401.4611.pdf.
 The goal of the algorithm is to match
 an input gesture sequence
@@ -930,7 +930,7 @@ with 10 participants.
 While GVF is one of the most promising
 algorithms for doing trajectory recognition
 in Sermo,
-it has two main weaknesses in its current formulation.
+it has two main limitations in its current formulation.
 First, while the classifier can be used online,
 it is formulated in discrete time;
 this weakness should be possible to overcome,
@@ -947,7 +947,7 @@ distribution over the system state,
 which is sampled
 (sampling has been shown to be
 possible with spiking neurons;
-see ??? plotbuesing...pdf).
+see ??? plotbuesing.pdf).
 However, when the importance weights
 of a sufficient number of particles
 is below a particular threshold,
@@ -959,7 +959,7 @@ a significant reorganization
 of the neurons implementing
 the sampling procedure,
 which we believe
-would not be chosen if
+would not have evolved if
 procedures that do not require
 reorganization exist.
 

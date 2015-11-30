@@ -15,8 +15,8 @@ that we believe can be implemented
 in biologically plausible spiking neural networks.
 
 The model, dubbed Sermo
-(\textul{S}peech \textul{e}xecution and \textul{r}ecognition
-\textul{m}odel \textul{o}rganism),
+(\underline{S}peech \underline{e}xecution and \underline{r}ecognition
+\underline{m}odel \underline{o}rganism),
 is a synthesis of the background material
 summarized in the previous chapter.
 The goal of Sermo
@@ -199,7 +199,7 @@ as part of the model.
 
 \subsection{Auditory feature extraction}
 
-??? Add input / output box, similar to Implementation probbox?
+% ??? Add input / output box, similar to Implementation probbox?
 
 The auditory feature extraction system
 preprocesses audio waveforms
@@ -382,7 +382,7 @@ went into the application of HMMs
 to speech, primarily because of
 its temporal nature
 (see e.g., ??? Rabiner tutorial,
-some other cite).
+other).
 One such improvement for HMM-based ASR systems
 is to include the first and second temporal derivatives
 in the state representation.
@@ -578,7 +578,7 @@ we need neural resources not only for
 the basic unit, but in the worst case,
 also for all possible
 interactions of those basic units;
-i.e., we would need $50^3n$ or $125,000n$ resources.
+i.e., we would need $50^3n$ or 125,000$n$ resources.
 On the other hand, if we chose
 words as the basic unit of representation,
 we would not have to worry about
@@ -587,15 +587,15 @@ but the number of words in a language
 is much larger than the number of syllables
 in a language.
 Using estimates for English
-from  ??? http://semarch.linguistics.fas.nyu.edu/barker/Syllables/index.txt
-and ??? http://www.languagemonitor.com/number-of-words/number-of-words-in-the-english-language-1008879/,
+from ??? \url{http://semarch.linguistics.fas.nyu.edu/barker/Syllables/index.txt}
+and ??? \url{http://www.languagemonitor.com/number-of-words/number-of-words-in-the-English-language-1008879/},
 word representations would use approximately
-$1,025,109.8n$ resources,
-compared to just $15,831n$ resources for syllables.
+1,025,109.8$n$ resources,
+compared to just 15,831$n$ resources for syllables.
 Syllable representations are clearly the most tractable
 given these assumptions.
-??? reminder: make sure we use this to argue
-that this scales in the results section.
+% ??? reminder: make sure we use this to argue
+% that this scales in the results section.
 
 So far, we have not been explicit
 about our representation of production information.
@@ -939,12 +939,12 @@ a disparate set of vocal tract gestures.
 The researchers that first proposed
 the task dynamics framework,
 and the ??? CASY synthesizer
-use a set of ??? vocal tract gestures
-??? more ??? cite.
+use a particular set of ??? vocal tract gestures..
+% ??? more ??? cite.
 ??? Kr\"{o}ger and Birkholz,
 on the other hand,
 use ??? gestures in the
-??? me and bernd synthesizer,
+??? our synthesizer,
 and 49 gestures in the VocalTractLab
 synthesizer ???cite.
 If a vocal tract gesture representation
@@ -973,7 +973,7 @@ in compensating for vocal tract perturbations.
 When our vocal tracts are modified in some way,
 perhaps by illness or injury,
 or by a deliberate manipulation
-as in ??? micheal jordan's thing,
+as in ??? prism adaptation,
 we can adapt our speech
 such that changes in how we voice a phoneme
 transfer to other syllables containing that phoneme.
@@ -1107,7 +1107,7 @@ We will show a proof of concept
 that Sermo supports such comparisons
 in Section~??? in which we compare
 ??? auditory periphery models
-on a word classification task.
+on a phoneme classification task.
 
 The strongest evaluation
 of the sensorimotor integration
@@ -1146,7 +1146,7 @@ measure how much the generated trajectory
 deviates from the target trajectory
 (comparing, for example,
 the squared jerk of the trajectories;
-see ??? http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3470860/).
+see ??? \url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3470860/}).
 However, a stronger evaluation
 is to use the generated trajectories
 to drive the speech motor control system,
@@ -1299,10 +1299,10 @@ Thus, in terms of gross structure, then,
 the Kr\"{o}ger model covers a larger subset
 of Sermo compared to DIVA.
 
-The Kr\"{o} model also uses
-a more sophisticated neural network model,
-the growing self-organized map (GSOM).
-??? summarize from Cao.
+% The Kr\"{o}ger model also uses
+% a more sophisticated neural network model,
+% the growing self-organized map (GSOM).
+% ??? summarize from Cao.
 
 In terms of whether the operations
 of the model can be realized in spiking neurons,
@@ -1325,12 +1325,12 @@ are also represented with one neuron;
 this representation scheme is unrealistic
 and  does not scale to adult vocabularies
 (??? cite Crawford).
-??? transition
-there is still no guarantee
-that a spiking neural approximation
-of GSOMs will be accurate enough
-to reproduce the results
-of the model.
+% ??? transition
+% there is still no guarantee
+% that a spiking neural approximation
+% of GSOMs will be accurate enough
+% to reproduce the results
+% of the model.
 
 \section{Subsystems modeled in this thesis}
 
@@ -1354,7 +1354,7 @@ The resulting representations are called
 neural cepstral coefficieints,
 and we will compare their ability
 to classify speech with
-existing approaches in ASR.
+existing approaches used in ASR.
 
 The second model implements
 a syllable sequencing model
@@ -1402,7 +1402,7 @@ The current presentation of Sermo
 was developed independently,
 primarily informed by the literature
 summarized in Chapter~???.
-We hope that upon first presentation,
+We hope that upon presentation,
 feedback from researchers will
 fill in missing pieces of the model,
 and clarify existing pieces,
