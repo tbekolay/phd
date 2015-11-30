@@ -8,6 +8,7 @@ from .experiments import *  # Load experiment tasks
 
 DOIT_CONFIG = {
     'default_tasks': [],
+    'verbosity': 2,
 }
 
 
