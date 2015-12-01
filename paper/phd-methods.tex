@@ -1,54 +1,140 @@
 \chapter{Methods}
 
-% Natural speech is not a series of phonemes
-% recited as clearly as possible
-% to maximize intelligibility.
-% Natural speech includes variation in
-% pitch and volume in order to transfer
-% non-linguistic information between speakers.
-% Current automated speech systems
-% focus solely on the linguistic content
-% of speech;
-% by deciphering and reproducing both
-% linguistic and non-linguistic content,
-% we aim to produce more natural speech
-% recognition and production
-% than the existing state of the art.
-
-% ??? make a little checklist here of what our end goal
-% is to motivate the four sections we're looking at
-
-\section{Distributed representations in neural networks}
-
-% Issue: localist ANN representations. Solution: NEF
-
-% NEF stuff; emphasize that unlike other models,
-% here representations are distributed,
-% which makes transformation harder,
-% so we have that.
-% Then also as a bonus we get dynamics.
-
-\section{Symbol-like processing with real-valued vectors}
-
-% Issue: there are a finite number of syllables
-% (especially frequent syllables) but there are an infinite
-% number of syllable strings (e.g., words, sentences).
-% Need some way to represent temporal information
-% with discrete symbols.
-% Solution: SPA
-
-% The previous section gives us a method to represent
-% and manipulate ANN activations (i.e., numerical vectors)
-% with distributed, possibly spiking, neurons.
-
-% ??? make links to knowledge representation in CS
-
-% ??? give general background for the math in methods?
-
-\section{Nengo: software for the NEF \& SPA}
+The three models that we implement
+in this thesis employ methods
+for auditory processing
+and trajectory generation
+online and in continuous time,
+meeting Sermo's criteria
+outlined in Section~???.
+Additionally,
+we construct spiking neuron models
+that implement or interact with those methods
+using the Neural Engineering Framework
+and Semantic Pointer Architecture.
 
 \section{Auditory periphery models}
 
-\subsection{Integrating Brian in Nengo}
+\subsection{Brian hears software}
 
 \section{Dynamic movement primitives}
+
+Dynamic movement primitives (DMPs)
+are a method for planning and controlling trajectories
+that requires little parameter tuning
+and is stable for trajectories
+with many degrees of freedom.
+DMPs were originally proposed by ??? Schaal,
+reformulated and refined by ??? ijspeert,
+and simplified for use in spiking neural networks
+by ??? dewolf.
+Here, we summarize the essential aspects
+of the DMP framework as described by ??? dewolf,
+but invite interested readers to
+the previously cited works
+and ??? some more DMP cites
+for further details and extensions.
+
+DMPs use dynamical systems
+with specified, stable behavior
+to generate trajectories
+with more complicated behavior.
+The main insight in the DMP framework
+is to define two separate systems,
+a point attractor,
+and a ``canonical system.''
+The point attractor pushes
+the system state to
+a goal, $g$, with dynamics
+\begin{equation}
+  \label{dmp-pointattractor}
+  \tau\ddot{y} = \alpha_y(\beta_y(g - y) - \dot{y}) + f(x, g),
+\end{equation}
+where $y$ is the system state,
+$\dot{y}$ is the system velocity,
+and $\alpha_y$ and $\beta_y$ are gain terms.
+$\tau$ is a scaling term
+that enables to system to operate
+at different timescales,
+and also appears in the definition
+of the canonical system.
+
+$f(x, g)$ is a function
+of the canonical system
+called the ``forcing function.''
+In the discrete, one-time action case,
+the canonical system
+has state $x$ that evolves
+with dynamics
+\begin{equation}
+  \label{dmp-discrete}
+  \tau\dot{x} =
+  \begin{cases}
+    1 &\text{if } x < 1 \\
+    0 &\text{if } x \ge 1,
+  \end{cases}
+\end{equation}
+Typically the initial value of $x$
+is set to 0,
+so the discrete forcing function
+is defined over the range $[0, 1]$.
+In the rhythmic case,
+the state evolves with
+2D oscillator dynamics
+\begin{align}
+  \tau \dot{x_1} &= -2 \pi x_2 \nonumber \\
+  \tau \dot{x_2} &= 2 \pi x_1.
+  \label{dmp-rhythmic}
+\end{align}
+
+??? Figure 3.1 from dewolf thesis
+
+The forcing function $f(x, g)$ is
+the weighted sum
+over some basis functions
+$\psi_i$
+(see Figure~???).
+In the discrete case,
+the basis functions are evaluated
+for the system state $x$ directly.
+In the rhythmic case,
+the basis functions are evaluated
+for $\frac{1}{2\pi}\tan^{-1}\left(\frac{x_2}{x_1}\right) + \frac{1}{2}$,
+which maps the 2D oscillator state
+to the range $[0, 1]$,
+allowing the forcing function to be defined
+as a function of $x$ over the range $[0, 1]$
+in both cases.
+The goal $g$ is used
+to scale the system state $x$ depending on
+the initial distance to the goal.
+The final equation is
+\begin{equation}
+  \label{dmp-forcing-func}
+  f(x, g) = \frac{\sum_{i=1}^N \psi_i w_i}{\sum_{i=1}^N \psi_i} \, x(g - y_0),
+\end{equation}
+where $w_i$ is the weight associated with
+basis function $\psi_i$ and $y_0$
+is the initial position of
+the system state.
+
+Typically, Gaussian functions
+tiling the range of $x$ with some overlap
+are used as the basis functions
+for the forcing function
+(as are used in Figure~???).
+??? dewolf showed that
+the response curves of spiking neurons
+could be used as the
+basis functions instead
+(as is done for general function approximation
+in the Neural Engineering Framework;
+see Section~???).
+
+\section{Neural Engineering Framework (NEF)}
+
+\section{Semantic Pointer Architecture (SPA)}
+
+\section{Nengo software}
+
+\subsection{Integrating Brian in Nengo}

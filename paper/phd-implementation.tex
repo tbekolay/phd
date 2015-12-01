@@ -1267,7 +1267,7 @@ and $\Vert\cdot\Vert$ is the L2-norm.
 Recall that the intrinsic dynamics
 of a discrete DMP are
 \begin{equation*}
-  \dot{x} = c,
+  \dot{x} = \alpha,
 \end{equation*}
 and the intrinsic dynamics
 of a rhythmic DMP are
@@ -1287,7 +1287,7 @@ has dynamics
   \dot{\hat{x}} =
   \begin{cases}
     0 & \text{if } s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) < th_s \\
-    c & \text{if } s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) \ge th_s,
+    \alpha & \text{if } s(\hat{\mathbf{y}}(t), \mathbf{O}(t)) \ge th_s,
   \end{cases}
 \end{equation}
 and the rhythmic case of iDMPs
@@ -1346,11 +1346,11 @@ to the upper range of the actual system state
 is chosen as the classified syllable.
 
 It is important to note that
-the $c$ and $f$ parameters
+the $\alpha$ and $f$ parameters
 used in the iDMP cannot be chosen
 in the same way as in DMPs.
 In the DMP,
-the $c$ and $f$ parameters
+the $\alpha$ and $f$ parameters
 control how quickly
 the DMP is moving through
 the state space,
@@ -1358,26 +1358,26 @@ and therefore controls
 the temporal scale
 of the trajectory.
 In the iDMP, however,
-$c$ and $f$ stay fixed,
+$\alpha$ and $f$ stay fixed,
 and instead represent
 the maximum speed that
 we expect the iDMP to
 move through the state space,
 or perhaps slightly higher than
 the maximum speed.
-If $c$ and $f$ are too low
+If $\alpha$ and $f$ are too low
 and the estimated state
 lags behind the actual state,
 then the predictions will
 diverge from the observations,
 leading to poor tracking
 (false negatives).
-If $c$ and $f$ are too high,
+If $\alpha$ and $f$ are too high,
 then the iDMP may advance
 too far in the state space,
 making an improper classification
 (false positives).
-Choosing a good $c$ or $f$
+Choosing a good $\alpha$ or $f$
 is critical to the success of an iDMP.
 
 While we believe that the iDMP
