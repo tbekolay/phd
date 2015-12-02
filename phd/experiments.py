@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 import subprocess
 import sys
 import warnings
@@ -29,6 +30,7 @@ def log(msg):
 class ExperimentResult(object):
 
     saved = []
+    to_numeric = []
     subdir = None
 
     def __init__(self, **kwargs):
@@ -75,9 +77,11 @@ class ExperimentTask(object):
         for seed in range(self.n_iters):
             for experiment in self:
                 experiment.seed = seed
-                yield {'name': self.fullname(experiment, seed),
-                       'actions': [experiment.run],
-                       'targets': [experiment.cache_file]}
+                name = self.fullname(experiment, seed)
+                yield {'name': name,
+                       'actions': [(experiment.run, [name])],
+                       'file_dep': [__file__, sermo.__file__],
+                       'targets': [experiment.cache_file(name)]}
 
     def __iter__(self):
         """Should yield experiment instances."""
@@ -207,7 +211,7 @@ class AuditoryFeaturesExperiment(object):
         elif self.words is not None:
             return self.timit.word_samples(self.words, corpus=corpus)
 
-    def _get_feature(self, feature, audio, n_frames=None):
+    def _get_feature(self, feature, audio, result=None, n_frames=None):
         labels = sorted(list(audio))
         with Timer() as t:
             if feature == 'mfcc':
@@ -217,6 +221,8 @@ class AuditoryFeaturesExperiment(object):
             else:
                 raise ValueError("Possible features: 'mfcc', 'ncc'")
         log("%ss generated in %.3f seconds" % (feature.upper(), t.duration))
+        if result is not None:
+            setattr(result, "%s_time" % feature, t.duration)
 
         if n_frames is None:
             n_frames = max(max(xx.shape[0] for xx in x[l]) for l in audio)
@@ -236,21 +242,25 @@ class AuditoryFeaturesExperiment(object):
                 svm.fit(x, y)
             log("SVM fitting for %ss done in %.3f seconds"
                 % (feature.upper(), t.duration))
-            setattr(result, "%s_time" % feature, t.duration)
+            setattr(result, "%s_fit_time" % feature, t.duration)
             _, _, acc = test_svm(svm, x, y, "Training")
-            setattr(result, "%s_train_acc", acc)
+            setattr(result, "%s_train_acc" % feature, acc)
             return svm
 
         audio = self._get_audio(corpus="train")
 
         # NB! Do MFCC first to get n_frames for NCC.
-        x_mfcc = self._get_feature('mfcc', audio)
+        x_mfcc = self._get_feature('mfcc', audio, result)
         n_frames = int(x_mfcc.shape[1] // self.model.dimensions)
         y = self._get_labels(audio)
         mfcc_svm = fit_svm(x_mfcc, y, 'mfcc')
 
-        x_ncc = self._get_feature('ncc', audio, n_frames=n_frames)
+        x_ncc = self._get_feature('ncc', audio, result, n_frames=n_frames)
         ncc_svm = fit_svm(x_ncc, y, 'ncc')
+
+        # Store all in result
+        result.y = y
+
         return mfcc_svm, ncc_svm
 
     def test(self, result, svm, feature):
@@ -259,43 +269,51 @@ class AuditoryFeaturesExperiment(object):
         x = self._get_feature(feature, audio, n_frames=n_frames)
         y = self._get_labels(audio)
         pred, y, acc = test_svm(svm, x, y, "Testing")
+        setattr(result, "%s_test_acc" % feature, acc)
         setattr(result, "%s_pred" % feature, pred)
 
-    @property
-    def cache_key(self):
-        return cache.generic_key(self)
+    def cache_file(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        return cache.cache_file(key, ext='npz', subdir='ncc')
 
-    @property
-    def cache_file(self):
-        return cache.cache_file(self.cache_key, ext='npz', subdir='ncc')
-
-    def run(self):
-        if cache.cache_file_exists(self.cache_key, ext='npz', subdir='ncc'):
-            log("%s.npz in the cache. Loading." % self.cache_key)
-            result = AuditoryFeaturesResult.load(self.cache_key)
+    def run(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        if cache.cache_file_exists(key, ext='npz', subdir='ncc'):
+            log("%s.npz in the cache. Loading." % key)
+            result = AuditoryFeaturesResult.load(key)
         else:
             result = AuditoryFeaturesResult()
-            log("%s.npz not in the cache. Running." % self.cache_key)
+            log("%s.npz not in the cache. Running." % key)
             log("==== Training ====")
             mfcc_svm, ncc_svm = self.train(result)
             log("==== Testing ====")
             self.test(result, mfcc_svm, 'mfcc')
             self.test(result, ncc_svm, 'ncc')
-            result.save(self.cache_key)
+            result.save(key)
             log("Experiment run saved to the cache.")
-        return True
 
 
 class AuditoryFeaturesResult(ExperimentResult):
 
-    saved = ['fit_time',
-             'mfcc_time',
-             'ncc_time',
+    saved = ['mfcc_time',
+             'mfcc_fit_time',
              'mfcc_train_acc',
-             'ncc_train_acc',
+             'mfcc_test_acc',
              'mfcc_pred',
+             'ncc_time',
+             'ncc_fit_time',
+             'ncc_train_acc',
+             'ncc_test_acc',
              'ncc_pred',
              'y']
+    to_numeric = ['mfcc_time',
+                  'mfcc_fit_time',
+                  'mfcc_train_acc',
+                  'mfcc_test_acc',
+                  'ncc_time',
+                  'ncc_fit_time',
+                  'ncc_train_acc',
+                  'ncc_test_acc']
     subdir = "ncc"
 
     @property
@@ -309,21 +327,20 @@ class AuditoryFeaturesResult(ExperimentResult):
 
 class AFNNeuronsTask(ExperimentTask):
 
-    params = ['n_neurons', 'phones']
+    params = ['n_neurons']
 
     def __iter__(self):
         for n_neurons in self.n_neurons:
             model = sermo.AuditoryFeatures()
             model.periphery.neurons_per_freq = n_neurons
-            expt = AuditoryFeaturesExperiment(model, phones=self.phones)
+            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
             expt.timit.filefilt.region = 8
             yield expt
 
     def name(self, experiment):
         return "periphery:%d" % experiment.model.periphery.neurons_per_freq
 
-task_af_n_neurons = lambda: AFNNeuronsTask(
-    n_neurons=[2, 3, 5, 10, 20, 40], phones=TIMIT.phones)()
+task_af_n_neurons = lambda: AFNNeuronsTask(n_neurons=[2, 3, 5, 10, 20, 40])()
 
 
 class AFPhonesTask(ExperimentTask):
@@ -354,7 +371,7 @@ task_af_phones = lambda: AFPhonesTask(
 
 class AFPostprocessingTask(ExperimentTask):
 
-    params = ['n_derivatives', 'zscores', 'phones']
+    params = ['n_derivatives', 'zscores']
 
     def __iter__(self):
         for n_derivatives in self.n_derivatives:
@@ -363,7 +380,7 @@ class AFPostprocessingTask(ExperimentTask):
                 for _ in range(n_derivatives):
                     model.add_derivative()
                 expt = AuditoryFeaturesExperiment(
-                    model, phones=self.phones, zscore=zscore)
+                    model, phones=TIMIT.phones, zscore=zscore)
                 expt.timit.filefilt.region = 8
                 yield expt
 
@@ -373,12 +390,12 @@ class AFPostprocessingTask(ExperimentTask):
 
 
 task_af_postprocessing = lambda: AFPostprocessingTask(
-    n_derivatives=[1, 2], zscores=[False, True], phones=TIMIT.phones)()
+    n_derivatives=[1, 2], zscores=[False, True])()
 
 
 class AFPeripheryTask(ExperimentTask):
 
-    params = ['auditory_filters', 'adaptive_neurons', 'phones']
+    params = ['auditory_filters', 'adaptive_neurons']
 
     def __iter__(self):
         for auditory_filter in self.auditory_filters:
@@ -386,7 +403,7 @@ class AFPeripheryTask(ExperimentTask):
                 model = sermo.AuditoryFeatures()
                 model.periphery.auditory_filter = auditory_filter
                 model.periphery.adaptive_neurons = adaptive_neurons
-                expt = AuditoryFeaturesExperiment(model, phones=self.phones)
+                expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
                 expt.timit.filefilt.region = 8
                 yield expt
 
@@ -395,34 +412,32 @@ class AFPeripheryTask(ExperimentTask):
                                    experiment.model.periphery.adaptive_neurons)
 
 task_af_periphery = lambda: AFPeripheryTask(
-    auditory_filters=[# 'gammatone',  # alredy done
+    auditory_filters=['gammatone',
                       'approximate_gammatone',
                       'log_gammachirp',
                       'linear_gammachirp',
                       'tan_carney',
                       'dual_resonance',
                       'compressive_gammachirp'],
-    adaptive_neurons=[False, True],
-    phones=TIMIT.phones)()
+    adaptive_neurons=[False, True])()
 
 
 class AFTimeWindowTask(ExperimentTask):
 
-    params = ['dts', 'phones']
+    params = ['dts']
 
     def __iter__(self):
         for dt in self.dts:
             model = sermo.AuditoryFeatures()
             model.mfcc.dt = dt
-            expt = AuditoryFeaturesExperiment(model, phones=self.phones)
+            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
             expt.timit.filefilt.region = 8
             yield expt
 
     def name(self, experiment):
         return "dt=%f" % experiment.model.mfcc.dt
 
-task_af_timewindow = lambda: AFTimeWindowTask(
-    dts=[0.001, 0.005, 0.02], phones=TIMIT.phones)()
+task_af_timewindow = lambda: AFTimeWindowTask(dts=[0.001, 0.005, 0.02])()
 
 
 # ############################
