@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import pandas as pd
 
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -74,3 +75,26 @@ def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
     sns.despine()
     plt.colorbar()
     plt.tight_layout()
+
+
+def compare(data, columns, x_keys, x_label, y_label,
+            group_by=None, plot_f=sns.violinplot):
+    if group_by is not None:
+        # Get the requested columns, and the one we're grouping by
+        data = pd.concat([data[[c, group_by]] for c in columns],
+                         keys=x_keys, names=[x_label])
+        # Merge all of the columns into one
+        data[y_label] = np.nan
+        for c in columns:
+            data[y_label].fillna(data[c], inplace=True)
+            del data[c]
+    else:
+        # Get the requested columns (auto-merged)
+        data = pd.concat([data[c] for c in columns],
+                         keys=x_keys, names=[x_label]).to_frame()
+        data.columns = [y_label]
+    # Make the index (`x_label`) into a column
+    data.reset_index(level=0, inplace=True)
+    # Go Seaborn!
+    plot_f(x=x_label, y=y_label, hue=group_by, data=data)
+    sns.despine()

@@ -14,21 +14,22 @@ def load_results(result_cls, keys):
     ffilter = re.compile(ffilter)
     cdir = (cache.cache_dir if result_cls.subdir is None
             else os.path.join(cache.cache_dir, result_cls.subdir))
-    data = defaultdict(list)
+    data = []
 
     for fname in os.listdir(cdir):
         match = ffilter.match(fname)
         if match is not None:
-            res = result_cls.load(fname[:-4])
-            data[match.groups()].append(res)
-    return data
+            res = result_cls.load(fname[:-4]).__dict__
+            for i, key in enumerate(keys):
+                res[key] = match.group(i+1)
+            data.append(res)
+    if len(data) == 0:
+        raise ValueError("No files matched those keys. Typo?")
+    df = pd.DataFrame(data)
+    for key in result_cls.to_float:
+        df[key] = df[key].apply(float)
+    return df
 
-
-def results2dataframe(results, keys):
-    # First, get all the result dictionaries
-    rdicts = []
-    for group in results:
-        pass
 
 
 

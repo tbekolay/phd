@@ -30,7 +30,7 @@ def log(msg):
 class ExperimentResult(object):
 
     saved = []
-    to_numeric = []
+    to_float = []
     subdir = None
 
     def __init__(self, **kwargs):
@@ -57,7 +57,7 @@ class ExperimentTask(object):
 
     params = []
 
-    def __init__(self, n_iters=5, **kwargs):
+    def __init__(self, n_iters=3, **kwargs):
         self.n_iters = n_iters
 
         for key in self.params:
@@ -196,7 +196,7 @@ def test_svm(svm, x, y, data="Testing"):
 
 class AuditoryFeaturesExperiment(object):
     def __init__(self, model, phones=None, words=None,
-                 zscore=False, seed=None):
+                 zscore=None, seed=None):
         self.model = model
         assert phones is None or words is None, "Can only set one, not both"
         self.phones = phones
@@ -215,9 +215,13 @@ class AuditoryFeaturesExperiment(object):
         labels = sorted(list(audio))
         with Timer() as t:
             if feature == 'mfcc':
-                x = mfccs(self.model, audio, self.zscore)
+                # Default to zscoring for MFCCs
+                zscore = True if self.zscore is None else self.zscore
+                x = mfccs(self.model, audio, zscore)
             elif feature == 'ncc':
-                x = nccs(self.model, audio, self.zscore, self.seed)
+                # Default to not zscoring for NCCs
+                zscore = False if self.zscore is None else self.zscore
+                x = nccs(self.model, audio, zscore, self.seed)
             else:
                 raise ValueError("Possible features: 'mfcc', 'ncc'")
         log("%ss generated in %.3f seconds" % (feature.upper(), t.duration))
@@ -306,14 +310,14 @@ class AuditoryFeaturesResult(ExperimentResult):
              'ncc_test_acc',
              'ncc_pred',
              'y']
-    to_numeric = ['mfcc_time',
-                  'mfcc_fit_time',
-                  'mfcc_train_acc',
-                  'mfcc_test_acc',
-                  'ncc_time',
-                  'ncc_fit_time',
-                  'ncc_train_acc',
-                  'ncc_test_acc']
+    to_float = ['mfcc_time',
+                'mfcc_fit_time',
+                'mfcc_train_acc',
+                'mfcc_test_acc',
+                'ncc_time',
+                'ncc_fit_time',
+                'ncc_train_acc',
+                'ncc_test_acc']
     subdir = "ncc"
 
     @property
@@ -325,22 +329,102 @@ class AuditoryFeaturesResult(ExperimentResult):
         return np.mean(self.ncc_pred == self.y)
 
 
-class AFNNeuronsTask(ExperimentTask):
+def phone_str(experiment):
+    if experiment.phones is TIMIT.consonants:
+        s = "consonants"
+    elif experiment.phones is TIMIT.vowels:
+        s = "vowels"
+    elif experiment.phones is TIMIT.phones:
+        s = "all"
+    else:
+        s = repr(experiment.phones)
+    return "phones:%s" % s
 
-    params = ['n_neurons']
+
+class AFZscoreTask(ExperimentTask):
+
+    params = ['zscore', 'phones']
+
+    def __iter__(self):
+        for zscore in self.zscore:
+            for phones in self.phones:
+                model = sermo.AuditoryFeatures()
+                expt = AuditoryFeaturesExperiment(
+                    model, phones=phones, zscore=zscore)
+                expt.timit.filefilt.region = 8
+                yield expt
+
+    def name(self, experiment):
+        return "zscore:%s,%s" % (
+            experiment.zscore, phone_str(experiment))
+
+task_af_zscore = lambda: AFZscoreTask(
+    zscore=[False, True], phones=[TIMIT.consonants, TIMIT.vowels])()
+
+
+class AFDerivativesTask(ExperimentTask):
+
+    params = ['n_derivatives', 'phones']
+
+    def __iter__(self):
+        for n_derivatives in self.n_derivatives:
+            for phones in self.phones:
+                model = sermo.AuditoryFeatures()
+                for _ in range(n_derivatives):
+                    model.add_derivative()
+                expt = AuditoryFeaturesExperiment(model, phones=phones)
+                expt.timit.filefilt.region = 8
+                yield expt
+
+    def name(self, experiment):
+        return "derivatives:%d,%s" % (
+            experiment.model.mfcc.n_derivatives, phone_str(experiment))
+
+task_af_derivatives = lambda: AFDerivativesTask(
+    n_derivatives=[0, 1, 2], phones=[TIMIT.consonants, TIMIT.vowels])()
+
+
+class AFPeripheryNeuronsTask(ExperimentTask):
+
+    params = ['n_neurons', 'phones']
 
     def __iter__(self):
         for n_neurons in self.n_neurons:
-            model = sermo.AuditoryFeatures()
-            model.periphery.neurons_per_freq = n_neurons
-            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
-            expt.timit.filefilt.region = 8
-            yield expt
+            for phones in self.phones:
+                model = sermo.AuditoryFeatures()
+                model.periphery.neurons_per_freq = n_neurons
+                expt = AuditoryFeaturesExperiment(model, phones=phones)
+                expt.timit.filefilt.region = 8
+                yield expt
 
     def name(self, experiment):
-        return "periphery:%d" % experiment.model.periphery.neurons_per_freq
+        return "periphery:%d,%s" % (
+            experiment.model.periphery.neurons_per_freq, phone_str(experiment))
 
-task_af_n_neurons = lambda: AFNNeuronsTask(n_neurons=[2, 3, 5, 10, 20, 40])()
+task_af_periphery_neurons = lambda: AFPeripheryNeuronsTask(
+    n_neurons=[2, 3, 5, 10, 20, 40], phones=[TIMIT.consonants, TIMIT.vowels])()
+
+
+class AFFeatureNeuronsTask(ExperimentTask):
+
+    params = ['n_neurons', 'phones']
+
+    def __iter__(self):
+        for n_neurons in self.n_neurons:
+            for phones in self.phones:
+                model = sermo.AuditoryFeatures()
+                model.cepstra.n_neurons = n_neurons
+                # TODO set n_neurons on derivatives, if used
+                expt = AuditoryFeaturesExperiment(model, phones=phones)
+                expt.timit.filefilt.region = 8
+                yield expt
+
+    def name(self, experiment):
+        return "feature:%d,%s" % (
+            experiment.model.cepstra.n_neurons, phone_str(experiment))
+
+task_af_feature_neurons = lambda: AFFeatureNeuronsTask(
+    n_neurons=[2, 3, 5, 10, 20, 40], phones=[TIMIT.consonants, TIMIT.vowels])()
 
 
 class AFPhonesTask(ExperimentTask):
@@ -355,42 +439,28 @@ class AFPhonesTask(ExperimentTask):
             yield expt
 
     def name(self, experiment):
-        if experiment.phones is TIMIT.consonants:
-            phones = "consonants"
-        elif experiment.phones is TIMIT.vowels:
-            phones = "vowels"
-        elif experiment.phones is TIMIT.phones:
-            phones = "all"
-        else:
-            phones = repr(experiment.phones)
-        return "phones:%s" % phones
+        return phone_str(experiment)
 
 task_af_phones = lambda: AFPhonesTask(
     phones=[TIMIT.consonants, TIMIT.vowels, TIMIT.phones])()
 
 
-class AFPostprocessingTask(ExperimentTask):
+class AFTimeWindowTask(ExperimentTask):
 
-    params = ['n_derivatives', 'zscores']
+    params = ['dts']
 
     def __iter__(self):
-        for n_derivatives in self.n_derivatives:
-            for zscore in self.zscores:
-                model = sermo.AuditoryFeatures()
-                for _ in range(n_derivatives):
-                    model.add_derivative()
-                expt = AuditoryFeaturesExperiment(
-                    model, phones=TIMIT.phones, zscore=zscore)
-                expt.timit.filefilt.region = 8
-                yield expt
+        for dt in self.dts:
+            model = sermo.AuditoryFeatures()
+            model.mfcc.dt = dt
+            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
+            expt.timit.filefilt.region = 8
+            yield expt
 
     def name(self, experiment):
-        return "derivatives:%d,zscore:%s" % (
-            experiment.model.mfcc.n_derivatives, experiment.zscore)
+        return "dt=%f" % experiment.model.mfcc.dt
 
-
-task_af_postprocessing = lambda: AFPostprocessingTask(
-    n_derivatives=[1, 2], zscores=[False, True])()
+task_af_timewindow = lambda: AFTimeWindowTask(dts=[0.001, 0.005, 0.02])()
 
 
 class AFPeripheryTask(ExperimentTask):
@@ -420,24 +490,6 @@ task_af_periphery = lambda: AFPeripheryTask(
                       'dual_resonance',
                       'compressive_gammachirp'],
     adaptive_neurons=[False, True])()
-
-
-class AFTimeWindowTask(ExperimentTask):
-
-    params = ['dts']
-
-    def __iter__(self):
-        for dt in self.dts:
-            model = sermo.AuditoryFeatures()
-            model.mfcc.dt = dt
-            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
-            expt.timit.filefilt.region = 8
-            yield expt
-
-    def name(self, experiment):
-        return "dt=%f" % experiment.model.mfcc.dt
-
-task_af_timewindow = lambda: AFTimeWindowTask(dts=[0.001, 0.005, 0.02])()
 
 
 # ############################
