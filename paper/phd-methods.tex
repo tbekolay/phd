@@ -15,7 +15,481 @@ and Semantic Pointer Architecture.
 
 \section{Auditory periphery models}
 
+In order to extract a feature vector
+from an audio signal
+in a biologically plausible manner,
+we use models of the auditory periphery
+to perform a continuous spectral analysis
+of the audio signal.
+We compare six existing
+auditory periphery model implementations
+in the model described in
+Section~???.
+
+\subsection{Gammatone filter}
+
+The Gammatone filter was proposed
+in ???Johannesma 1972 also de Boer 1975?
+and has become
+the most widely used auditory filter
+as it emulates the basic function
+of the inner ear
+yet can be implemented efficiently
+on general purpose computers.
+It does not capture many of the
+psychoacoustical phenomena discussed
+in Section~???
+(e.g., the auditory filter is symmetric),
+but can process audio online
+and in continuous time,
+making it applicable to Sermo.
+
+As described in ??? patterson,
+the Gammatone filter has
+an impulse response of the form
+\begin{equation}
+  \text{IR}(t) = t^{n-1} \cos(2 \pi f t) e^{-2 \pi b \text{ERB}(f) t}},
+\end{equation}
+where $n$ is the order of the filter,
+$b$ is a parameter determining the filter bandwidth,
+and ERB$(f)$ is the equivalent rectangular bandwidth
+of the filter centered at frequency $f$
+($\text{ERB}(f) = 24.7 + 0.108f$).
+Intuitively, the impulse response
+is the convolution of a
+carrier signal (the cosine)
+and an envelope
+(a Gamma function, hence the name Gammatone).
+Fourth order Gammatone filters
+are the most common
+??? cite patterson1992.
+See Figure~??? for a plot of the impulse response
+and frequency response.
+
+??? fig: impulse, freq response
+
+Slaney ??? cite proposed an efficient
+digital filter implementation
+of the Gammatone filter.
+The filter is an eighth order
+digital filter
+implemented as a cascade of four
+second order infinite impulse response (IIR) filters
+that can be realized
+with Direct Form II structure.
+The Z-transforms of the
+second order filters are
+\begin{align*}
+  H_1(z) &= \frac{-2 T z^2 + z \left(
+            \frac{2 T \cos(2 f \pi T)}{e^{BT}}
+            + \frac{2 \sqrt{3 + 2^{1.5}} T \sin(2 f \pi T)}{e^{BT}}
+           \right)}
+           {\frac{-2}{e^{2BT}} - 2 z^2
+           + \frac{4 z \cos(2 f \pi T)}{e^{BT}}} \\
+  H_2(z) &= \frac{-2 T z^2 + z \left(
+            \frac{2 T \cos(2 f \pi T)}{e^{BT}}
+            - \frac{2 \sqrt{3 + 2^{1.5}} T \sin(2 f \pi T)}{e^{BT}}
+           \right)}
+           {\frac{-2}{e^{2BT}} - 2 z^2
+           + \frac{4 z \cos(2 f \pi T)}{e^{BT}}} \\
+  H_3(z) &= \frac{-2 T z^2 + z \left(
+            \frac{2 T \cos(2 f \pi T)}{e^{BT}}
+            + \frac{2 \sqrt{3 - 2^{1.5}} T \sin(2 f \pi T)}{e^{BT}}
+           \right)}
+           {\frac{-2}{e^{2BT}} - 2 z^2
+           + \frac{4 z \cos(2 f \pi T)}{e^{BT}}} \\
+  H_4(z) &= \frac{-2 T z^2 + z \left(
+            \frac{2 T \cos(2 f \pi T)}{e^{BT}}
+            - \frac{2 \sqrt{3 - 2^{1.5}} T \sin(2 f \pi T)}{e^{BT}}
+           \right)}
+           {\frac{-2}{e^{2BT}} - 2 z^2
+           + \frac{4 z \cos(2 f \pi T)}{e^{BT}}},
+\end{align*}
+where $T$ is is the sampling interval,
+$f$ is the characteristic frequency of the filter,
+and $B$ controls the bandwidth of the filter
+($B = 2 \pi b \text{ERB}(f)$).
+See ??? slaney for the derivation
+of the Z-transforms.
+
+\subsection{Log Gammachirp filter}
+
+A primary weakness of the Gammatone filter
+is that it responds symmetrically
+to power in frequencies above and below
+the characteristic frequency of the filter.
+In empirically determined auditory filters,
+portions of the basilar membrane
+are more sensitive to frequencies
+below the characteristic frequency,
+and have a sharp dropoff in sensitivity
+for power in frequencies
+above the characteristic frequency.
+The family of Gammachirp filters
+are IIR filters that remain
+computationally efficient,
+like the Gammatone filter,
+but have an asymmetric frequency response.
+They are based on spectral masking experiments
+(see Section~????)
+in which the listener has to
+detect a brief sinusoidal signal
+along ``notched'' white noise,
+in which the power spectrum of the noise
+at frequencies just above and just below
+the frequency of the sinusoid
+are set to zero ??? cite Patterson 1976.
+The Log Gammachirp filter,
+proposed by ??? unoki et al
+in an improvement over
+the original Gammachirp filter
+??? irino patterson from unoki
+in that it is more numerically stable.
+
+The impulse response
+of the Log Gammachirp filter is
+\begin{equation}
+  \text{IR}(t) = t^3 \cos(2 \pi (f t + c \ln(t)) e^{-2 \pi b \text{ERB}(f) t}},
+\end{equation}
+where $c$ is a ``chirp'' parameter
+that affects the asymmetry
+of the auditory filter;
+typically, $c$ is set to a negative value,
+raising the response to lower frequency sounds
+and attenuating the response to higher frequency sounds.
+See Figure~??? for a plot of the impulse response.
+Unlike the Gammatone impulse response,
+the Gammachirp ???more,
+use the word frequency sweep
+
+??? Figure, impulse response and freq sepctrum
+
+Gammachirp filters are closely related
+to Gammatone filters.
+In fact, the amplitude spectrum of the Gammachirp is
+\begin{equation}
+  |G_C(f)| = a_0 \cdot |G_T(f)| \cdot |H_A(f)|,
+\end{equation}
+where $a_0$ is a scaling factor,
+$|G_T(f)|$ is the amplitude sepctrum
+of the Gammatone filter,
+and $|H_A(f)|$ is the asymmetric function
+that depends on the parameter $c$.
+See Figure~??? for a visualization.
+The final IIR filter
+is designed by determining
+an asymmetric filter $H_C(f)$
+that simulated the
+asymmetric function $H_A(f)$
+(see ??? for details).
+The Log Gammachirp improves upon
+the original Gammachirp filter
+by identifying parameter values
+that yield discrepancies
+between $H_A(f)$ and $H_C(f)$,
+and present an alternative $H_C(f)$
+with a parameter that is optimized
+to minimize the error between
+$H_C(f)$ and $H_A(f)$.
+
+\subsection{Linear Gaborchirp}
+
+Another auditory filter
+in the same vein as the
+Gammatone and Log Gammachirp
+filters is the Linear Gaborchip filter.
+The impulse response is defined as
+\begin{equation} \label{gaborchirp}
+  \text{IR}(t) = e^{-t / 2 \sigma^2}
+    \cos\left(2 \pi \left(ft + \frac{c}{2t^2}\right)\right),
+\end{equation}
+where $\sigma$ determines the duration
+of the impulse response
+(see Figure~???).
+
+??? IR Figure
+
+Unlike the Gammatone and Gammachrip filters,
+which convolve the cosine with
+a Gamma function,
+this filter uses a Gaussian
+as the envelope;
+convolving a cosine with
+a Gaussian yeilds a Gabor filter.
+Also unlike the Gammatone and Gammachirp filters,
+the Linear Gaborchirp is implemented
+as a finite impulse response (FIR) filter.
+Therefore, a fixed length history of the
+audio is kept,
+and the output of the filter
+is the convolution
+of the audio signal
+with the Linear Gaborchirp
+impulse response \eqref{gaborchirp}
+(implemented by taking the
+Fourier transform of both signals,
+multiplying them,
+and taking the inverse Fourier transform
+of the result).
+
+??? wagner recorded auditory responses
+to clicks in the barn owl,
+and found that the Linear Gaborchirp filter
+provided the best match
+to the empirically derived auditory filters
+($n=132$).
+
+\subsection{Dual resonance nonlinear filter}
+
+The filters discussed to this point
+are independent linear filters.
+However, as discussed in Section~???,
+there are many nonlinearities
+in the human auditory system,
+including at the level of the auditory periphery.
+
+The Dual Resonance Nonlinear (DRNL) filter,
+proposed in ??? lopezpoveda
+based on earlier work by ??? meddis,
+consists of two parallel pathways
+that are summed together
+(see Figure~???).
+The linear path (top, Figure~???)
+scales the input by some gain $g$,
+filters the signal through
+two or three first-order Gammatone filters,
+and then through a cascade of
+four second-order low-pass filters.
+The non-linear path (bottom, Figure~???)
+filters the signal through
+three first-order Gammatone filters,
+a nonlinear gain,
+and three more first-order Gammatone filters.
+The filters in the nonlinear path
+have the same frequency,
+which is the desired characteristic frequency
+of the filter,
+while the filters in the linear path
+have parameters fit to human data.
+The result of the linear and nonlinear paths
+are summed to yield
+the final result of the filter,
+which models the velocity of
+basilar membrane deflection.
+
+??? fig 3
+
+The nonlinear gain in the nonlinear path
+is a ``broken stick'' nonlinearity;
+i.e.,
+\begin{equation}
+  y(t) = \text{sign}(x(t)) \min(a |x(t)|, b |x(t)|^c),
+\end{equation}
+where $x(t)$ is the input signal,
+$y(t)$ is the output signal,
+and $a$, $b$ and $c$ are parameters.
+Like the parameters of the linear path's filters,
+these parameters are fit to human data.
+Detail on the fitting procedure
+and the digital filter implementation
+of the filter can be found in ??? lopezpoveda.
+
+??? fig: impulse, freq response
+
+Due to its complexity,
+the DRNL impulse response does not have a simple closed form.
+However, its impulse response
+and frequency response can be simulated;
+see Figure~???.
+
+\subsection{Dynamic compressive Gammachirp model}
+
+Just as the DRNL filter can be thought of
+as an nonlinear extension of Gammatone filters,
+the Dynamic Compressive Gammachirp model (DCGC)
+??? cite
+is a nonlinear extension of Gammachirp filters.
+It also consists of two pathways,
+which unlike the DRNL,
+interact nonlinearly.
+
+??? fig 3
+
+Figure~??? gives the overall structure of the filter.
+In the control pathway,
+the signal is filtered by
+a bank of passive Gammachirp filters,
+and then a highpass filter.
+The signal pathway
+also begins with a bank of Gammachirp filters,
+and then a highpass filter,
+but the high pass filters in the signal pathway
+have variable cutoff frequencies
+depending on the output of the control pathway.
+
+The filter simulates
+several psychoacoustical effects
+from masking experiments,
+and can be inverted in order to
+synthesize audio
+from transformed versions
+of filter output
+??? cite.
+Like the DRNL filter, it is too complicated
+to express the impulse response
+in a simple closed form,
+but simulated impulse and frequency response
+curves are shown in Figure~???.
+
+??? imp, freq response curves
+
+\subsection{Full auditory periphery modeling}
+
+The filters described up to this point
+emulate the deflection
+of the basilar membrane,
+given some audio signal.
+These filters are an important part
+of a full auditory periphery model,
+which should also include
+a filter emulating the function
+of the outer and middle ear,
+a method for transducing
+the basilar membrane deflections
+into inner hair cell activity,
+and a method for generating
+action potentials from the inner hair cell activity,
+mimicking the function of spiral ganglion cells.
+See Figure~??? for the full pipeline
+of an auditory periphery model.
+
+??? figure: hierarchy from wilson et al
+
+The middle ear function...
+??? figure out
+
+For transducing the inner hair cell activity,
+we rectify and compress the output
+of the auditory filter model
+to account for two effects.
+First, the basilar membrane may deflect
+positively or negatively
+(as can be seen in the impulse response
+in Figure~???),
+but only positive deflections result in
+inner hair cell activity.
+Second, the amount of inner hair cell activity
+does not linearly increase with
+membrane deflection;
+the activity is ``compressed''
+as the deflection increases.
+These effects are modeled by
+\begin{equation} \label{filter-compress}
+  f(x) =
+  \begin{cases}
+    x^{1 / 3} &\text{if } x \ge 0 \\
+    0 &\text{if } x < 0.
+  \end{cases}
+\end{equation}
+The result of equation~\eqref{filter-compress}
+is interpreted as the inner hair cell activity,
+which is the input to a simulated neuron.
+Synapses and neurons are simulated with Nengo;
+see Section~??? for details.
+
+\subsection{Tan \& Carney model}
+
+Finally, we also test
+an auditory periphery model
+presented in ??? cite
+which takes into account
+the full auditory periphery pathway
+in Figure~???.
+
+The model, depicted in Figure~???,
+consists of a middle ear model,
+a auditory filter consisting
+of a control path and signal path,
+and an inner hair cell
+and synapse model.
+The output of the model
+is the instantaneous firing rate
+of spiral ganglion cells
+connected to inner hair cells
+sensitive to a particular
+characteristic frequency.
+
+The signal path in the model
+consists of a linear bandpass filter
+with two eight-order poles
+and one fourth-order pole,
+their complex conjugates,
+and a tenth-order zero
+on the real axis.
+Despite this complexity,
+??? authors
+state that these poles and zero
+are the minimum number required
+to capture physiological effects
+like frequency glides
+and sharp frequency response curves.
+
+% ??? fig impulse, freq
+
+The bandwidth and gain of the linear filter
+in the signal path is controlled
+by the output of the control path,
+which can be thought of as
+implementing the compression
+mentioned in the previous section.
+The control path cascade consists of
+a nonlinear wideband filter,
+a symmetric nonlinear function,
+an asymmetric nonlinear Boltzmann function,
+and a second-order lowpass filter
+with a cutoff frequency of 800 Hz.
+As mentioned above,
+the output of the control path
+controls the bandwidth
+of the signal path,
+but it also is fed back
+into the start of the control path
+to control the bandwidth of the initial
+wideband filter.
+
+Finally, the output of the signal path
+is used to simulate an inner hair cell,
+and the synapse between an inner hair cell
+and a spiral ganglion cell
+??? cite Zhang 2001.
+The IHC model
+consists of a log-sigmoid transfer function
+and a seventh-order lowpass filter.
+The synapse model is a three-store
+diffusion model ??? cite 1993 craney,
+which generates the instantaneous
+rate of a spiral ganglion cell.
+
 \subsection{Brian hears software}
+
+The \textit{Brian hears} software
+???cite
+provides implementations
+of the six models described above.
+\textit{Brian hears} is part of the
+\textit{Brian} package,
+which is a general purpose
+neural simulator capable
+of simulating spiking neural networks
+with relatively high precision
+but slow speed
+(see ??? nengo paper for benchmark results).
+Due in part to its slow speed,
+we use \textit{Brian} only for
+the auditory periphery model implementations
+provided in the \textit{Brain hears} subpackage,
+and use Nengo (described below)
+for all other model implementations.
 
 \section{Dynamic movement primitives}
 
