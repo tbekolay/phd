@@ -78,10 +78,25 @@ def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
 
 
 def compare(data, columns, x_keys, x_label, y_label,
-            group_by=None, plot_f=sns.violinplot):
+            relative_to=None, group_by=None, filter_by=None,
+            plot_f=sns.violinplot, **plot_args):
+    data = data.copy()  # Make a copy, as we modify it
+
+    # Make columns relative to other columns
+    relative_to = [] if relative_to is None else relative_to
+    for col, rel in zip(columns, relative_to):
+        data[col] /= data[rel].mean()
+
+    filter_by = [] if filter_by is None else filter_by
+
+    extra_keys = [key for key, val in filter_by]
+    extra_keys.extend(relative_to)
     if group_by is not None:
+        extra_keys.append(group_by)
+
+    if len(extra_keys) > 0:
         # Get the requested columns, and the one we're grouping by
-        data = pd.concat([data[[c, group_by]] for c in columns],
+        data = pd.concat([data[[c] + extra_keys] for c in columns],
                          keys=x_keys, names=[x_label])
         # Merge all of the columns into one
         data[y_label] = np.nan
@@ -95,6 +110,10 @@ def compare(data, columns, x_keys, x_label, y_label,
         data.columns = [y_label]
     # Make the index (`x_label`) into a column
     data.reset_index(level=0, inplace=True)
+    # Only take what we're filtering by
+    for key, val in filter_by:
+        data = data[data[key] == val]
+
     # Go Seaborn!
-    plot_f(x=x_label, y=y_label, hue=group_by, data=data)
+    plot_f(x=x_label, y=y_label, hue=group_by, data=data, **plot_args)
     sns.despine()

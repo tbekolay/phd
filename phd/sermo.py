@@ -84,7 +84,7 @@ class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=melspace(0, 8000, 32), shape=('*',))
     sound_process = params.ProcessParam(default=None)
     auditory_filter = params.StringParam(default='gammatone')
-    neurons_per_freq = params.IntParam(default=12)
+    neurons_per_freq = params.IntParam(default=5)
     fs = params.NumberParam(default=TIMIT.fs)
     middle_ear = params.BoolParam(default=True)
     adaptive_neurons = params.BoolParam(default=False)
@@ -97,18 +97,18 @@ class PeripheryParams(ParamsObject):
 
 
 class CepstraParams(ParamsObject):
-    n_neurons = params.IntParam(default=30)
+    n_neurons = params.IntParam(default=20)
     n_cepstra = params.IntParam(default=13)
 
 
 class FeedforwardDerivParams(ParamsObject):
-    n_neurons = params.IntParam(default=30)
+    n_neurons = params.IntParam(default=20)
     tau_fast = params.NumberParam(default=0.005)
     tau_slow = params.NumberParam(default=0.1)
 
 
 class IntermediateDerivParams(ParamsObject):
-    n_neurons = params.IntParam(default=30)
+    n_neurons = params.IntParam(default=20)
     tau = params.NumberParam(default=0.1)
 
 

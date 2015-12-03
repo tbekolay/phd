@@ -9,7 +9,6 @@ import nengo
 import nengo.utils.numpy as npext
 import numpy as np
 import scipy
-from multiprocess import Pool  # Uses dill instead of pickle
 from nengo.cache import NoDecoderCache
 from nengo.utils.compat import iteritems, range
 from nengo.utils.stdlib import Timer
@@ -17,7 +16,7 @@ from sklearn.svm import LinearSVC
 from scipy.interpolate import interp1d
 from scipy import stats
 
-from . import cache, config, filters, sermo
+from . import cache, config, filters, parallel, sermo
 from .timit import TIMIT
 
 
@@ -57,7 +56,7 @@ class ExperimentTask(object):
 
     params = []
 
-    def __init__(self, n_iters=3, **kwargs):
+    def __init__(self, n_iters=4, **kwargs):
         self.n_iters = n_iters
 
         for key in self.params:
@@ -133,24 +132,24 @@ def ncc(model, sample, zscore, seed):
     return feat
 
 
-def nccs(model, audio, zscore, seed, parallel=True):
+def nccs(model, audio, zscore, seed):
     out = {label: [] for label in audio}
-    if parallel:
+
+    if parallel.get_pool() is not None:  # Asynchronous / parallel version
         jobs = {label: [] for label in audio}
-        pool = Pool(processes=config.n_processes)
 
-    for label in audio:
-        for sample in audio[label]:
-            if parallel:
-                jobs[label].append(
-                    pool.apply_async(ncc, [model, sample, zscore, seed]))
-            else:
-                out[label].append(ncc(model, sample, zscore, seed))
-
-    if parallel:
+        for label in audio:
+            for sample in audio[label]:
+                jobs[label].append(parallel.get_pool().apply_async(
+                    ncc, [model, sample, zscore, seed]))
         for label in jobs:
             for result in jobs[label]:
                 out[label].append(result.get())
+    else:  # Synchronous / serial version
+        for label in audio:
+            for sample in audio[label]:
+                out[label].append(ncc(model, sample, zscore, seed))
+
     return out
 
 
@@ -349,6 +348,7 @@ class AFZscoreTask(ExperimentTask):
         for zscore in self.zscore:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
+                model.add_derivative()
                 expt = AuditoryFeaturesExperiment(
                     model, phones=phones, zscore=zscore)
                 expt.timit.filefilt.region = 8
@@ -370,6 +370,7 @@ class AFDerivativesTask(ExperimentTask):
         for n_derivatives in self.n_derivatives:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
+                model.add_derivative()
                 for _ in range(n_derivatives):
                     model.add_derivative()
                 expt = AuditoryFeaturesExperiment(model, phones=phones)
@@ -392,6 +393,7 @@ class AFPeripheryNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
+                model.add_derivative()
                 model.periphery.neurons_per_freq = n_neurons
                 expt = AuditoryFeaturesExperiment(model, phones=phones)
                 expt.timit.filefilt.region = 8
@@ -402,7 +404,7 @@ class AFPeripheryNeuronsTask(ExperimentTask):
             experiment.model.periphery.neurons_per_freq, phone_str(experiment))
 
 task_af_periphery_neurons = lambda: AFPeripheryNeuronsTask(
-    n_neurons=[2, 3, 5, 10, 20, 40], phones=[TIMIT.consonants, TIMIT.vowels])()
+    n_neurons=[1, 2, 4, 8, 32], phones=[TIMIT.consonants, TIMIT.vowels])()
 
 
 class AFFeatureNeuronsTask(ExperimentTask):
@@ -413,8 +415,9 @@ class AFFeatureNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
+                model.add_derivative(n_neurons=n_neurons)
                 model.cepstra.n_neurons = n_neurons
-                # TODO set n_neurons on derivatives, if used
+                # For this one at least, we'll use one derivative
                 expt = AuditoryFeaturesExperiment(model, phones=phones)
                 expt.timit.filefilt.region = 8
                 yield expt
@@ -424,7 +427,7 @@ class AFFeatureNeuronsTask(ExperimentTask):
             experiment.model.cepstra.n_neurons, phone_str(experiment))
 
 task_af_feature_neurons = lambda: AFFeatureNeuronsTask(
-    n_neurons=[2, 3, 5, 10, 20, 40], phones=[TIMIT.consonants, TIMIT.vowels])()
+    n_neurons=[1, 2, 4, 8, 16, 32, 64], phones=[TIMIT.consonants, TIMIT.vowels])()
 
 
 class AFPhonesTask(ExperimentTask):
@@ -434,6 +437,7 @@ class AFPhonesTask(ExperimentTask):
     def __iter__(self):
         for phones in self.phones:
             model = sermo.AuditoryFeatures()
+            model.add_derivative()
             expt = AuditoryFeaturesExperiment(model, phones=phones)
             expt.timit.filefilt.region = 8
             yield expt
@@ -452,6 +456,7 @@ class AFTimeWindowTask(ExperimentTask):
     def __iter__(self):
         for dt in self.dts:
             model = sermo.AuditoryFeatures()
+            model.add_derivative()
             model.mfcc.dt = dt
             expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
             expt.timit.filefilt.region = 8
@@ -471,6 +476,7 @@ class AFPeripheryTask(ExperimentTask):
         for auditory_filter in self.auditory_filters:
             for adaptive_neurons in self.adaptive_neurons:
                 model = sermo.AuditoryFeatures()
+                model.add_derivative()
                 model.periphery.auditory_filter = auditory_filter
                 model.periphery.adaptive_neurons = adaptive_neurons
                 expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)

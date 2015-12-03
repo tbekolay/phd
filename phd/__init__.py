@@ -9,4 +9,5 @@ import brian  # Raises a bunch of warnings, no thanks
 
 from .dtw import dtw
 from .gestures import ges_path
-from . import experiments, filters, plots, processes, sermo, timit, vtl
+from . import (
+    analysis, experiments, filters, plots, processes, sermo, timit, vtl)
