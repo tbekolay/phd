@@ -1076,11 +1076,425 @@ connections with the time constant $\tau$
 
 \section{Semantic Pointer Architecture (SPA)}
 
+The Neural Engineering Framework (NEF)
+allows us to manipulate dynamical systems
+in $n$-dimensional vector spaces
+with spiking neurons,
+which is essential for
+the continuous temporal tasks
+involved in speech.
+However, speech also connects
+to linguistic and cognitive systems
+that have traditionally been described
+with static symbols
+and rule-based algorithms.
+The Semantic Pointer Architecture (SPA; ??? cite)
+provides a method to implement
+symbol-like representations
+and transformations in spiking neural networks,
+building on the NEF.
+
+The crux of the SPA is to implement
+the operations in
+a vector symbolic architecture
+using the NEF.
+While many vector symbolic architectures exist,
+the SPA specifically uses
+Holographic Reduced Representations (HER),
+developed by ??? plate 2003,
+as it scales well to high dimensional spaces,
+and can be implemented naturally
+with the NEF.
+
+\subsection{Representation}
+
+As in all vector symbolic architectures,
+we associate a real-valued vector
+with every ``symbol''
+in the vocabulary associated with
+the problem domain.
+In the case of speech,
+the vocabulary depends on
+the specific subproblem,
+but could be composed
+of phoneme symbols,
+syllable symbols,
+word symbols, and so on.
+
+In order to robustly implement
+the transformations discussed
+in the subsequent section,
+we use vectors of unit length
+when possible.
+When we have no information
+about the structure of a particular pointer,
+we randomly generate it
+by sampling from a normal distribution
+for each dimension of the vector,
+then normalizing by the L2-norm
+of the vector.
+
+
+When we do have information about
+the structure of vector,
+we construct them by
+using the transformations below
+with randomly generated vectors,
+or vectors learned through
+unsupervised methods.
+However, it is possible that
+the transformations below
+result in vectors that are
+no longer of unit length.
+To limit the number of situations
+in which this occurs,
+we can use random \textit{unitary} vectors
+??? cite plate.
+
+A unitary vector is a vector with
+the same exact inverse
+as its approximate inverse.
+The exact inverse of a vector
+is sensitive to noise,
+which is prevalent in biological systems.
+Therefore, when a transformation needs to
+invert a vector,
+it instead uses an approximation
+of the inverse called the \textit{involution}.
+Given a vector $\V{A}$, the involution
+of that vector $\V{A'}$,
+is a rearrangement of the vector dimensions;
+specifically,
+\begin{equation}
+  \V{A'} = A'_{i} = A_{-i \bmod n},
+\end{equation}
+where $n$ is the number of dimensions,
+and $\bmod$ is the modulo operator.
+For example, if $\V{A} = [a_0, a_1, a_2, a_3]$,
+then $\V{A'} = [a_0, a_3, a_2, a_1]$.
+It is apparent that $\V{A''} = \V{A}$,
+hence its usefulness as an approximate inverse.
+
+The approximate inverse is equal to the
+inverse when the components
+of the discrete Fourier transform
+of the vector have unit magnitude.
+Therefore, to generate a random unitary vector,
+we generate a random unit vector,
+and then normalize
+the frequency components;
+specifically,
+\begin{equation} \label{unitary}
+  \V{A}^1 = \text{IDFT}\left(
+    \frac{\text{DFT}(\V{A})}{\Vert\text{DFT}(\V{A})\Vert}\right),
+\end{equation}
+where $\Vert\cdot\Vert$ is the L2-norm.
+Note that the a unitary vector generated
+with equation~\eqref{unitary}
+is still a unit vector.
+
+\subsection{Transformation}
+
+Vector symbolic architectures
+define two transformations
+that are necessary
+to implement rule-like behavior:
+merging and binding.
+Merging takes two vectors
+and combines them such that
+the resulting vector
+is similar to both of the input vectors.
+Binding takes two vectors
+and combines them such that
+the resulting vector
+is dissimilar from either of the input vectors,
+but the input vectors can be recovered
+through an unbinding process.
+
+In HRRs,
+the merging transformation,
+which we will denote with $\oplus$,
+is vector superposition.
+\begin{equation}
+  \V{A} \oplus \V{B} = [A_0 + B_0, A_1 + B_1, ...]
+\end{equation}
+Since the new representation
+is a linear combination of
+the two vectors,
+it is similar to both,
+as long as the two vectors
+are not too dissimilar.
+Note that similarity in SPA can
+be computed either by
+the dot product between two vectors,
+\begin{equation}
+  \V{A} \cdot \V{B} = \sum_{i=0}^{n-1} A_i B_i,
+\end{equation}
+or the cosine similarity,
+which is the dot product normalized
+by the length of the two vectors; i.e.,
+\begin{equation}
+  \cos(\theta) = \frac{\V{A} \cdot \V{B}}{\Vert\V{A}\Vert \Vert\V{B}\Vert}
+    = \frac{\sum_{i=0}^{n-1} A_i B_i}
+           {\sqrt{\sum_{i=0}^{n-1} A_i^2} \sqrt{\sum_{i=0}^{n-1} B_i^2}}.
+\end{equation}
+
+The binding transformation in HRRs,
+which we will denote with $\bind$,
+is circular convolution.
+While circular convolution
+is defined as
+\begin{equation}
+  \V{A} \bind \V{B} = \sum_{i=0}^{n-1} A_{i \bmod n}B_{j-i \bmod n},
+    \text{ for } j=0, \ldots, n-1,
+\end{equation}
+we can reduce the computational complexity
+of the transform
+by computing it as the
+product of discrete Fourier coefficients.
+Specifically,
+\begin{equation}
+  \V{A} \bind \V{B} = \text{IDFT}\left[
+    \text{DFT}(\V{A}) \circ \text{DFT}(\V{B})\right],
+\end{equation}
+where $\circ$ is the Hadamard (element-wise) product.
+In addition to lowering
+the computational complexity,
+the DFT and IDFT functions are linear,
+making them easy to implement
+in a spiking neural network.
+Also, observe that in this formulation,
+convolving with a unitary vector,
+which has DFT coefficients of unit magnitude,
+does not change the magnitude
+of the resulting element-wise product.
+Therefore, when convolving a unit vector
+with a unitary vector,
+we obtain another unit vector,
+which is a useful property
+in many situations.
+
+In order to recover inputs,
+we can ``unbind'' the bound vector
+to retrieve one input vector
+by binding with the approximate inverse (involution)
+of the other input vector.
+\begin{equation}
+  (\V{A} \bind \V{B}) \bind \V{A'} \approx \V{B}
+\end{equation}
+Note that unbinding is approximate;
+since the binding operation
+mixes the two vectors together,
+they cannot be recovered exactly.
+However, vectors can be subsequently
+``cleaned up'' to known
+vocabulary items using an autoassociative memory
+(see Section~???).
+
+It is important to note that
+the HRR definitions for merging and binding
+do not change the dimensionality
+of the vector space, unlike other VSAs
+(e.g., ??? cite tensor products).
+One can therefore think of the
+merging and binding operators
+as compressing the information
+in the input vectors.
+The Semantic Pointer Architecture
+gets its name from the idea that
+the vectors used
+in any reasonably large SPA network
+are made up of compressed versions
+of other vectors in vocabularies
+distributed among many interacting networks.
+The vectors in these vocabularies
+have meaning.
+Since the compressed representations
+can be decompressed through unbinding,
+we say that they ``point''
+to deeper semantics,
+analogous to how a pointer in computer science
+points to an area of memory.
+Semantic pointers, however,
+also contain shallow semantics,
+so that the compressed
+representations themselves
+can be used to implement cognitive behaviors.
+From here on, We will refer to
+the vectors in a conceptual vocabulary
+as semantic pointers.
+
+The SPA has been used to implement
+models of large-scale knowledge representation
+using WordNet ???cite,
+serial working memory ??? cite choo,
+and other cognitive tasks.
+An integrated model called Spaun
+combined several previous models
+in a single unified model
+that performed eight cognitive tasks
+with no reorganization.
+In these tasks, input was provided
+through a simulated visual system,
+and output was produced
+as motor commands driving
+a three link arm model ??? cite spaun.
+
 \section{Nengo software}
 
-% mention that Nengo takes care of a lot of annoying details.
-% for example, instead of manually specifying the gain and bias,
-% we specify the desired radius, x-intercepts, and maximum firing rates
-% for the ensemble; Nengo figures out the gain and bias.
+Nengo is a piece of software
+for designing and simulating
+models using the representations,
+transformations, and dynamics
+of the NEF and SPA
+??? cite.
+The NEF provides a level of abstraction
+that allows modelers to generate
+spiking neural networks
+that implement dynamic transformations
+in vector spaces.
+The SPA provides a level of abstraction
+on top of that
+to allow modelers to generate
+NEF networks to perform
+cognitively relevant operations
+on symbol-like representations.
+Nengo provides modelers
+a level of abstraction to
+define and simulate NEF and SPA models
+using the Python programming language.
+
+Nengo defines a set of six objects
+used to construct a spiking neural model.
+The \textit{Ensemble} is
+a population of spiking neurons
+that represents a vector over time.
+It presents a simplified interface
+allowing modelers to specify
+details important for modeling,
+rather than manually specifying
+all model parameters;
+for example, instead of specifying
+the gain and bias
+(see equation~???),
+one can specify the desired
+$x$-intercepts and maximum firing rates
+of the ensemble's tuning curves.
+Additionally, one can specify
+these parameters in terms of
+probability distributions
+to be sampled,
+rather than specifying a value for each neuron.
+
+\textit{Nodes} provide output
+to the model, or gather input from the model,
+but does so without using spiking neurons.
+Nodes allow models to interact with environments.
+Connecting from a node provides input
+to the model, which could be
+a direct current injection,
+a list of vectors to be encoded,
+or data coming from a sensor
+like a spiking camera.
+Connecting to a node allows it
+to do arbitrary processing on
+model outputs;
+nodes can record model outputs,
+update plots in real time,
+or drive a physical robot arm.
+
+\textit{Connections} encapsulate
+the flow of information between two objects.
+For connections between ensembles,
+connections can be specified in vector space
+as a function of the input ensemble,
+or in neuron space
+by fulling specifying the connection weight matrix.
+When functions are provided,
+the decoder solving process
+(see equation~???)
+is done automatically,
+though parameters affecting
+how the decoders are solved for
+can be specified.
+
+\textit{Probes} specify quantities
+in the model that should be recorded
+for analysis and visualization.
+Nengo by itself does not
+impose any constraints on how
+that data is used;
+for the models in this thesis,
+the data was analyzed with
+NumPy ???cite and SciPy ???<
+and visualized with
+Matplotlib ???cite
+and Seaborn ???cite.
+However, other analysis and plotting packages
+could be used.
+
+\textit{Networks} are a collection of
+the other five objects
+(and possibly other networks),
+and provide the primary abstraction
+for defining large models
+in few lines of Python code.
+The SPA transformations
+described in the previous section
+are implemented as a several
+interacting networks.
+The models described
+in Chapter~??? consist
+of some instances of
+these SPA networks,
+and several networks
+that we have constructed.
+
+Python scripts using Nengo to construct
+the models discussed in the next chapter
+are available at ???,
+and in simplified form in the appendix.
 
 \subsection{Integrating Brian in Nengo}
+
+As discussed in Section~???,
+we use the Brain neural simulator's
+Brian Hears package
+to simulate auditory periphery models.
+As our models are implemented in Nengo,
+it is necessary for Brian and Nengo
+to interact in some way.
+The naive approach,
+which is necessary in many simulation environments,
+is to manually step through both simulators,
+copying the data produced by Brian
+to Nengo when the Nengo simulator advances.
+A faster approach would be to
+pre-generate all of the data
+produced by Brian
+and feed that in as
+static input.
+However,
+then the Brian simulation could not
+use input from the Nengo simulator;
+a bidirectional interface
+is important for future closed loop models.
+
+The integration is instead done
+through a Nengo node.
+The function attached to the node
+contains the state of the Brain simulation,
+which can be advanced at a different rate
+as the Nengo simulation if desired.
+In addition to collecting
+data from the auditory filters,
+the node can update the
+sound associated with
+the auditory filter,
+allowing for a bidirectional interface.
+Updating the sound would normally
+clear the state of the auditory filter,
+so we instead subclass Brain's
+\textit{Sound} object
+and provide samples from
+Nengo when needed.

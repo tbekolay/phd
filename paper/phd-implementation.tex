@@ -469,15 +469,15 @@ by a semantic pointer
 that tags each syllable with its place
 in the list; i.e.,
 \begin{equation}
-  \text{SEQ} = \text{SYLL1} \circledast \text{POS1} \oplus
-    \text{SYLL2} \circledast \text{POS2} \ldots
+  \text{SEQ} = \text{SYLL1} \bind \text{POS1} \oplus
+    \text{SYLL2} \bind \text{POS2} \ldots
 \end{equation}
 For example, the word ``family'' (??? /fam schwa lee/)
 would be represented as
 \begin{equation}
-  \text{FAMILY} = \text{FAM} \circledast \text{POS1} \oplus
-    \text{SCHWA} \circledast \text{POS2} \oplus
-    \text{LEE} \circledast \text{POS3}.
+  \text{FAMILY} = \text{FAM} \bind \text{POS1} \oplus
+    \text{SCHWA} \bind \text{POS2} \oplus
+    \text{LEE} \bind \text{POS3}.
 \end{equation}
 Representing a syllable sequence
 by binding syllables to list positions
@@ -489,7 +489,7 @@ for the first syllable,
 we can bind the sequence semantic pointer
 with the inverse of the first position pointer.
 \begin{equation}
-  \text{FAM} \approx \text{FAMILY} \circledast \text{POS1}^{-1}
+  \text{FAM} \approx \text{FAMILY} \bind \text{POS1}^{-1}
 \end{equation}
 
 The semantic pointers representing syllable positions
@@ -499,7 +499,7 @@ a randomly generated $\text{NEXTPOS}$ pointer.
 For example,
 \begin{equation}
   \label{nextpos}
-  \text{POS2} = \text{POS1} \circledast \text{NEXTPOS}
+  \text{POS2} = \text{POS1} \bind \text{NEXTPOS}
 \end{equation}
 The initial position, $\text{POS1}$,
 and semantic pointers for each syllable
@@ -507,8 +507,8 @@ are also randomly generated.\footnote{
   Syllable semantic pointer could be constructed to
   reflect how the syllable is produced; e.g.,
   it could have a representation like
-  $\text{BA} = \text{B} \circledast \text{ONSET} \oplus
-    \text{A} \circledast \text{NUCLEUS}$,
+  $\text{BA} = \text{B} \bind \text{ONSET} \oplus
+    \text{A} \bind \text{NUCLEUS}$,
   where semantic pointers for the individual phonemes
   and syllable parts are randomly generated.
   However, as we will show in section~???,
@@ -526,7 +526,7 @@ the current syllable to be voiced
 is computed by binding the sequence
 with the current position pointer.
 \begin{equation}
-  \text{SYLL} = \text{WORD} \circledast \text{CURRPOS}^{-1},
+  \text{SYLL} = \text{WORD} \bind \text{CURRPOS}^{-1},
 \end{equation}
 where $\text{CURRPOS}$ starts as $\text{POS1}$
 and changes over the course of the simulation
