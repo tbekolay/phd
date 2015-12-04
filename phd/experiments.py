@@ -359,7 +359,7 @@ class AFZscoreTask(ExperimentTask):
             experiment.zscore, phone_str(experiment))
 
 task_af_zscore = lambda: AFZscoreTask(
-    zscore=[False, True], phones=[TIMIT.consonants, TIMIT.vowels])()
+    zscore=[False, True], phones=[TIMIT.consonants])()
 
 
 class AFDerivativesTask(ExperimentTask):
@@ -382,7 +382,7 @@ class AFDerivativesTask(ExperimentTask):
             experiment.model.mfcc.n_derivatives, phone_str(experiment))
 
 task_af_derivatives = lambda: AFDerivativesTask(
-    n_derivatives=[0, 1, 2], phones=[TIMIT.consonants, TIMIT.vowels])()
+    n_derivatives=[0, 1, 2], phones=[TIMIT.consonants])()
 
 
 class AFPeripheryNeuronsTask(ExperimentTask):
@@ -404,7 +404,7 @@ class AFPeripheryNeuronsTask(ExperimentTask):
             experiment.model.periphery.neurons_per_freq, phone_str(experiment))
 
 task_af_periphery_neurons = lambda: AFPeripheryNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 32], phones=[TIMIT.consonants, TIMIT.vowels])()
+    n_neurons=[1, 2, 4, 8, 32], phones=[TIMIT.consonants])()
 
 
 class AFFeatureNeuronsTask(ExperimentTask):
@@ -427,7 +427,7 @@ class AFFeatureNeuronsTask(ExperimentTask):
             experiment.model.cepstra.n_neurons, phone_str(experiment))
 
 task_af_feature_neurons = lambda: AFFeatureNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 16, 32, 64], phones=[TIMIT.consonants, TIMIT.vowels])()
+    n_neurons=[1, 2, 4, 8, 16, 32, 64], phones=[TIMIT.consonants])()
 
 
 class AFPhonesTask(ExperimentTask):
@@ -451,41 +451,46 @@ task_af_phones = lambda: AFPhonesTask(
 
 class AFTimeWindowTask(ExperimentTask):
 
-    params = ['dts']
+    params = ['dts', 'phones']
 
     def __iter__(self):
         for dt in self.dts:
-            model = sermo.AuditoryFeatures()
-            model.add_derivative()
-            model.mfcc.dt = dt
-            expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
-            expt.timit.filefilt.region = 8
-            yield expt
-
-    def name(self, experiment):
-        return "dt=%f" % experiment.model.mfcc.dt
-
-task_af_timewindow = lambda: AFTimeWindowTask(dts=[0.001, 0.005, 0.02])()
-
-
-class AFPeripheryTask(ExperimentTask):
-
-    params = ['auditory_filters', 'adaptive_neurons']
-
-    def __iter__(self):
-        for auditory_filter in self.auditory_filters:
-            for adaptive_neurons in self.adaptive_neurons:
+            for phones in self.phones:
                 model = sermo.AuditoryFeatures()
                 model.add_derivative()
-                model.periphery.auditory_filter = auditory_filter
-                model.periphery.adaptive_neurons = adaptive_neurons
-                expt = AuditoryFeaturesExperiment(model, phones=TIMIT.phones)
+                model.mfcc.dt = dt
+                expt = AuditoryFeaturesExperiment(model, phones=phones)
                 expt.timit.filefilt.region = 8
                 yield expt
 
     def name(self, experiment):
-        return "%s,adaptive:%s" % (experiment.model.periphery.auditory_filter,
-                                   experiment.model.periphery.adaptive_neurons)
+        return "dt=%f,%s" % (experiment.model.mfcc.dt, phone_str(experiment))
+
+task_af_timewindow = lambda: AFTimeWindowTask(
+    dts=[0.001, 0.005, 0.02], phones=[TIMIT.consonants])()
+
+
+class AFPeripheryTask(ExperimentTask):
+
+    params = ['auditory_filters', 'adaptive_neurons', 'phones']
+
+    def __iter__(self):
+        for auditory_filter in self.auditory_filters:
+            for adaptive_neurons in self.adaptive_neurons:
+                for phones in self.phones:
+                    model = sermo.AuditoryFeatures()
+                    model.add_derivative()
+                    model.periphery.auditory_filter = auditory_filter
+                    model.periphery.adaptive_neurons = adaptive_neurons
+                    expt = AuditoryFeaturesExperiment(model, phones=phones)
+                    expt.timit.filefilt.region = 8
+                    yield expt
+
+    def name(self, experiment):
+        return "%s,adaptive:%s,%s" % (
+            experiment.model.periphery.auditory_filter,
+            experiment.model.periphery.adaptive_neurons,
+            phone_str(experiment))
 
 task_af_periphery = lambda: AFPeripheryTask(
     auditory_filters=['gammatone',
@@ -495,7 +500,8 @@ task_af_periphery = lambda: AFPeripheryTask(
                       'tan_carney',
                       'dual_resonance',
                       'compressive_gammachirp'],
-    adaptive_neurons=[False, True])()
+    adaptive_neurons=[False, True],
+    phones=[TIMIT.consonants, TIMIT.vowels])()
 
 
 # ############################

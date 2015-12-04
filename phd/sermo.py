@@ -84,7 +84,7 @@ class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=melspace(0, 8000, 32), shape=('*',))
     sound_process = params.ProcessParam(default=None)
     auditory_filter = params.StringParam(default='gammatone')
-    neurons_per_freq = params.IntParam(default=5)
+    neurons_per_freq = params.IntParam(default=8)
     fs = params.NumberParam(default=TIMIT.fs)
     middle_ear = params.BoolParam(default=True)
     adaptive_neurons = params.BoolParam(default=False)
