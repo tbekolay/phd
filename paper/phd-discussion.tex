@@ -1,6 +1,80 @@
 \chapter{Discussion}
 
-\section{Reflection on results}
+\section{Summary and implications of results}
+
+\subsection{Neural cepstral coefficients}
+
+The most important and somewhat surprising result
+is that NCCs can yield significantly
+better training and test accuracy rates than MFCCs,
+which are the most commonly used
+feature vector in ASR systems.
+Our goal in these experiments was to
+show that NCCs are at least as good as MFCCs,
+as the primary motivation behind
+NCCs is to generate a feature vector
+entirely in spiking neurons,
+therefore making it suitable
+for use in Sermo,
+and more broadly being applicable
+in neuromorphic systems using
+a silicon cochlea.
+The fact that they also yielded
+better accuracy rates
+is promising,
+though it should be kept in mind
+that these results
+do classification through
+an ideal statistical linear SVM classifier,
+rather than being embedded
+in a full continuous ASR system.
+It remains to be seen
+whether NCCs will be successful
+in that more realistic setting.
+
+One advantage of NCCs is that
+no explicit normalization is required,
+as shown in Section~???,
+where it was determined
+that NCCs are best used
+without z-scoring, unlike MFCCs.
+It is important to note, however,
+that NCCs do still employ a method
+of normalization;
+spiking neurons have a refractory period,
+meaning that they have a strict maximum firing rate,
+which puts an effective limit on the
+decoded output of an ensembles.
+Unlike MFCCs, however,
+this normalization is applied
+for every step in the pipeline,
+rather than just once at the end.
+It is possible that
+the normalization inherent in
+spiking neural networks
+is responsible for the better performance
+compared to MFCCs.
+
+While a similar argument could be made
+for why adding derivatives had
+a deleterious effect on
+NCC test accuracy,
+it is also possible that
+using offline SVM classification
+is responsible for decreased performance.
+Having many more features
+may make the supervised learning procedure
+more difficult,
+or perhaps since we have the full history,
+the derivative is redundant
+and only makes it more difficult
+to linearly separate data.
+
+We view the final NCC experiment,
+in which the auditory periphery model was varied,
+as being the main contribution
+of this model.
+???more
 
 \subsection{Syllable sequencing and production}
 

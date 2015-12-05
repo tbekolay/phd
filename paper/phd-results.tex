@@ -272,6 +272,32 @@ as is standard in many ASR systems.
 NCCs are generated
 by running the model described in
 Section~??? with a 1 ms simulation timestep.
+Because NCC generation takes several minutes,
+and because the SVM fitting procedure
+is quadratic in the number of samples,
+we limit our experiments to
+one region of the TIMIT dataset
+(the ``army brat'' region,
+which consists of a training set
+of 220 utterances across 22 speakers,
+and a test set of of 110 utterances
+across 11 different speakers),
+but run each experiment
+10 times with different random seeds
+to generate confidence intervals
+for each experimental condition.
+In the MFCC case,
+the feature vectors are the same
+on every trial;
+the random seed controls the
+stochastic nature of
+the supervised learning procedure
+used in the SVM.
+In the NCC case,
+the random seed affects both
+the generation of model parameters
+that are sampled from random distributions,
+and the random seed used by the SVM.
 
 All trajectories are
 made to be the same length,
@@ -317,32 +343,246 @@ Finally, the same procedure is done
 with the test set to produce another
 set of input-output pairs.
 The input is fed to the linear SVM
-to generate a predicted phone labels,
+to generate predicted phone labels,
 which are compared to the actual phones
 to yield a correctness measure.
 
-\subsubsection{Number of neurons}
+Wherever not specified,
+the parameters used for each model
+are as listed in Table~???.
 
-??? for Nengo model, ramp up the number of neurons
-in each population to see where it plateaus;
-set that
-
-\subsubsection{Phone groups}
-
-??? Compare consonants and vowels separate vs. together
+??? table of default parameters
 
 \subsubsection{Derivatives and z-scoring}
 
-??? compare with deriv to without
+Two important choices for a feature vector
+are whether to include derivatives,
+and whether to normalize the resulting vector.
+Typically, ASR systems include at least
+one derivative, and perform normalization
+through z-scoring
+(i.e., removing the mean
+and normalizing to unit variance).
+We investigated whether these
+choices were important for NCCs.
 
-??? compare with zscore to without
+??? z-score figure
 
-for subsequent, use the one that was best (number of derivs
-and zscore)
+Figure~??? shows
+the training and testing accuracy
+for ten trials
+with and without z-scoring.
+For MFCCs,
+z-scoring greatly reduces the variance
+of the training and testing accuracy;
+the mean accuracy values
+are indistinguishable for
+vowel phonemes,
+and may be slightly lower
+for consonant phonemes.
+For NCCs,
+z-scoring sigiificantly
+raises training accuracy,
+but lowers testing accuracy
+(this trend is similar for MFCCs,
+but is obscured by the
+highly variable results
+when not z-scoring).
 
-??? Compare different auditory filters, with middle ear and without
+We interpret these results
+as meaning that z-scoring is essential
+for MFCCs because without it,
+the SVM fitting procedure
+varies significantly for
+different random seeds
+(hence the high variability without z-scoring).
+NCCs, on the other hand,
+have low variance in either condition.
+Since a higher test accuracy indicates
+better generalization,
+we believe that z-scoring
+does more harm than good for NCCs.
+Therefore, for future simulations,
+we will z-score the MFCC feature vector,
+but not the NCC feature vector.
 
-??? Compare adaptive neurons to normal LIF
+??? derviative figure
+
+Figure~??? shows
+the same experiment
+varying the number of derivatives used
+while always z-scoring MFCCs,
+and never z-scoring NCCs.
+Note that using derivative means
+that the feature vector has
+length 26,
+where the first 13 elements
+are cepstral coefficients,
+and the last 13 are derivatives
+of the cepstral coefficients;
+using two derivatives means that
+the vector has length 39,
+with the derivative of the
+derivative of the cepstral coefficient
+appended to vector with 26 elements.
+
+For MFCCs, adding a single derivative
+improves testing accuracy
+by almost double
+(??? 0deriv to 1deriv),
+but adding a second derivative
+has very little effect.
+For NCCs, adding derivatives
+improves training accuracy,
+but slightly reduces testing accuracy.
+
+??? derivative time figure
+
+Unlike with z-scoring,
+we believe it is important
+for the MFCC and NCC features to
+be the same length,
+so for subsequent experiments,
+both feature vectors
+will contain the first derivative
+(and therefore have length 26).
+We use one derivative
+because it puts MFCCs and NCCs
+on nearly equal footing;
+MFCCs are greatly improved
+with derivatives,
+while NCCs are only slightly worsened.
+Adding derivatives
+has a significant effect
+on the amount of time taken to
+generate NCCs
+(see Figure~???),
+so we add only one derivative
+to keep the experiments tractable.
+
+Note that in both of these experiments,
+it is accuracy is generally higher
+for vowel phones versus consonant phones.
+Therefore, in subsequent experiments,
+we will test only with consonant phones
+as they should pose a greater challenge
+to the model.
+
+\subsubsection{Number of neurons}
+
+Ideally,
+we would like to reduce the amount of time
+that the NCC generation process takes.
+As shown in Figure~???,
+generating NCCs for all
+of the speech samples is expensive.
+Reducing the number of neurons
+used in the NCC model
+can speed it up,
+but at the cost of performance.
+In these experiments,
+we vary the number of neurons used
+in different layers of the model
+in order to see their impact
+on speed and performance.
+
+??? figure: periph figure
+
+Figure~??? shows the results of
+varying the number of neurons
+in the auditory periphery layer.
+In this layer,
+each auditory filter projects
+to an ensemble of neurons
+of the size varied in this experiment.
+Since the representation here
+is a simple one
+(a positive scalar value),
+the number of neurons required
+should not be very large,
+so we vary between
+1 and 32 neurons with steps
+at each power of two.
+The number of neurons used
+in the feature layers
+is fixed at 20 per feature.
+Instead of plotting the absolute accuracy,
+in this and subsequent experiments,
+we plot the accuracy of the NCC model
+relative to the mean accuracy
+of the same number
+of MFCC model instance accuracies.
+
+As seen in Figure~???,
+training accuracy
+does not change significantly
+whether we use
+1 or 32 neurons neurons per filter,
+thought variance is higher
+with fewer neurons.
+Testing accuracy,
+however, improves up to
+using 8 neurons per filter,
+but then plateaus,
+or may even decline
+(possibly due to overfitting).
+Therefore, in all
+subsequent experiments,
+we use 8 neurons to represent
+the output of each auditory filter.
+
+??? Figure: feature figure
+
+Figure~??? shows the results
+of varying the number of neurons
+in the feature layer,
+which includes the ensembles
+representing the cepstral coefficients,
+the ensembles representing
+the derivatives of those coefficients,
+and any additional ensembles required
+to compute the derivative.
+The number of neurons for each filter
+in the periphery is fixed at 8.
+
+A very different trend is evident
+when varying the number of neurons
+used in the feature layer.
+For very small number of neurons,
+training accuracy is worse
+than MFCC training accuracy.
+As the number of neurons increases,
+accuracy improves up to
+using 8 neurons per ensemble,
+then steadily worsens.
+Testing accuracy, however,
+is highly variable until
+we use 8 neurons per ensemble,
+at which point performance
+steadily increases up to
+the highest number of neurons tested,
+64 neurons per ensemble.
+
+??? Figure: feature times
+
+As with the number of derivatives,
+the number of neurons in the feature layer
+has a big impact on the amount of time
+each experiment takes;
+see Figure~???.
+The time taken for each trial
+is the same up to 12 neurons per ensemble,
+at which point
+the time taken sharply increases.
+Since the accuracy using 12 neurons per ensemble
+is significantly higher than
+the mean accuracy of the equivalent MFCC feature vector,
+we believe that using 12 neurons per ensemble
+is sufficiently accurate,
+and so in subsequent experiments,
+we fix the number of neurons
+in the feature layer to contain
+12 neurons per ensemble.
 
 \subsubsection{NCC averaging}
 
@@ -350,6 +590,21 @@ Maybe this worked because the NCCs operate
 at a lower timestep and average.
 Do a run with 0.001 ms MFCCs
 to show that it doesn't matter
+
+\subsubsection{Phone groups}
+
+As previously mentioned,
+to this point we have
+
+??? Compare consonants and vowels separate vs. together
+
+\subsubsection{Auditory periphery model}
+
+This experiment varies the auditory periphery model
+used at the beginning of the NCC pipeline.
+
+6 models, with and without outer/middle ear, and with and without adaptive LIF;
+18 conditions in all
 
 \subsection{Scaling}
 
