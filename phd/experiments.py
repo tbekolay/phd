@@ -237,7 +237,7 @@ class AuditoryFeaturesExperiment(object):
         labels = sorted(list(audio))
         return np.array([l for l in labels for _ in range(len(audio[l]))])
 
-    def train(self, result):
+    def train(self, result, n_frames=None):
 
         def fit_svm(x, y, feature):
             svm = LinearSVC(random_state=self.seed)
@@ -253,7 +253,7 @@ class AuditoryFeaturesExperiment(object):
         audio = self._get_audio(corpus="train")
 
         # NB! Do MFCC first to get n_frames for NCC.
-        x_mfcc = self._get_feature('mfcc', audio, result)
+        x_mfcc = self._get_feature('mfcc', audio, result, n_frames=n_frames)
         n_frames = int(x_mfcc.shape[1] // self.model.dimensions)
         y = self._get_labels(audio)
         mfcc_svm = fit_svm(x_mfcc, y, 'mfcc')
@@ -279,7 +279,7 @@ class AuditoryFeaturesExperiment(object):
         key = cache.generic_key(self) if key is None else key
         return cache.cache_file(key, ext='npz', subdir='ncc')
 
-    def run(self, key=None):
+    def run(self, key=None, n_frames=None):
         key = cache.generic_key(self) if key is None else key
         if cache.cache_file_exists(key, ext='npz', subdir='ncc'):
             log("%s.npz in the cache. Loading." % key)
@@ -288,7 +288,7 @@ class AuditoryFeaturesExperiment(object):
             result = AuditoryFeaturesResult()
             log("%s.npz not in the cache. Running." % key)
             log("==== Training ====")
-            mfcc_svm, ncc_svm = self.train(result)
+            mfcc_svm, ncc_svm = self.train(result, n_frames=n_frames)
             log("==== Testing ====")
             self.test(result, mfcc_svm, 'mfcc')
             self.test(result, ncc_svm, 'ncc')
@@ -385,7 +385,9 @@ class AFPeripheryNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
-                model.add_derivative()
+                # Set features to 20 neurons to isolate periphery effect
+                model.add_derivative(n_neurons=20)
+                model.cepstra.n_neurons = 20
                 model.periphery.neurons_per_freq = n_neurons
                 expt = AuditoryFeaturesExperiment(model, phones=phones)
                 expt.timit.filefilt.region = 8
@@ -396,7 +398,7 @@ class AFPeripheryNeuronsTask(ExperimentTask):
             experiment.model.periphery.neurons_per_freq, phone_str(experiment))
 
 task_af_periphery_neurons = lambda: AFPeripheryNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 32], phones=[TIMIT.consonants])()
+    n_neurons=[1, 2, 4, 8, 16, 32], phones=[TIMIT.consonants])()
 
 
 class AFFeatureNeuronsTask(ExperimentTask):
@@ -407,9 +409,10 @@ class AFFeatureNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             for phones in self.phones:
                 model = sermo.AuditoryFeatures()
+                # Set periphery to 8 neurons to isolate feature effect
+                model.periphery.neurons_per_freq = 8
                 model.add_derivative(n_neurons=n_neurons)
                 model.cepstra.n_neurons = n_neurons
-                # For this one at least, we'll use one derivative
                 expt = AuditoryFeaturesExperiment(model, phones=phones)
                 expt.timit.filefilt.region = 8
                 yield expt
@@ -455,11 +458,19 @@ class AFTimeWindowTask(ExperimentTask):
                 expt.timit.filefilt.region = 8
                 yield expt
 
+    def __call__(self):
+        """Generate a set of `n_iters` tasks for the given model."""
+        for task in super(AFTimeWindowTask, self).__call__():
+            # Overwrite the action to include n_frames=35
+            #  consonants: 22 frames; vowels: 35 frames
+            task['actions'][0][1].append(35)
+            yield task
+
     def name(self, experiment):
-        return "dt=%f,%s" % (experiment.model.mfcc.dt, phone_str(experiment))
+        return "dt:%f,%s" % (experiment.model.mfcc.dt, phone_str(experiment))
 
 task_af_timewindow = lambda: AFTimeWindowTask(
-    dts=[0.001, 0.005, 0.02], phones=[TIMIT.consonants])()
+    dts=[0.001, 0.005, 0.01], phones=[TIMIT.consonants])()
 
 
 class AFPeripheryTask(ExperimentTask):

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
+from scipy import stats
 
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -77,9 +78,8 @@ def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
     plt.tight_layout()
 
 
-def compare(data, columns, x_keys, x_label, y_label,
-            relative_to=None, group_by=None, filter_by=None,
-            plot_f=sns.violinplot, **plot_args):
+def prep_data(data, columns, x_keys, x_label, y_label,
+              relative_to=None, group_by=None, filter_by=None):
     data = data.copy()  # Make a copy, as we modify it
 
     # Make columns relative to other columns
@@ -89,31 +89,60 @@ def compare(data, columns, x_keys, x_label, y_label,
 
     filter_by = [] if filter_by is None else filter_by
 
-    extra_keys = [key for key, val in filter_by]
+    extra_keys = ['seed']
+    extra_keys.extend([key for key, val in filter_by])
     extra_keys.extend(relative_to)
     if group_by is not None:
         extra_keys.append(group_by)
 
-    if len(extra_keys) > 0:
-        # Get the requested columns, and the one we're grouping by
-        data = pd.concat([data[[c] + extra_keys] for c in columns],
-                         keys=x_keys, names=[x_label])
-        # Merge all of the columns into one
-        data[y_label] = np.nan
-        for c in columns:
-            data[y_label].fillna(data[c], inplace=True)
-            del data[c]
-    else:
-        # Get the requested columns (auto-merged)
-        data = pd.concat([data[c] for c in columns],
-                         keys=x_keys, names=[x_label]).to_frame()
-        data.columns = [y_label]
+    # Get the requested columns, and the one we're grouping by
+    data = pd.concat([data[[c] + extra_keys] for c in columns],
+                     keys=x_keys, names=[x_label])
+    # Merge all of the columns into one
+    data[y_label] = np.nan
+    for c in columns:
+        data[y_label].fillna(data[c], inplace=True)
+        del data[c]
+
     # Make the index (`x_label`) into a column
     data.reset_index(level=0, inplace=True)
     # Only take what we're filtering by
     for key, val in filter_by:
         data = data[data[key] == val]
+    return data
 
+
+def compare(data, columns, x_keys, x_label, y_label,
+            relative_to=None, group_by=None, filter_by=None,
+            plot_f=sns.violinplot, **plot_args):
+    data = prep_data(data, columns, x_keys, x_label, y_label,
+                     relative_to, group_by, filter_by)
     # Go Seaborn!
     plot_f(x=x_label, y=y_label, hue=group_by, data=data, **plot_args)
     sns.despine()
+
+
+def timeseries(data, columns, x_keys, x_label, y_label,
+               relative_to=None, group_by=None, filter_by=None,
+               **plot_args):
+    data = prep_data(data, columns, x_keys, x_label, y_label,
+                     relative_to, group_by, filter_by)
+    data[group_by] = data[group_by].apply(float)
+    # data.sort_values(by=group_by, inplace=True)
+
+    # plot_args.setdefault("err_style", "ci_bars")
+    plot_args.setdefault("estimator", stats.nanmedian)
+    # plot_args.setdefault("estimator", stats.nanmean)
+    plot_args.setdefault("ci", [68, 95])
+
+    sns.tsplot(data=data,
+               time=group_by,
+               unit='seed',
+               value=y_label,
+               condition=x_label,
+               **plot_args)
+    sns.despine()
+
+
+# Stat bars:
+# https://github.com/jbmouret/matplotlib_for_papers#stars-statistical-significance
