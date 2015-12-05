@@ -358,6 +358,7 @@ class GestureSequence(object):
         for gest in self.gestures:
             start = int(t / dt)
             end = start + int(gest.duration_s / dt)
+            t += gest.duration_s
             if not self.numerical:
                 label = gest.label
             if label == 'neutral':
@@ -368,7 +369,6 @@ class GestureSequence(object):
                 old_min, old_max = VTL.numerical_range[label]
                 traj = rescale(traj, old_min, old_max, 0, 1)
             out[start:end, ix] = traj
-            t += gest.duration_s
         return out
 
 
