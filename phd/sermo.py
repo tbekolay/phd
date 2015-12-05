@@ -267,7 +267,6 @@ class ProdSyllableParams(ParamsObject):
 
 class ProductionInfoParams(ParamsObject):
     n_per_d = params.IntParam(default=60)
-    dimensions = params.IntParam(default=None)
     threshold = params.NumberParam(default=0.3)
 
 
@@ -310,9 +309,10 @@ class Production(object):
         # Make a readout for the production info coming from the DMPs
         intercepts = ClippedExpDist(0.15, self.production_info.threshold, 1)
         net.production_info = EnsembleArray(self.production_info.n_per_d,
-                                            self.production_info.dimensions,
+                                            n_ensembles=48,
                                             encoders=Choice([[1]]),
-                                            intercepts=intercepts)
+                                            intercepts=intercepts,
+                                            radius=1.1)
 
         net.syllables = []
         dt = self.trial.dt
@@ -365,6 +365,11 @@ class Production(object):
         net.init_reset = nengo.Node(
             lambda t: 1.0 if t < self.trial.t_release else 0.0)
         nengo.Connection(net.init_reset, net.sequencer.reset)
+
+        # the output is suppressed,
+        nengo.Connection(net.init_reset,
+                         net.production_info.add_neuron_input(),
+                         transform=-1)
 
         # the timer is started.
         nengo.Connection(net.init_reset, net.sequencer.timer,

@@ -56,7 +56,7 @@ class ExperimentTask(object):
 
     params = []
 
-    def __init__(self, n_iters=4, **kwargs):
+    def __init__(self, n_iters=10, **kwargs):
         self.n_iters = n_iters
 
         for key in self.params:
@@ -319,14 +319,6 @@ class AuditoryFeaturesResult(ExperimentResult):
                 'ncc_test_acc']
     subdir = "ncc"
 
-    @property
-    def mfcc_acc(self):
-        return np.mean(self.mfcc_pred == self.y)
-
-    @property
-    def ncc_acc(self):
-        return np.mean(self.ncc_pred == self.y)
-
 
 def phone_str(experiment):
     if experiment.phones is TIMIT.consonants:
@@ -427,7 +419,7 @@ class AFFeatureNeuronsTask(ExperimentTask):
             experiment.model.cepstra.n_neurons, phone_str(experiment))
 
 task_af_feature_neurons = lambda: AFFeatureNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 16, 32, 64], phones=[TIMIT.consonants])()
+    n_neurons=[1, 2, 4, 8, 12, 16, 32, 64], phones=[TIMIT.consonants])()
 
 
 class AFPhonesTask(ExperimentTask):
@@ -511,6 +503,14 @@ task_af_periphery = lambda: AFPeripheryTask(
 class ProductionExperiment(object):
     def __init__(self):
         pass
+
+
+class ProductionResult(object):
+
+    saved = []
+    to_float = []
+    subdir = "prod"
+
 
 
 # #############################
