@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import os
-import subprocess
 import sys
 import warnings
 
@@ -10,14 +8,15 @@ import nengo.utils.numpy as npext
 import numpy as np
 import scipy
 from nengo.cache import NoDecoderCache
-from nengo.utils.compat import iteritems, range
+from nengo.utils.compat import range
 from nengo.utils.stdlib import Timer
 from sklearn.svm import LinearSVC
 from scipy.interpolate import interp1d
 from scipy import stats
 
-from . import cache, config, filters, parallel, sermo
+from . import analysis, cache, config, ges_path, parallel, vtl
 from .timit import TIMIT
+from .utils import derivative, rescale
 
 
 def log(msg):
@@ -50,45 +49,6 @@ class ExperimentResult(object):
     def save(self, key):
         cache.cache_obj(self.save_dict(),
                         key=key, ext='npz', subdir=self.subdir)
-
-
-class ExperimentTask(object):
-
-    params = []
-
-    def __init__(self, n_iters=10, **kwargs):
-        self.n_iters = n_iters
-
-        for key in self.params:
-            setattr(self, key, kwargs.pop(key, None))
-        # kwargs should be empty now
-        for key in kwargs:
-            raise TypeError("got an unexpected keyword argument '%s'" % key)
-
-
-    def fullname(self, experiment, seed):
-        ename = self.name(experiment)
-        sname = "seed:%d" % seed
-        return sname if ename is None else "%s,%s" % (ename, sname)
-
-    def __call__(self):
-        """Generate a set of `n_iters` tasks for the given model."""
-        for seed in range(self.n_iters):
-            for experiment in self:
-                experiment.seed = seed
-                name = self.fullname(experiment, seed)
-                yield {'name': name,
-                       'actions': [(experiment.run, [name])],
-                       'file_dep': [__file__, sermo.__file__],
-                       'targets': [experiment.cache_file(name)]}
-
-    def __iter__(self):
-        """Should yield experiment instances."""
-        raise NotImplementedError()
-
-    def name(self, experiment):
-        """Should return a name based on the experiment."""
-        return None
 
 
 # #####################################
@@ -320,208 +280,219 @@ class AuditoryFeaturesResult(ExperimentResult):
     subdir = "ncc"
 
 
-def phone_str(experiment):
-    if experiment.phones is TIMIT.consonants:
-        s = "consonants"
-    elif experiment.phones is TIMIT.vowels:
-        s = "vowels"
-    elif experiment.phones is TIMIT.phones:
-        s = "all"
-    else:
-        s = repr(experiment.phones)
-    return "phones:%s" % s
-
-
-class AFZscoreTask(ExperimentTask):
-
-    params = ['zscore', 'phones']
-
-    def __iter__(self):
-        for zscore in self.zscore:
-            for phones in self.phones:
-                model = sermo.AuditoryFeatures()
-                model.add_derivative()
-                expt = AuditoryFeaturesExperiment(
-                    model, phones=phones, zscore=zscore)
-                expt.timit.filefilt.region = 8
-                yield expt
-
-    def name(self, experiment):
-        return "zscore:%s,%s" % (
-            experiment.zscore, phone_str(experiment))
-
-task_af_zscore = lambda: AFZscoreTask(
-    zscore=[False, True], phones=[TIMIT.consonants])()
-
-
-class AFDerivativesTask(ExperimentTask):
-
-    params = ['n_derivatives', 'phones']
-
-    def __iter__(self):
-        for n_derivatives in self.n_derivatives:
-            for phones in self.phones:
-                model = sermo.AuditoryFeatures()
-                model.add_derivative()
-                for _ in range(n_derivatives):
-                    model.add_derivative()
-                expt = AuditoryFeaturesExperiment(model, phones=phones)
-                expt.timit.filefilt.region = 8
-                yield expt
-
-    def name(self, experiment):
-        return "derivatives:%d,%s" % (
-            experiment.model.mfcc.n_derivatives, phone_str(experiment))
-
-task_af_derivatives = lambda: AFDerivativesTask(
-    n_derivatives=[0, 1, 2], phones=[TIMIT.consonants])()
-
-
-class AFPeripheryNeuronsTask(ExperimentTask):
-
-    params = ['n_neurons', 'phones']
-
-    def __iter__(self):
-        for n_neurons in self.n_neurons:
-            for phones in self.phones:
-                model = sermo.AuditoryFeatures()
-                # Set features to 20 neurons to isolate periphery effect
-                model.add_derivative(n_neurons=20)
-                model.cepstra.n_neurons = 20
-                model.periphery.neurons_per_freq = n_neurons
-                expt = AuditoryFeaturesExperiment(model, phones=phones)
-                expt.timit.filefilt.region = 8
-                yield expt
-
-    def name(self, experiment):
-        return "periphery:%d,%s" % (
-            experiment.model.periphery.neurons_per_freq, phone_str(experiment))
-
-task_af_periphery_neurons = lambda: AFPeripheryNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 16, 32], phones=[TIMIT.consonants])()
-
-
-class AFFeatureNeuronsTask(ExperimentTask):
-
-    params = ['n_neurons', 'phones']
-
-    def __iter__(self):
-        for n_neurons in self.n_neurons:
-            for phones in self.phones:
-                model = sermo.AuditoryFeatures()
-                # Set periphery to 8 neurons to isolate feature effect
-                model.periphery.neurons_per_freq = 8
-                model.add_derivative(n_neurons=n_neurons)
-                model.cepstra.n_neurons = n_neurons
-                expt = AuditoryFeaturesExperiment(model, phones=phones)
-                expt.timit.filefilt.region = 8
-                yield expt
-
-    def name(self, experiment):
-        return "feature:%d,%s" % (
-            experiment.model.cepstra.n_neurons, phone_str(experiment))
-
-task_af_feature_neurons = lambda: AFFeatureNeuronsTask(
-    n_neurons=[1, 2, 4, 8, 12, 16, 32, 64], phones=[TIMIT.consonants])()
-
-
-class AFPhonesTask(ExperimentTask):
-
-    params = ['phones']
-
-    def __iter__(self):
-        for phones in self.phones:
-            model = sermo.AuditoryFeatures()
-            model.add_derivative()
-            expt = AuditoryFeaturesExperiment(model, phones=phones)
-            expt.timit.filefilt.region = 8
-            yield expt
-
-    def name(self, experiment):
-        return phone_str(experiment)
-
-task_af_phones = lambda: AFPhonesTask(
-    phones=[TIMIT.consonants, TIMIT.vowels, TIMIT.phones])()
-
-
-class AFTimeWindowTask(ExperimentTask):
-
-    params = ['dts', 'phones']
-
-    def __iter__(self):
-        for dt in self.dts:
-            for phones in self.phones:
-                model = sermo.AuditoryFeatures()
-                model.add_derivative()
-                model.mfcc.dt = dt
-                expt = AuditoryFeaturesExperiment(model, phones=phones)
-                expt.timit.filefilt.region = 8
-                yield expt
-
-    def __call__(self):
-        """Generate a set of `n_iters` tasks for the given model."""
-        for task in super(AFTimeWindowTask, self).__call__():
-            # Overwrite the action to include n_frames=35
-            #  consonants: 22 frames; vowels: 35 frames
-            task['actions'][0][1].append(35)
-            yield task
-
-    def name(self, experiment):
-        return "dt:%f,%s" % (experiment.model.mfcc.dt, phone_str(experiment))
-
-task_af_timewindow = lambda: AFTimeWindowTask(
-    dts=[0.001, 0.005, 0.01], phones=[TIMIT.consonants])()
-
-
-class AFPeripheryTask(ExperimentTask):
-
-    params = ['auditory_filters', 'adaptive_neurons', 'phones']
-
-    def __iter__(self):
-        for auditory_filter in self.auditory_filters:
-            for adaptive_neurons in self.adaptive_neurons:
-                for phones in self.phones:
-                    model = sermo.AuditoryFeatures()
-                    model.add_derivative()
-                    model.periphery.auditory_filter = auditory_filter
-                    model.periphery.adaptive_neurons = adaptive_neurons
-                    expt = AuditoryFeaturesExperiment(model, phones=phones)
-                    expt.timit.filefilt.region = 8
-                    yield expt
-
-    def name(self, experiment):
-        return "%s,adaptive:%s,%s" % (
-            experiment.model.periphery.auditory_filter,
-            experiment.model.periphery.adaptive_neurons,
-            phone_str(experiment))
-
-task_af_periphery = lambda: AFPeripheryTask(
-    auditory_filters=['gammatone',
-                      'approximate_gammatone',
-                      'log_gammachirp',
-                      'linear_gammachirp',
-                      'tan_carney',
-                      'dual_resonance',
-                      'compressive_gammachirp'],
-    adaptive_neurons=[False, True],
-    phones=[TIMIT.consonants, TIMIT.vowels])()
-
-
 # ############################
 # Model 2: Syllable production
 # ############################
 
+def ix2seqlabel(ix, labels):
+    if ix < labels.index('ll-labial-nas'):
+        return 'vowel-gestures'
+    elif ix < labels.index('tt-alveolar-nas'):
+        return 'lip-gestures'
+    elif ix < labels.index('tb-palatal-fric'):
+        return 'tongue-tip-gestures'
+    elif ix < labels.index('breathy'):
+        return 'tongue-body-gestures'
+    elif ix < labels.index('velic'):
+        return 'glottal-shape-gestures'
+    elif ix < labels.index('lung-pressure'):
+        return 'velic-gestures'
+    else:
+        return 'lung-pressure-gestures'
+
+
+def gesture_score(traj, dt, dspread=18, dthresh=0.012):
+    """Construct a gesture score given a trajectory."""
+    # --- Take derivative and find times with high derivative
+    trajd = np.abs(derivative(traj, dspread))
+    slices = trajd > dthresh
+
+    # --- Find x and y indices for slice starts and ends
+    diff_in = np.vstack([np.zeros(trajd.shape[1]),
+                         slices,
+                         np.zeros(trajd.shape[1])])
+    x_ind, y_ind = np.where(np.abs(np.diff(diff_in, axis=0)))
+    if x_ind.size % 2 != 0:
+        raise ValueError("Odd number of slice start/ends, not good.")
+
+    # --- Sort by seqs
+    synth = vtl.VTL()
+    labels = synth.gesture_labels()
+    labels.remove("f0")
+    seqs = np.array([ix2seqlabel(yi, labels) for yi in y_ind])
+    sort_ix = np.argsort(seqs)
+    seqs = seqs[sort_ix]
+    x_ind = x_ind[sort_ix]
+    y_ind = y_ind[sort_ix]
+
+    # --- Sort by x within seqs
+    for seq in np.unique(seqs):
+        subset = seqs == seq
+        x_order = np.argsort(x_ind[subset])
+        x_ind[subset] = x_ind[subset][x_order]
+        y_ind[subset] = y_ind[subset][x_order]
+
+    # Convert to lists so that we can process and delete them
+    seqs = seqs.tolist()
+    x_ind = x_ind.tolist()
+    y_ind = y_ind.tolist()
+
+    # --- Construct the gesture score
+    gs = vtl.GestureScore(labels)
+    # Make an initial sequence
+    seq = vtl.GestureSequence(seqs[0])
+    gs.sequences.append(seq)
+
+    while len(x_ind) > 0:
+        this_start, this_y, this_seq = x_ind[0], y_ind[0], seqs[0]
+        x_ind, y_ind, seqs = x_ind[1:], y_ind[1:], seqs[1:]
+
+        # Get only the x values for the same y
+        filt_x = [x_ind[i] for i in range(len(y_ind)) if y_ind[i] == this_y]
+        filt_y = [y_ind[i] for i in range(len(y_ind)) if y_ind[i] == this_y]
+        this_end = filt_x[0]
+        ix = x_ind.index(this_end)
+        del x_ind[ix]
+        assert y_ind[ix] == this_y
+        del y_ind[ix]
+        assert seqs[ix] == this_seq
+        del seqs[ix]
+
+        if len(filt_x) == 1:
+            # At the end of this gesture
+            next_start = next_end = trajd.shape[0]
+        else:
+            next_start, next_end = filt_x[1], filt_x[2]
+
+        if this_seq != seq.type:
+            # Moved to the next sequence!
+            seq = vtl.GestureSequence(this_seq)
+            gs.sequences.append(seq)
+
+        # Use the midpoint of the high derivative slice
+        st = int((this_end + this_start) // 2)
+        ed = int((next_end + next_start) // 2)
+        tr_slice = traj[st:ed, this_y]
+
+        # Median gives a somewhat more robust measure
+        # of if we're on or off
+        if np.median(tr_slice) < 0.1:
+            # We ignore neutral gesture that occur, but later add our own
+            continue
+
+        if seq.numerical:
+            value = tr_slice.max()  # Max gives a better measure than median
+            value = rescale(value, 0, 1,
+                            *synth.numerical_range[labels[this_y]])
+        else:
+            value = labels[this_y]
+
+        tau = (this_end - this_start) * dt * 0.5  # scale to match examples
+        duration = (ed - st) * dt
+
+        # Add in a neutral gesture to make sure this gesture is time-aligned
+        t_diff = round(st * dt, 3) - round(seq.t_end, 3)
+        if t_diff > 0:
+            seq.gestures.append(vtl.Gesture("", 0., t_diff, tau, True))
+        elif t_diff < 0:
+            warnings.warn("Gesture start time is before seq.t_end; difference "
+                          "is %s. Trying to compensate..." % t_diff)
+            duration += t_diff
+
+        # Finally, add the gesture for this time slice
+        seq.gestures.append(vtl.Gesture(value, 0., duration, tau, False))
+    return gs
+
+
+def ideal_traj(model, sequence):
+    traj = []
+    for syll in sequence:
+        syllable = model.syllable_dict[syll.upper()]
+        t_frames = int((1. / syllable.freq) / model.trial.dt)
+        traj.append(shorten(syllable.trajectory, t_frames))
+    return np.vstack(traj)
+
+
 class ProductionExperiment(object):
-    def __init__(self):
-        pass
+    def __init__(self, model, syllables, sequence, seed=None):
+        self.model = model
+        self.syllables = syllables
+        self.sequence = sequence
+        self.seed = np.random.randint(npext.maxint) if seed is None else seed
+
+    def run(self):
+        result = ProductionResult()
+
+        t = 0.2
+        gs_targets = []
+        for gdir, ges, freq in self.syllables:
+            path = ges_path(gdir, "%s.ges" % ges.lower())
+            gs = vtl.parse_ges(path)
+            gs_targets.append(gs)
+            traj = gs.trajectory(self.model.trial.dt)
+            self.model.add_syllable(
+                label=ges.upper(), freq=freq, trajectory=traj)
+            t += 1. / freq
+        # Add some t fudge factor?
+
+        seq_str = " + ".join(["%s*POS%d" % (ges.upper(), i+1)
+                              for i, ges in enumerate(self.sequence)])
+        self.model.trial.sequence = seq_str
+
+        net = self.model.build()
+        with net:
+            p_out = nengo.Probe(net.production_info.output, synapse=0.01)
+
+        sim = nengo.Simulator(net)
+        sim.run(t)
+
+        # Get ideal trajectory; compare RMSE
+        delay_frames = int(self.model.trial.t_release / self.model.trial.dt)
+        traj = ideal_traj(self.model, self.sequence)
+        result.traj = traj
+
+        simtraj = sim.data[p_out][delay_frames:]
+        simtraj = simtraj[:traj.shape[0]]
+        result.simtraj = simtraj
+        result.simrmse = npext.rmse(traj, simtraj)
+
+        # Reconstruct gesture score; compare to originals
+        gs = gesture_score(simtraj, self.model.trial.dt)
+        # result.gs_accuracy = analysis.gs_accuracy(gs, gs_targets)
+        # result.gs_timing = analysis.gs_timing(gs, gs_targets)
+        # result.gs_cooccur = analysis.gs_cooccur(gs, gs_targets)
+
+        # Get the reconstructed trajectory and audio
+        reconstructed = gs.trajectory(dt=self.model.trial.dt)
+        result.reconstructed = reconstructed
+        minsize = min(reconstructed.shape[0], traj.shape[0])
+        result.reconstructedrmse = npext.rmse(traj[:minsize],
+                                              reconstructed[:minsize])
+        audio, fs = gs.synthesize()
+        result.audio = audio
+        result.fs = fs
+
+        return result
 
 
 class ProductionResult(object):
 
-    saved = []
-    to_float = []
+    saved = ['traj',
+             'simtraj',
+             'simrmse',
+             'reconstructed',
+             'reconstructedrmse',
+             'gs_accuracy',
+             'gs_timing',
+             'gs_cooccur',
+             'audio',
+             'fs']
+    to_float = ['simrmse',
+                'reconstructedrmse',
+                'gs_accuracy',
+                'gs_timing',
+                'gs_cooccur']
     subdir = "prod"
-
 
 
 # #############################

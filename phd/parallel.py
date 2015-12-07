@@ -5,6 +5,7 @@ from multiprocess import Pool
 
 def initializer():
     from phd.experiments import ncc
+    assert ncc
     # Add any other things needed here
 
 

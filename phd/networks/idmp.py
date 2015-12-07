@@ -2,10 +2,6 @@ import nengo
 import nengo.utils.numpy as npext
 import numpy as np
 from nengo.dists import Choice, ClippedExpDist
-from nengo.networks import Product
-
-from .dmp import radial_f
-from ..utils import rescale
 
 
 def ff_inv(func, thresh=0.6, scale=0.7):

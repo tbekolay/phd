@@ -1,4 +1,3 @@
-import brian.hears as bh
 from nengo.params import (  # noqa: F401
     BoolParam,
     DictParam,

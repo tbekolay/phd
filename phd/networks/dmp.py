@@ -19,10 +19,9 @@ def traj2func(traj, dt=0.001):
 
     def _trajf(x):
         # x goes from 0 to 1; normalize by t_end
-        # But give a bit of 0 at the start...
         if x < 0.1:
             return np.zeros(traj.shape[1])
-        ix = min(int(rescale(x, 0.1, 1., 0., t_end-0.1) / dt), traj.shape[0]-1)
+        ix = min(int(rescale(x, 0.0, 1.0, 0., t_end) / dt), traj.shape[0]-1)
         return traj[ix]
     _trajf.traj = traj
     _trajf.ix = traj_ix
@@ -96,8 +95,11 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
         nengo.Connection(net.diff_inhib.neurons, net.diff.neurons,
                          transform=-np.ones((n_per_d, 20)))
         nengo.Connection(net.osc, net.diff)
-        reset_goal = np.array([-1, omega*0.9])
+        reset_goal = np.array([-1, omega*0.1])
         nengo.Connection(net.diff, net.osc, function=lambda x: reset_goal - x)
+
+        # TODO: figure out a way to inhibit the reset drive when
+        #       we're the one generating it...
 
         # --- Inhibit the oscillator by default
         i_intercepts = ClippedExpDist(0.15, -0.5, 0.1)

@@ -4,7 +4,7 @@ import os
 import doit
 from doit.action import CmdAction
 
-from .experiments import *  # Load experiment tasks
+from .tasks import *  # noqa; Load experiment tasks
 
 DOIT_CONFIG = {
     'default_tasks': [],

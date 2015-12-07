@@ -80,6 +80,7 @@ class MFCCParams(ParamsObject):
     def __call__(self):
         return mfcc(**self.kwargs())
 
+
 class PeripheryParams(ParamsObject):
     freqs = params.NdarrayParam(default=melspace(0, 8000, 32), shape=('*',))
     sound_process = params.ProcessParam(default=None)
@@ -283,6 +284,7 @@ class Production(object):
         self.sequence = SyllableSequenceParams()
         self.sequencer = SequencerParams()
         self.syllables = []
+        self.syllable_dict = {}
         self.production_info = ProductionInfoParams()
         self.trial = ProductionTrialParams()
 
@@ -291,6 +293,7 @@ class Production(object):
         for k, v in iteritems(kwargs):
             setattr(syll, k, v)
         self.syllables.append(syll)
+        self.syllable_dict[syll.label] = syll
 
     def build(self, net=None):
         if net is None:
@@ -367,9 +370,9 @@ class Production(object):
         nengo.Connection(net.init_reset, net.sequencer.reset)
 
         # the output is suppressed,
-        nengo.Connection(net.init_reset,
-                         net.production_info.input,
-                         transform=-np.ones((48, 1)))
+        # nengo.Connection(net.init_reset,
+        #                  net.production_info.input,
+        #                  transform=-np.ones((48, 1)))
 
         # the timer is started.
         nengo.Connection(net.init_reset, net.sequencer.timer,

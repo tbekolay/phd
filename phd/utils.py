@@ -36,3 +36,19 @@ def ensuretuple(val):
     if is_string(val) or not is_iterable(val):
         return tuple([val])
     return tuple(val)
+
+
+def derivative(feat, spread):
+    assert feat.ndim == 2
+    if feat.shape[0] == 1:
+        # Can't do derivative of one sample
+        return feat
+    spread = min(spread, feat.shape[0] - 1)
+    out = np.zeros_like(feat)
+    for i in range(1, spread + 1):
+        plus = np.roll(feat, -i, axis=0)
+        plus[-i:] = plus[-i-1]
+        minus = np.roll(feat, i, axis=0)
+        minus[:i] = 0.
+        out += plus - minus
+    return out / (2 * np.sum(np.arange(1, spread + 1)))

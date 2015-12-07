@@ -29,8 +29,7 @@ import sys
 import numpy as np
 from lxml import etree
 from nengo.utils.compat import is_number, is_string, iteritems, range
-from scipy.io.wavfile import read as read_wav
-from scipy.io.wavfile import write as write_wav
+import soundfile as sf
 
 from ..cache import cache_file
 from ..utils import hz2st, rescale
@@ -99,7 +98,8 @@ class VTL(object):
 
         # Get tract info
         c_n_tract_param_ptr = ctypes.c_double * self.n_vocaltract_params
-        self.tract_param_names = ctypes.create_string_buffer(self.n_vocaltract_params * 32)
+        self.tract_param_names = ctypes.create_string_buffer(
+            self.n_vocaltract_params * 32)
         self.tract_param_min = c_n_tract_param_ptr(0)
         self.tract_param_max = c_n_tract_param_ptr(0)
         self.tract_param_neutral = c_n_tract_param_ptr(0)
@@ -111,7 +111,8 @@ class VTL(object):
 
         # Get glottis info
         c_n_glottis_param_ptr = ctypes.c_double * self.n_glottis_params
-        self.glottis_param_names = ctypes.create_string_buffer(self.n_glottis_params * 32)
+        self.glottis_param_names = ctypes.create_string_buffer(
+            self.n_glottis_params * 32)
         self.glottis_param_min = c_n_glottis_param_ptr(0)
         self.glottis_param_max = c_n_glottis_param_ptr(0)
         self.glottis_param_neutral = c_n_glottis_param_ptr(0)
@@ -158,16 +159,17 @@ class VTL(object):
         repair_wavheader(wavfile)
         # As a bit of a hack, we'll zero out the first 5 ms, which often has
         # some kind of weird click.
-        fs, audio = read_wav(wavfile)
+        audio, fs = sf.read(wavfile)
         audio[:int(round(0.005 * fs))] = 0
 
         if loadwav:
             os.remove(wavfile)
             return audio, fs
         else:
-            write_wav(wavfile, fs, audio)
+            sf.write(wavfile, audio, fs)
 
-    def synthesize_direct(self, tract_params, glottis_params, duration_s, framerate_hz, wavfile=None):
+    def synthesize_direct(self, tract_params, glottis_params, duration_s,
+                          framerate_hz, wavfile=None):
         extra_frames = 1000
         n_frames = int(duration_s * framerate_hz)
         assert len(tract_params) / self.n_vocaltract_params == n_frames
@@ -179,11 +181,14 @@ class VTL(object):
             duration_s * self.audio_samplerate + extra_frames)
         audio = c_audio_ptr(0)
         n_audio_samples = c_int_ptr(0)
-        c_tubeareas_ptr = ctypes.c_double * int(n_frames * self.n_tube_sections)
+        c_tubeareas_ptr = ctypes.c_double * int(
+            n_frames * self.n_tube_sections)
         tubeareas = c_tubeareas_ptr(0)
-        c_tractsequence_ptr = ctypes.c_double * int(n_frames * self.n_vocaltract_params)
+        c_tractsequence_ptr = ctypes.c_double * int(
+            n_frames * self.n_vocaltract_params)
         tract_params_ptr = c_tractsequence_ptr(*tract_params)
-        c_glottissequence_ptr = ctypes.c_double * int(n_frames * self.n_glottis_params)
+        c_glottissequence_ptr = ctypes.c_double * int(
+            n_frames * self.n_glottis_params)
         glottis_params_ptr = c_tractsequence_ptr(*glottis_params)
 
         # Call VTL
@@ -203,7 +208,7 @@ class VTL(object):
 
         if wavfile is None:
             return out_audio, self.audio_samplerate
-        write_wav(wavfile, self.audio_samplerate, out_audio)
+        sf.write(wavfile, out_audio, self.audio_samplerate)
 
     def gesture_labels(self):
         """Determines labels for all gestures from the speaker file."""
@@ -440,9 +445,9 @@ def get_traindata(gesfile, audio_f, dt,
         audio, fs = synthesize(gesfile)
     elif not os.path.exists(wavfile):
         synthesize(gesfile, wavfile)
-        fs, audio = read_wav(wavfile)
+        audio, fs = sf.read(wavfile)
     else:
-        fs, audio = read_wav(wavfile)
+        audio, fs = sf.read(wavfile)
 
     audio_fargs = {} if audio_fargs is None else audio_fargs.copy()
     audio_fargs.update({'audio': audio, 'fs': fs, 'dt': dt})

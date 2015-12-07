@@ -15,7 +15,6 @@ def erbspace(low, high, n_freq):
 def melspace(low, high, n_freq):
     return mel2hz(np.linspace(hz2mel(low), hz2mel(high), n_freq))
 
-# Auditory filters (need rectification)
 
 def gammatone(freqs, b=1.019):
     return bh.Gammatone(dummy_sound, freqs, b=b)
@@ -33,8 +32,6 @@ def log_gammachirp(freqs, glide_slope=-2.96, time_const=1.81):
 
 # Use LinearGaborChirp instead
 
-
-# Auditory models (don't need rectification)
 
 def dual_resonance(freqs):
     return bh.DRNL(dummy_sound, freqs, type='human')

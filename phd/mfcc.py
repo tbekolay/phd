@@ -12,7 +12,7 @@ import numpy as np
 from nengo.utils.compat import range
 from scipy.fftpack import dct
 
-from .utils import hz2mel, mel2hz
+from .utils import derivative, hz2mel, mel2hz
 
 
 def mfcc(audio, fs=16000, window_dt=0.025, dt=0.01, n_cepstra=13,
@@ -79,22 +79,6 @@ def mfcc(audio, fs=16000, window_dt=0.025, dt=0.01, n_cepstra=13,
         derivs.append(derivative(target, deriv_spread))
         target = derivs[-1]
     return np.hstack([feat] + derivs)
-
-
-def derivative(feat, spread):
-    assert feat.ndim == 2
-    if feat.shape[0] == 1:
-        # Can't do derivative of one sample
-        return feat
-    spread = min(spread, feat.shape[0] - 1)
-    out = np.zeros_like(feat)
-    for i in range(1, spread + 1):
-        plus = np.roll(feat, -i, axis=0)
-        plus[-i:] = plus[-i-1]
-        minus = np.roll(feat, i, axis=0)
-        minus[:i] = 0.
-        out += plus - minus
-    return out / (2 * np.sum(np.arange(1, spread + 1)))
 
 
 def fbank(audio, fs=16000, window_dt=0.025, dt=0.01,

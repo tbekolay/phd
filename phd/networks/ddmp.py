@@ -1,6 +1,6 @@
 import nengo
 import numpy as np
-from nengo.dists import Choice, ClippedExpDist, Uniform
+from nengo.dists import ClippedExpDist, Uniform
 
 
 class UniformWithDeadzone(Uniform):
@@ -33,6 +33,7 @@ def zone(deadzone):
 def radial_f(func, deadzone):
     # Compensate for the deadzone by giving theta * deadcomp to the function
     deadcomp = 1. + deadzone / (2 * np.pi)
+
     def _radial_f(x):
         theta = np.arctan2(x[1], x[0]) * deadcomp
         return func(theta / (2 * np.pi) + 0.5)
