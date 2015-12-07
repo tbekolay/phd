@@ -41,6 +41,7 @@ setup(
         "numpy",
         "matplotlib",
         "nengo",
+        "nwalign",
         "pandas",
         "pysoundfile",
         "scikit-learn",

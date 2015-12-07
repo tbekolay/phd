@@ -309,6 +309,8 @@ class GestureScore(object):
 
     @property
     def t_end(self):
+        if len(self.sequences) == 0:
+            return 0.0
         return max(seq.t_end for seq in self.sequences)
 
     def save(self, path):
@@ -373,7 +375,7 @@ class GestureSequence(object):
             if self.numerical:
                 old_min, old_max = VTL.numerical_range[label]
                 traj = rescale(traj, old_min, old_max, 0, 1)
-            out[start:end, ix] = traj
+            out[start:end, ix] = traj[:end-start]
         return out
 
 

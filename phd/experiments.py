@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 import sys
 import warnings
 
@@ -7,6 +8,7 @@ import nengo
 import nengo.utils.numpy as npext
 import numpy as np
 import scipy
+from nengo import spa
 from nengo.cache import NoDecoderCache
 from nengo.utils.compat import range
 from nengo.utils.stdlib import Timer
@@ -128,6 +130,7 @@ def normalize(features, n_frames):
 
 def shorten(feature, n_frames):
     """Compute neighbourhood mean to shorten the feature vector."""
+    assert feature.shape[0] >= n_frames
     scale = int(feature.shape[0] / n_frames)
     pad_size = int(np.ceil(float(feature.shape[0]) / scale) * scale
                    - feature.shape[0])
@@ -139,6 +142,7 @@ def shorten(feature, n_frames):
 
 def lengthen(feature, n_frames):
     """Use linear interpolation to lengthen the feature vector."""
+    assert feature.shape[0] <= n_frames
     if feature.shape[0] == 1:
         feature = np.tile(feature, (2, 1))
     interp_x = np.linspace(0, n_frames, feature.shape[0])
@@ -254,6 +258,7 @@ class AuditoryFeaturesExperiment(object):
             self.test(result, ncc_svm, 'ncc')
             result.save(key)
             log("Experiment run saved to the cache.")
+        return key
 
 
 class AuditoryFeaturesResult(ExperimentResult):
@@ -340,18 +345,19 @@ def gesture_score(traj, dt, dspread=18, dthresh=0.012):
     # --- Construct the gesture score
     gs = vtl.GestureScore(labels)
     # Make an initial sequence
+    if len(seqs) == 0:
+        return gs
     seq = vtl.GestureSequence(seqs[0])
     gs.sequences.append(seq)
 
     while len(x_ind) > 0:
-        this_start, this_y, this_seq = x_ind[0], y_ind[0], seqs[0]
-        x_ind, y_ind, seqs = x_ind[1:], y_ind[1:], seqs[1:]
+        this_start, this_y, this_seq = x_ind.pop(0), y_ind.pop(0), seqs.pop(0)
 
         # Get only the x values for the same y
-        filt_x = [x_ind[i] for i in range(len(y_ind)) if y_ind[i] == this_y]
-        filt_y = [y_ind[i] for i in range(len(y_ind)) if y_ind[i] == this_y]
-        this_end = filt_x[0]
-        ix = x_ind.index(this_end)
+        filt_x = [(i, x_ind[i]) for i in range(len(y_ind))
+                  if y_ind[i] == this_y]
+        ix, this_end = filt_x[0]
+        assert x_ind[ix] == this_end
         del x_ind[ix]
         assert y_ind[ix] == this_y
         del y_ind[ix]
@@ -362,7 +368,7 @@ def gesture_score(traj, dt, dspread=18, dthresh=0.012):
             # At the end of this gesture
             next_start = next_end = trajd.shape[0]
         else:
-            next_start, next_end = filt_x[1], filt_x[2]
+            next_start, next_end = filt_x[1][1], filt_x[2][1]
 
         if this_seq != seq.type:
             # Moved to the next sequence!
@@ -399,6 +405,9 @@ def gesture_score(traj, dt, dspread=18, dthresh=0.012):
                           "is %s. Trying to compensate..." % t_diff)
             duration += t_diff
 
+        if duration < 0:
+            raise ValueError("Duration is negative. Big problems!")
+
         # Finally, add the gesture for this time slice
         seq.gestures.append(vtl.Gesture(value, 0., duration, tau, False))
     return gs
@@ -409,37 +418,67 @@ def ideal_traj(model, sequence):
     for syll in sequence:
         syllable = model.syllable_dict[syll.upper()]
         t_frames = int((1. / syllable.freq) / model.trial.dt)
-        traj.append(shorten(syllable.trajectory, t_frames))
+        if t_frames >= syllable.trajectory.shape[0]:
+            traj.append(lengthen(syllable.trajectory, t_frames))
+        else:
+            traj.append(shorten(syllable.trajectory, t_frames))
     return np.vstack(traj)
 
 
+def get_syllables(n_syllables, minfreq, maxfreq, rng=np.random):
+    allpaths = []
+    for gdir in ['ges-de-ccv', 'ges-de-cv', 'ges-de-cvc', 'ges-de-v']:
+        allpaths.extend([ges_path(gdir, gfile)
+                         for gfile in os.listdir(ges_path(gdir))])
+    indices = rng.permutation(len(allpaths))
+    return ([allpaths[indices[i]] for i in range(n_syllables)],
+            [rng.uniform(minfreq, maxfreq) for i in range(n_syllables)])
+
+
+def path2label(ges_path):
+    return os.path.basename(ges_path)[:-4].upper()
+
+
 class ProductionExperiment(object):
-    def __init__(self, model, syllables, sequence, seed=None):
+    def __init__(self, model, n_syllables, sequence_len,
+                 minfreq=0.8, maxfreq=3.0, seed=None):
         self.model = model
-        self.syllables = syllables
-        self.sequence = sequence
+        self.n_syllables = n_syllables
+        self.sequence_len = sequence_len
+        self.minfreq = minfreq
+        self.maxfreq = maxfreq
         self.seed = np.random.randint(npext.maxint) if seed is None else seed
 
-    def run(self):
-        result = ProductionResult()
+    def run_model(self):
+        res = ProductionResult()
+        rng = np.random.RandomState(self.seed)
+
+        paths, freqs = get_syllables(
+            self.n_syllables, self.minfreq, self.maxfreq, rng)
 
         t = 0.2
         gs_targets = []
-        for gdir, ges, freq in self.syllables:
-            path = ges_path(gdir, "%s.ges" % ges.lower())
+        for path, freq in zip(paths, freqs):
             gs = vtl.parse_ges(path)
             gs_targets.append(gs)
             traj = gs.trajectory(self.model.trial.dt)
-            self.model.add_syllable(
-                label=ges.upper(), freq=freq, trajectory=traj)
+            label = path2label(path)
+            self.model.add_syllable(label=label, freq=freq, trajectory=traj)
             t += 1. / freq
-        # Add some t fudge factor?
 
-        seq_str = " + ".join(["%s*POS%d" % (ges.upper(), i+1)
-                              for i, ges in enumerate(self.sequence)])
+        # Determine and save syllable sequence
+        seq_ix = rng.permutation(len(paths))[:self.sequence_len]
+        seq = [path2label(paths[i]) for i in seq_ix]
+        seq_str = " + ".join(["%s*POS%d" % (label, i+1)
+                              for i, label in enumerate(seq)])
         self.model.trial.sequence = seq_str
+        res.seq = np.array(seq)
+
+        # Save frequencies for that sequence
+        res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
 
         net = self.model.build()
+        net.seed = self.seed
         with net:
             p_out = nengo.Probe(net.production_info.output, synapse=0.01)
 
@@ -448,50 +487,74 @@ class ProductionExperiment(object):
 
         # Get ideal trajectory; compare RMSE
         delay_frames = int(self.model.trial.t_release / self.model.trial.dt)
-        traj = ideal_traj(self.model, self.sequence)
-        result.traj = traj
+        traj = ideal_traj(self.model, seq)
+        res.traj = traj
 
         simtraj = sim.data[p_out][delay_frames:]
         simtraj = simtraj[:traj.shape[0]]
-        result.simtraj = simtraj
-        result.simrmse = npext.rmse(traj, simtraj)
+        res.simtraj = simtraj
+        res.simrmse = npext.rmse(traj, simtraj)
 
         # Reconstruct gesture score; compare to originals
         gs = gesture_score(simtraj, self.model.trial.dt)
-        # result.gs_accuracy = analysis.gs_accuracy(gs, gs_targets)
-        # result.gs_timing = analysis.gs_timing(gs, gs_targets)
-        # result.gs_cooccur = analysis.gs_cooccur(gs, gs_targets)
+        res.accuracy = analysis.gs_accuracy(gs, gs_targets)
+        res.timing_mean, res.timing_var = analysis.gs_timing(gs, gs_targets)
+        res.cooccur, res.co_chance = analysis.gs_cooccur(gs, gs_targets)
 
         # Get the reconstructed trajectory and audio
         reconstructed = gs.trajectory(dt=self.model.trial.dt)
-        result.reconstructed = reconstructed
+        res.reconstructed = reconstructed
         minsize = min(reconstructed.shape[0], traj.shape[0])
-        result.reconstructedrmse = npext.rmse(traj[:minsize],
+        res.reconstructedrmse = npext.rmse(traj[:minsize],
                                               reconstructed[:minsize])
         audio, fs = gs.synthesize()
-        result.audio = audio
-        result.fs = fs
+        res.audio = audio
+        res.fs = fs
 
-        return result
+        # FIXME: also save the clean audio for comparison!
+
+        return res
+
+    def cache_file(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        return cache.cache_file(key, ext='npz', subdir='prod')
+
+    def run(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        if cache.cache_file_exists(key, ext='npz', subdir='prod'):
+            log("%s.npz in the cache. Loading." % key)
+            result = ProductionResult.load(key)
+        else:
+            log("%s.npz not in the cache. Running." % key)
+            result = self.run_model()
+            result.save(key)
+            log("Experiment run saved to the cache.")
+        return key
 
 
-class ProductionResult(object):
+class ProductionResult(ExperimentResult):
 
-    saved = ['traj',
+    saved = ['seq',
+             'freqs',
+             'traj',
              'simtraj',
              'simrmse',
              'reconstructed',
              'reconstructedrmse',
-             'gs_accuracy',
-             'gs_timing',
-             'gs_cooccur',
+             'accuracy',
+             'timing_mean',
+             'timing_var',
+             'cooccur',
+             'co_chance',
              'audio',
              'fs']
     to_float = ['simrmse',
                 'reconstructedrmse',
-                'gs_accuracy',
-                'gs_timing',
-                'gs_cooccur']
+                'accuracy',
+                'timing_mean',
+                'timing_var',
+                'cooccur',
+                'co_chance']
     subdir = "prod"
 
 
@@ -499,6 +562,100 @@ class ProductionResult(object):
 # Model 3: Syllable recognition
 # #############################
 
-class RecognitionExpermient(object):
-    def __init__(self):
-        pass
+class RecognitionExperiment(object):
+    def __init__(self, model, n_syllables, sequence_len,
+                 minfreq=0.8, maxfreq=1.6, seed=None):
+        self.model = model
+        self.n_syllables = n_syllables
+        self.sequence_len = sequence_len
+        self.minfreq = minfreq
+        self.maxfreq = maxfreq
+        self.seed = np.random.randint(npext.maxint) if seed is None else seed
+
+    def run_model(self):
+        res = RecognitionResult()
+        rng = np.random.RandomState(self.seed)
+
+        paths, freqs = get_syllables(
+            self.n_syllables, self.minfreq, self.maxfreq, rng)
+
+        t = 0.2
+        gs_targets = []
+        for path, freq in zip(paths, freqs):
+            gs = vtl.parse_ges(path)
+            gs_targets.append(gs)
+            traj = gs.trajectory(self.model.trial.dt)
+            label = path2label(path)
+            self.model.add_syllable(label=label, freq=freq, trajectory=traj)
+            t += 1. / freq
+
+        # Determine and save syllable sequence
+        seq_ix = rng.permutation(len(paths))[:self.sequence_len]
+        seq = [path2label(paths[i]) for i in seq_ix]
+        seq_str = " + ".join(["%s*POS%d" % (label, i+1)
+                              for i, label in enumerate(seq)])
+        res.seq = np.array(seq)
+
+        # Set that sequence in the model
+        traj = ideal_traj(self.model, seq)
+        self.model.trial.trajectory = traj
+
+        # Save frequencies for that sequence
+        res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
+
+        net = self.model.build()
+        net.seed = self.seed
+        with net:
+            p_dmps = [nengo.Probe(dmp.state[0], synapse=0.01)
+                      for dmp in net.syllables]
+            p_class = nengo.Probe(net.classifier, synapse=0.01)
+            p_mem = nengo.Probe(net.memory.output, synapse=0.01)
+
+        sim = nengo.Simulator(net)
+        sim.run(t)
+
+        # Save iDMP system states
+        res.dmps = np.hstack([sim.data[p_d] for p_d in p_dmps])
+        res.dmp_labels = np.array([s.label for s in self.model.syllables])
+
+        # Save working memory similarities
+        res.memory = spa.similarity(sim.data[p_mem], net.vocab, True)
+
+        # Determine if memory representation is correct
+        # res.memory_acc =
+
+        # Determine classification times and labels
+        t_ix, class_ix = analysis.classinfo(sim.data[p_class], res.dmps)
+        res.class_time = sim.trange()[t_ix]
+        res.class_labels = np.array([path2label(paths[ix]) for ix in class_ix])
+
+        return res
+
+    def cache_file(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        return cache.cache_file(key, ext='npz', subdir='recog')
+
+    def run(self, key=None):
+        key = cache.generic_key(self) if key is None else key
+        if cache.cache_file_exists(key, ext='npz', subdir='recog'):
+            log("%s.npz in the cache. Loading." % key)
+            result = RecognitionResult.load(key)
+        else:
+            log("%s.npz not in the cache. Running." % key)
+            result = self.run_model()
+            result.save(key)
+            log("Experiment run saved to the cache.")
+        return key
+
+
+class RecognitionResult(ExperimentResult):
+
+    saved = ['seq',
+             'freqs',
+             'dmps',
+             'dmp_labels',
+             'memory',
+             'class_time',
+             'class_labels',]
+    to_float = []
+    subdir = "recog"

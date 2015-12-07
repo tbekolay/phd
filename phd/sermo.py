@@ -254,16 +254,13 @@ class SequencerParams(ParamsObject):
 
 class ProdSyllableParams(ParamsObject):
     n_per_d = params.IntParam(default=120)
-    label = params.StringParam(default=None)
-    freq = params.NumberParam(default=3.)
-    trajectory = params.NdarrayParam(shape=('*', 48))
     tau = params.NumberParam(default=0.025)
 
-    def kwargs(self):
-        args = super(ProdSyllableParams, self).kwargs()
-        del args['trajectory']
-        del args['label']
-        return args
+
+class ProdSyllable(ParamsObject):
+    label = params.StringParam(default=None)
+    freq = params.NumberParam(default=1.)
+    trajectory = params.NdarrayParam(shape=('*', 48))
 
 
 class ProductionInfoParams(ParamsObject):
@@ -283,13 +280,14 @@ class Production(object):
             nengo.Ensemble, nengo.Connection, nengo.Probe)
         self.sequence = SyllableSequenceParams()
         self.sequencer = SequencerParams()
+        self.syllable = ProdSyllableParams()
         self.syllables = []
         self.syllable_dict = {}
         self.production_info = ProductionInfoParams()
         self.trial = ProductionTrialParams()
 
     def add_syllable(self, **kwargs):
-        syll = ProdSyllableParams()
+        syll = ProdSyllable()
         for k, v in iteritems(kwargs):
             setattr(syll, k, v)
         self.syllables.append(syll)
@@ -322,7 +320,8 @@ class Production(object):
         for syllable in self.syllables:
             forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
             forcing_f.__name__ = syllable.label
-            dmp = RhythmicDMP(forcing_f=forcing_f, **syllable.kwargs())
+            dmp = RhythmicDMP(forcing_f=forcing_f, freq=syllable.freq,
+                              **self.syllable.kwargs())
             nengo.Connection(dmp.output, net.production_info.input[gesture_ix])
             net.syllables.append(dmp)
 
@@ -384,19 +383,17 @@ class Production(object):
 # #############################
 
 class RecogSyllableParams(ParamsObject):
-    trajectory = params.NdarrayParam(shape=('*', 48))
     n_per_d = params.IntParam(default=400)
-    label = params.StringParam(default=None)
     similarity_th = params.NumberParam(default=0.85)
     scale = params.NumberParam(default=0.67)
     reset_scale = params.NumberParam(default=2.5)
     tau = params.NumberParam(default=0.05)
 
-    def kwargs(self):
-        args = super(RecogSyllableParams, self).kwargs()
-        del args['trajectory']
-        del args['label']
-        return args
+
+class RecogSyllable(ParamsObject):
+    label = params.StringParam(default=None)
+    trajectory = params.NdarrayParam(shape=('*', 48))
+    freq = params.NumberParam(default=3.)
 
 
 class CleanupParams(ParamsObject):
@@ -429,17 +426,20 @@ class Recognition(object):
     def __init__(self):
         self.config = nengo.Config(
             nengo.Ensemble, nengo.Connection, nengo.Probe)
+        self.syllable = RecogSyllableParams()
         self.syllables = []
+        self.syllable_dict = {}
         self.cleanup = CleanupParams()
         self.memory = MemoryParams()
         self.classifier = ClassifierParams()
         self.trial = RecognitionTrialParams()
 
     def add_syllable(self, **kwargs):
-        syll = RecogSyllableParams()
+        syll = RecogSyllable()
         for k, v in iteritems(kwargs):
             setattr(syll, k, v)
         self.syllables.append(syll)
+        self.syllable_dict[syll.label] = syll
 
     def build(self, net=None):
         if net is None:
@@ -467,7 +467,7 @@ class Recognition(object):
         for syllable in self.syllables:
             forcing_f, gesture_ix = traj2func(syllable.trajectory, dt=dt)
             forcing_f.__name__ = syllable.label
-            dmp = InverseDMP(forcing_f=forcing_f, **syllable.kwargs())
+            dmp = InverseDMP(forcing_f=forcing_f, **self.syllable.kwargs())
             # Sensitive gestures: pass on to state
             nengo.Connection(net.trajectory.output[gesture_ix], dmp.input)
             # Non-sensitive gestures: reset the state

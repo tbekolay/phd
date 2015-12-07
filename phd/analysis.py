@@ -1,11 +1,13 @@
 import copy
 import os
+import random
 import re
 import string
-from itertools import groupby
 
 import numpy as np
+import nwalign as nw
 import pandas as pd
+from nengo.utils.compat import range
 
 from . import cache, vtl
 from .utils import rescale
@@ -75,18 +77,26 @@ def gs_combine(scores):
 
 
 def gs2strings(gs, neutral_th=0.05):
-    """Convert a gesture score to a list of strings.
+    """Convert a gesture score to a string for alignment.
 
-    Each string represents the gesture sequence for one
-    of the articulator sets, with no timing information.
+    The string represents the gesture sequence, grouped by articulator set,
+    with no timing information. Timing information is instead included in
+    the other return values: duration, start time, and end time of all
+    of the
     """
     strings = {}
+    durations = {}
+    t_start = {}
+    t_end = {}
     for seq in gs.sequences:
         chars = []
+        durs = []
         for gest in seq.gestures:
             if gest.neutral:
                 if gest.duration_s > neutral_th:
                     chars.append("0")
+                else:
+                    continue
             elif gest.value in gs.labels:
                 # Use ascii_letters; there are 52, so sufficient for gests
                 chars.append(string.ascii_letters[gs.labels.index(gest.value)])
@@ -94,23 +104,84 @@ def gs2strings(gs, neutral_th=0.05):
                 label = seq.type[:-len("-gestures")]
                 old_min, old_max = vtl.VTL.numerical_range[label]
                 val = rescale(gest.value, old_min, old_max, 0, 1)
-                val = np.clip(val, 0, 0.999)
-                chars.append(str(int(val * 10)))
+                chars.append("9" if val > 0.3 else "0")
             else:
                 raise ValueError("gest.value '%s' not recognized" % gest.value)
-        # Use groupby to remove repeated instances of the same char
-        st = "".join(c for c, _ in groupby(chars))
-        st = st[:-1] if st.endswith("0") else st
-        strings[seq.type] = st
-    return "".join([strings[k] for k in sorted(list(strings))])
+            durs.append(gest.duration_s)
+
+        assert len(chars) == len(durs)
+
+        # Need to remove repeated instances of the same char,
+        # and sum their durations at the same time.
+        i = 0
+        while i+1 < len(chars):
+            if chars[i] == chars[i+1]:
+                del chars[i+1]
+                durs[i] += durs[i+1]
+                del durs[i+1]
+            else:
+                i += 1
+        if len(chars) > 0 and chars[-1] == '0':
+            # Remove ending neutral gesture
+            del chars[-1]
+            del durs[-1]
+
+        # Determine the starting and ending times for each gesture
+        t_s = []
+        t_e = []
+        for i in range(len(durs)):
+            if i == 0:
+                t_s.append(0.)
+                t_e.append(durs[i])
+            else:
+                t_s.append(t_s[-1] + durs[i - 1])
+                t_e.append(t_e[-1] + durs[i])
+
+        strings[seq.type] = "".join(chars)
+        durations[seq.type] = durs
+        t_start[seq.type] = t_s
+        t_end[seq.type] = t_e
+
+    return ("".join([strings[k] for k in sorted(list(strings))]),
+            [d for k in sorted(list(strings)) for d in durations[k]],
+            [ts for k in sorted(list(strings)) for ts in t_start[k]],
+            [te for k in sorted(list(strings)) for te in t_end[k]])
+
+
+def gs_align(left, right):
+    lstring, lduration, lstart, lend = left
+    rstring, rduration, rstart, rend = right
+
+    lalign, ralign = nw.global_align(lstring, rstring)
+
+    def insert_placeholders(align, duration, start, end):
+        for i, ch in enumerate(align):
+            if ch == '-':
+                duration.insert(i, -1)
+                start.insert(i, -1)
+                end.insert(i, -1)
+    insert_placeholders(lalign, lduration, lstart, lend)
+    insert_placeholders(ralign, rduration, rstart, rend)
+    align_ix = [i for i in range(len(lalign)) if lalign[i] == ralign[i]]
+    return lalign, ralign, align_ix
 
 
 def gs_accuracy(gs, targets):
     """Compare a gesture score to a collection of gesture score targets."""
     target = gs_combine(targets)
+    gsinfo, tginfo = gs2strings(gs), gs2strings(target)
+    lalign, ralign, _ = gs_align(gsinfo, tginfo)
 
-    # We'll compare sequence by sequence
-    # for seq in
+    n_gestures = len(tginfo[0])
+    n_sub = n_del = n_ins = 0
+    for lchar, rchar in zip(lalign, ralign):
+        if lchar == '-':
+            n_ins += 1
+        elif rchar == '-':
+            n_del += 1
+        elif lchar != rchar:
+            n_sub += 1
+    return float(n_gestures - n_sub - n_del - n_ins) / n_gestures
 
 
 def gs_accuracy_baseline():
@@ -134,20 +205,89 @@ def gs_timing(gs, targets):
     overall speed bias, and the variance, which is how reliably the
     reconstruction
     """
-    pass
+    target = gs_combine(targets)
+    gsinfo, tginfo = gs2strings(gs), gs2strings(target)
+    lalign, ralign, align_ix = gs_align(gsinfo, tginfo)
+
+    gsdurs = np.array(gsinfo[1])[align_ix]
+    tgdurs = np.array(tginfo[1])[align_ix]
+    durdiff = gsdurs - tgdurs
+    return np.mean(durdiff), np.var(durdiff)
 
 
-def gs_cooccur(gs, targets):
+def gs_cooccur(gs, targets, th=0.005):
     """Compare the timing of cooccurring gestures to those in targets.
 
     Gesture that start or end at the same time are critical to well-formed
     speech. Here, we ensure that those cooccurrences are captured in a
     given gesture compared to the targets.
     """
-    pass
+    target = gs_combine(targets)
+    gsinfo, tginfo = gs2strings(gs), gs2strings(target)
+    lalign, ralign, align_ix = gs_align(gsinfo, tginfo)
 
+    def filtaligned(l):
+        return np.array(l)[align_ix].tolist()
+    gs_start, gs_end = filtaligned(gsinfo[2]), filtaligned(gsinfo[3])
+    tg_start, tg_end = filtaligned(tginfo[2]), filtaligned(tginfo[3])
+
+    # Shuffled versions for determining chance levels
+    shuff_starts = random.sample(gs_start, len(gs_start))
+    shuff_ends = random.sample(gs_end, len(gs_end))
+
+    # Get the cooccurring indices from the target score
+    def cooccurr_ix(l, th=0.001):
+        ix = []
+        for i in range(len(l)):
+            for j in range(i+1, len(l)):
+                if abs(l[i] - l[j]) < th:
+                    ix.append((i, j))
+        return ix
+    costart_ix = cooccurr_ix(tg_start)
+    coend_ix = cooccurr_ix(tg_end)
+
+    def accuracy(starts, ends):
+        good = bad = 0
+
+        for lix, rix in costart_ix:
+            if abs(starts[lix] - starts[rix]) < th:
+                good += 1
+            else:
+                bad += 1
+        for lix, rix in coend_ix:
+            if abs(ends[lix] - ends[rix]) < th:
+                good += 1
+            else:
+                bad += 1
+        if good + bad == 0:
+            # Ignore situations with no co-occurrence
+            return np.nan
+        return good / float(good + bad)
+
+    # Accuracy of gs; chance accuracy
+    return accuracy(gs_start, gs_end), accuracy(shuff_starts, shuff_ends)
 
 
 # #############################
 # Model 3: Syllable recognition
 # #############################
+
+# SOMEWHERE IN HERE WE SHOULD DO THE ALIGNMENTS,
+# USE THAT INFO IN THE ACC / TIMING STUFF
+
+def classinfo(classdata, dmpdata):
+    dclass = np.diff((classdata > 0.001).astype(float), axis=0)
+    time_ix, _ = np.where(dclass > 0)
+
+    # Find the iDMP most active when the classification happened
+    class_ix = np.argmax(dmpdata[time_ix], axis=1)
+    return time_ix, class_ix
+
+
+def cl_accuracy():
+    # Also return the number of subst, deletions, ins
+    pass
+
+
+def cl_timing(class_time, ):
+    pass
