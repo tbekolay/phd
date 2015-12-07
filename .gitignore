@@ -43,3 +43,6 @@ paper/auto/
 # Project specific
 *.wav
 cache/
+
+# Figure stuff
+figures/**/*.pdf

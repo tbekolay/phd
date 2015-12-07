@@ -586,21 +586,103 @@ in the feature layer to contain
 
 \subsubsection{NCC averaging}
 
-Maybe this worked because the NCCs operate
-at a lower timestep and average.
-Do a run with 0.001 ms MFCCs
-to show that it doesn't matter
+Before the eventual goal of
+varying the auditory periphery model used,
+we address concerns about the validity
+of our comparison.
+
+One possible concern is that
+the NCC model runs at a lower timestep,
+giving it some numerical advantages
+over the MFCC model;
+similarly, the shortening and lengthening
+procedures may affect the results.
+To examine the validity of these concerns,
+we set up an experiment
+with a fixed number of frames
+per audio sample,
+and varied the amount that the frame window
+advanced on each timestep.
+When the frame window moves at the
+same rate as the Nengo simulation timestep,
+the two models are manipulated
+in the same way by the
+shortening algorithm,
+which averages over a time windo.
+
+??? Figure: timewindow
+
+Figure~??? shows the consonant accuracy
+as a function of the
+frame window advance in seconds.
+While using a lower timestep results in
+significantly better training accuracy,
+testing accuracy is actually better
+with a longer timestep,
+indicating that the increased temporal
+resolution may be causing overfitting.
+It is possible that this overfitting
+also occurs with the NCC model,
+but running with a high simulation timestep
+would result in an abundance of
+synchronous spiking activity
+and lowered decoding accuracy.
 
 \subsubsection{Phone groups}
 
-As previously mentioned,
-to this point we have
+Finally, to this point we have
+evaluated all of the experiments using
+the consonant phones
+because we believe that they are
+more difficult than vowel phones.
+However, it may be the case that
+using all phones together
+is a more advantageous situation
+for MFCCs compared to NCCs.
+For that reason,
+we compared the relative accuracy
+of NCCs when using
+vowel phones, consonant phones,
+and all phones together
+(including the silent phone).
 
-??? Compare consonants and vowels separate vs. together
+??? Figure: phones
+
+Figure~??? presents the results.
+All conditions have relative accuracy
+significantly above one,
+meaning that NCC features performed
+better than MFCC features.
+Additionally, ??? more
+
+??? figure: time taken
+
+As seen in Figure~???,
+using all phones increases the
+amount of time to run experiments significantly.
+Not only do NCCs take a long time to generate,
+the increased number of samples
+causes the SVM fitting procedure
+to take a long time
+for both MFCCs and NCCs.
+Interestingly, fitting for NCCs
+takes ??? almost half
+the time as fitting for MFCCs,
+despite the number of samples
+and number of features being identical.
+This result indicates that it is
+easier to find linearly separating hyperplanes
+for NCCs than MFCCs.
+
+In sum, we believe that our choice to
+only test with consonant phones
+was justified,
+and results in the closest
+comparison between MFCCs and NCCs.
 
 \subsubsection{Auditory periphery model}
 
-This experiment varies the auditory periphery model
+This final experiment varies the auditory periphery model
 used at the beginning of the NCC pipeline.
 
 6 models, with and without outer/middle ear, and with and without adaptive LIF;
@@ -753,46 +835,102 @@ The gesture score resulting from the model simulation
 is then compared to the original gesture score
 on three criteria.
 First, we calculate the accuracy
-of the model's gesture score
-% using the same formula
-% that is used for phoneme classification accuracy;
-% specifically,
-% \begin{equation}
-%   \text{Acc} = \frac{N_g - S - D - I}{N_g},
-% \end{equation}
-% where $N_g$ is the number of gestures
-% in the original gesture score,
-% $S$ is the number of substitutions,
-% $D$ is the number of deletions,
-% and $I$ is the number of insertions.
+of the reconstructed gesture score
+with the same equation as phoneme classification accuracy;
+specifically,
+\begin{equation}
+  \text{Acc} = \frac{N_g - S - D - I}{N_g},
+\end{equation}
+Therefore, we must find the number of
+substitutions, deletions, and insertions
+in our gesture score compared to
+a gesture score composed of
+the original gestures scores
+for the target syllables
+concatenated together.
+In order to determine the number of
+insertions, deletions and substitutions,
+we first convert the original
+and reconstructed gesture scores
+to a sequence of characters
+by assigning a character to each gesture
+and determining their order
+within each articulator set,
+then concatenating them.
+Neutral gestures are recorded
+and denoted with the ``\texttt{0}'' character;
+numerical gestures are assigned
+a digit from \texttt{0} to \texttt{9}
+depending on the relative value
+in the gesture's range.
+We then do a global pairwise alignment
+of the string determined
+from the target gesture
+and the reconstructed gesture,
+which is then evaluated
+according to equation~???.
+In order to evaluate whether
+accuracy scores are good
+(since we know of no comparable
+speech trajectory generation techniques)
+we will compare the accuracy
+of the reconstructed gesture scores
+to a baseline calculated as
+the mean accuracy of all the
+non-matching syllables in the
+repository of syllables.
+In other words, we will calculate
+the accuracy of all combinations
+of syllables in the syllable repository
+(except for matching syllables)
+and set the baseline as the mean
+of those accuracy measures.
 
-% In the case of phonemes,
-% it is easy to calculate accuracy,
-% as we represent the actual and classified labels
-% as strings.
-% For gesture scores,
-% each gesture has a start time and a length;
-% in some cases, gestures should co-occur,
-% so their temporal order is unimportant.
-% For other gestures ...
+Since the accuracy measure only tells us
+that the gesture score contains
+the right gestures in the right order,
+we also aim to quantify
+how the temporal characteristics
+of the reconstructed gesture score
+differ from the target gesture score.
+For each correctly aligned gesture
+in the alignment computed
+for the accuracy measure,
+we record the difference
+between the gesture duration,
+and report both the mean and variance.
+The mean tells us about
+overall temporal difference,
+indicating that gesture durations
+differ in predictable ways;
+e.g., a high mean difference
+indicates that
+the reconstructed gesture score
+is slower than thee target gesture score,
+but may still be able to
+produce good speech.
+High variance, however,
+indicates that
+gesture durations vary in unpredictable ways,
+which is likely to be detrimental
+to natural speech.
 
-% try some stuff and then update the commented section.
-
-Second, we calculate the temporal variability
-of co-occurring gestures.
-For most syllables,
-there are one or more pairs of gestures
-that have either begin or end
-at the same time.
-The co-occurring gestures
-are critical to producing
-recognizable speech.
+It is critically important
+for speech that certain gestures
+either begin or end at the same time;
+we will call these co-occurring gestures,
+though they may end or start at different times.
 Therefore, for each pair
 of co-occurring gestures in the
-original gesture score,
+target gesture score,
 we record the difference
-in the simulated gesture score's
-corresponding co-occurrence pair.
+in the reconstructed gesture score's
+corresponding co-occurrence pair,
+if those gestures exist.
+We report the average absolute
+difference between the start or end times
+of reconstructed gestures
+that co-occur in the target gesture.
 
 Finally, we synthesize a speech sample
 using VocalTractLab,
