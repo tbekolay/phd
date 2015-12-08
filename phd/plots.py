@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from scipy import stats
-
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.ticker import ScalarFormatter
+from scipy import stats
 
 
 def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
@@ -60,22 +60,32 @@ def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 
-def cochleogram(data, time, freqs, cmap=plt.cm.RdBu):
+def cochleogram(data, time, freqs, ax=None, cax=None, cmap=plt.cm.RdBu):
     if data.min() >= 0.0:
         cmap = plt.cm.Blues
     elif not np.allclose(data.max() + data.min(), 0, atol=1e-5):
         midpoint = np.abs(data.min()) / (data.max() - data.min())
         cmap = shiftedcmap(cmap, midpoint=midpoint)
 
-    plt.pcolormesh(time, freqs, data.T, cmap=cmap)
-    # For some reason, putting this on a log y scale is crashing MPL...
-    # plt.yscale('log')
-    plt.ylabel('Frequency (Hz)')
-    plt.xlabel('Time (ms)')
-    plt.axis('tight')
-    sns.despine()
-    plt.colorbar()
-    plt.tight_layout()
+    if ax is None:
+        ax = plt.gca()
+
+    mesh = ax.pcolormesh(time, freqs, data.T, cmap=cmap)
+    ax.set_yscale('log')
+    ax.set_yticks((200, 1000, 2000, 4000, 8000))
+    ax.yaxis.set_major_formatter(ScalarFormatter())
+    ax.set_ylabel('Frequency (Hz)')
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylim(freqs[0], freqs[-1])
+    ax.set_xlim(time[0], time[-1])
+    sns.despine(ax=ax)
+
+    if cax is None:
+        plt.colorbar(mesh, ticklocation='right', use_gridspec=True)
+        plt.tight_layout()
+    else:
+        plt.colorbar(mesh, ticklocation='right', cax=cax)
+        cax.yaxis.set_ticks_position('none')
 
 
 def prep_data(data, columns, x_keys, x_label, y_label,

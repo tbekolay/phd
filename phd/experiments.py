@@ -78,6 +78,12 @@ def mfccs(model, audio, zscore):
 
 
 def ncc(model, sample, zscore, seed):
+    if model.periphery.auditory_filter == "tan_carney":
+        # Tan Carney requires 50 kHz samples!
+        fs_scale = 50000. / TIMIT.fs
+        resample_len = int(sample.shape[0] * fs_scale)
+        sample = lengthen(sample, resample_len)
+
     model.audio = sample
     net = model.build(nengo.Network(seed=seed))
     with net:

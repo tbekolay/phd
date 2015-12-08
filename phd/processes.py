@@ -6,6 +6,8 @@ import numpy as np
 from scipy.io.wavfile import read as readwav
 from scipy.signal import resample
 
+from . import filters
+
 
 class NengoSound(bh.BaseSound):
     def __init__(self, step_f, nchannels, samplerate):
@@ -30,18 +32,11 @@ class NengoSound(bh.BaseSound):
 
 
 class AuditoryFilterBank(nengo.processes.Process):
-    def __init__(self, freqs, sound_process, filterbank, samplerate,
-                 middle_ear=True):
+    def __init__(self, freqs, sound_process, filterbank, samplerate):
         self.freqs = freqs
         self.sound_process = sound_process
         self.filterbank = filterbank
         self.samplerate = samplerate
-        self.middle_ear = middle_ear
-
-    @staticmethod
-    def bm2ihc(x):
-        """Half wave rectify and compress it with a 1/3 power law."""
-        return 3 * np.clip(x, 0, np.inf) ** (1. / 3.)
 
     def make_step(self, size_in, size_out, dt, rng):
         assert size_in == 0
@@ -54,22 +49,13 @@ class AuditoryFilterBank(nengo.processes.Process):
         # Set up the sound
         step_f = self.sound_process.make_step(0, 1, sound_dt, rng)
         ns = NengoSound(step_f, 1, samplerate)
+        # Always use middle ear filter
+        ns = bh.MiddleEar(ns, gain=1)
 
-        # Make a deep copy of the filterbank so hashes stay the same
-        filterbank = dill.loads(dill.dumps(self.filterbank))
-
-        if self.middle_ear:
-            ns = bh.MiddleEar(ns, gain=1)
-
-        filterbank.source = ns
-
+        # Instantiate filterbank from string
+        ihc_cls = getattr(filters, self.filterbank)
+        ihc = ihc_cls(ns, self.freqs, dt)
         duration = int(dt / sound_dt)
-        filterbank.buffersize = duration
-
-        # TODO different filter may not need bm2ihc function
-        ihc = bh.FunctionFilterbank(filterbank, self.bm2ihc)
-        # Fails if we don't do this...
-        ihc.cached_buffer_end = 0
 
         def step_filterbank(t, startend=np.array([0, duration], dtype=int)):
             result = ihc.buffer_fetch(startend[0], startend[1])
@@ -149,6 +135,38 @@ class Tone(FuncProcess):
 
     def func(self, t):
         return self.amplitude * np.sin(2 * np.pi * t * self.freq_in_hz)
+
+
+class ToneRamp(nengo.processes.Process):
+    """Pure tones ramping up over time."""
+    def __init__(self, t_ramp=1.0, minfreq=100, maxfreq=8000, rms=0.5):
+        self.t_ramp = t_ramp
+        self.minfreq = minfreq
+        self.maxfreq = maxfreq
+        self.rms = rms
+        super(ToneRamp, self).__init__()
+
+    @property
+    def rms(self):
+        return self._rms
+
+    @rms.setter
+    def rms(self, _rms):
+        self._rms = _rms
+        self.amplitude = _rms * np.sqrt(2)
+
+    def make_step(self, size_in, size_out, dt, rng):
+        assert size_in == 0
+        assert size_out == 1
+        assert dt <= (1. / self.maxfreq)
+
+        n_frames = int(self.t_ramp / dt)
+        ramp = np.linspace(self.minfreq, self.maxfreq, n_frames)
+
+        def func(t):
+            ix = int(t / dt) % n_frames
+            return self.amplitude * np.sin(2 * np.pi * t * ramp[ix])
+        return func
 
 
 class WhiteNoise(nengo.processes.WhiteNoise):

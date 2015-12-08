@@ -6,7 +6,7 @@ from ..processes import AuditoryFilterBank
 
 def AuditoryPeriphery(freqs, sound_process, auditory_filter,
                       neurons_per_freq=12, fs=50000.,
-                      adaptive_neurons=False, middle_ear=False, net=None):
+                      adaptive_neurons=False, net=None):
     if net is None:
         net = nengo.Network(label="Auditory Periphery")
 
@@ -18,7 +18,7 @@ def AuditoryPeriphery(freqs, sound_process, auditory_filter,
     with net:
         # Inner hair cell activity
         net.fb = AuditoryFilterBank(
-            freqs, sound_process, auditory_filter, samplerate=fs)
+            freqs, sound_process, filterbank=auditory_filter, samplerate=fs)
         net.ihc = nengo.Node(output=net.fb, size_out=freqs.size)
 
         # Cochlear neurons projecting down auditory nerve

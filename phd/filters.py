@@ -4,6 +4,9 @@ import numpy as np
 
 from .utils import hz2mel, mel2hz
 
+# NB! Although the dummy sound is never used, it must be first set
+# because Brian Hears isn't really designed for online sounds, which
+# NengoSound is. So, we set this then immediately swap it.
 dummy_sound = bh.Sound(np.zeros(1))
 
 
@@ -16,30 +19,62 @@ def melspace(low, high, n_freq):
     return mel2hz(np.linspace(hz2mel(low), hz2mel(high), n_freq))
 
 
-def gammatone(freqs, b=1.019):
-    return bh.Gammatone(dummy_sound, freqs, b=b)
+def rectify(filterbank, scale=3):
+    """Half wave rectify and scale."""
+
+    def _bm2ihc(x, scale=scale):
+        return scale * np.clip(x, 0, np.inf)
+    ihc = bh.FunctionFilterbank(filterbank, _bm2ihc)
+    ihc.cached_buffer_end = 0  # Fails if we don't do this...
+    return ihc
 
 
-def log_gammachirp(freqs, glide_slope=-2.96, time_const=1.81):
-    return bh.LogGammachirp(dummy_sound, freqs, c=glide_slope, b=time_const)
+def compress(filterbank, scale=3):
+    """Half wave rectify and compress with a 1/3 power law."""
+
+    def _bm2ihc(x, scale=scale):
+        return scale * np.clip(x, 0, np.inf) ** (1. / 3.)
+
+    ihc = bh.FunctionFilterbank(filterbank, _bm2ihc)
+    ihc.cached_buffer_end = 0  # Fails if we don't do this...
+    return ihc
 
 
-# def linear_gammachirp(freqs, glide_slope=0.0, time_const=None):
-#     if time_const is None:
-#         time_const = np.linspace(3, 0.3, freqs.size) * br.ms
-#     return bh.LinearGammachirp(
-#         dummy_sound, freqs, time_constant=time_const, c=glide_slope)
-
-# Use LinearGaborChirp instead
-
-
-def dual_resonance(freqs):
-    return bh.DRNL(dummy_sound, freqs, type='human')
+def gammatone(source, freqs, dt, b=1.019):
+    duration = int(dt / source.source.dt)
+    fb = bh.Gammatone(dummy_sound, freqs, b=b)
+    fb.source = source
+    fb.buffersize = duration
+    return compress(fb, scale=3)
 
 
-def compressive_gammachirp(freqs, update_interval=1):
-    return bh.DCGC(dummy_sound, freqs, update_interval=update_interval)
+def log_gammachirp(source, freqs, dt, glide_slope=-2.96, time_const=1.81):
+    duration = int(dt / source.source.dt)
+    fb = bh.LogGammachirp(dummy_sound, freqs, c=glide_slope, b=time_const)
+    fb.source = source
+    fb.buffersize = duration
+    return compress(fb, scale=1.76)
 
 
-def tan_carney(freqs, update_interval=1):
-    return bh.TanCarney(dummy_sound, freqs, update_interval=update_interval)
+def dual_resonance(source, freqs, dt):
+    duration = int(dt / source.source.dt)
+    fb = bh.DRNL(dummy_sound, freqs, type='human')
+    fb.source = source
+    fb.buffersize = duration
+    return compress(fb, scale=0.75)
+
+
+def compressive_gammachirp(source, freqs, dt, update_interval=1):
+    duration = int(dt / source.source.dt)
+    fb = bh.DCGC(dummy_sound, freqs, update_interval=update_interval)
+    fb.source = source
+    fb.buffersize = duration
+    return compress(fb, scale=0.7)
+
+
+def tan_carney(source, freqs, dt, update_interval=1):
+    duration = int(dt / source.source.dt)
+    fb = bh.TanCarney(source, freqs, update_interval=update_interval)
+    fb.source = source
+    fb.buffersize = duration
+    return rectify(fb, scale=7)

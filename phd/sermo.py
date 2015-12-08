@@ -69,7 +69,7 @@ class MFCCParams(ParamsObject):
     n_cepstra = params.IntParam(default=13)
     n_filters = params.IntParam(default=32)
     n_fft = params.IntParam(default=512)
-    minfreq = params.NumberParam(default=0)
+    minfreq = params.NumberParam(default=200)
     maxfreq = params.NumberParam(default=8000)
     preemph = params.NumberParam(default=0)
     lift = params.NumberParam(default=0)
@@ -82,19 +82,12 @@ class MFCCParams(ParamsObject):
 
 
 class PeripheryParams(ParamsObject):
-    freqs = params.NdarrayParam(default=melspace(0, 8000, 32), shape=('*',))
+    freqs = params.NdarrayParam(default=melspace(200, 8000, 32), shape=('*',))
     sound_process = params.ProcessParam(default=None)
     auditory_filter = params.StringParam(default='gammatone')
     neurons_per_freq = params.IntParam(default=8)
     fs = params.NumberParam(default=TIMIT.fs)
-    middle_ear = params.BoolParam(default=True)
     adaptive_neurons = params.BoolParam(default=False)
-
-    def kwargs(self):
-        args = super(PeripheryParams, self).kwargs()
-        klass = getattr(filters, args['auditory_filter'])
-        args['auditory_filter'] = klass(freqs=args['freqs'])
-        return args
 
 
 class CepstraParams(ParamsObject):
