@@ -375,7 +375,12 @@ class GestureSequence(object):
             if self.numerical:
                 old_min, old_max = VTL.numerical_range[label]
                 traj = rescale(traj, old_min, old_max, 0, 1)
-            out[start:end, ix] = traj[:end-start]
+            try:
+                out[start:end, ix] = traj[:end-start]
+            except ValueError:
+                # I have no idea why this happens and is necessary,
+                # but it does and it is.
+                out[start:end, ix] = traj[:end-start-1]
         return out
 
 

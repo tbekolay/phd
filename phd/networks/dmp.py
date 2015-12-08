@@ -95,7 +95,7 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
         nengo.Connection(net.diff_inhib.neurons, net.diff.neurons,
                          transform=-np.ones((n_per_d, 20)))
         nengo.Connection(net.osc, net.diff)
-        reset_goal = np.array([-1, omega*0.1])
+        reset_goal = np.array([-1, omega*0.5])
         nengo.Connection(net.diff, net.osc, function=lambda x: reset_goal - x)
 
         # TODO: figure out a way to inhibit the reset drive when

@@ -406,10 +406,10 @@ def gesture_score(traj, dt, dspread=18, dthresh=0.012):
             duration += t_diff
 
         if duration < 0:
-            raise ValueError("Duration is negative. Big problems!")
-
-        # Finally, add the gesture for this time slice
-        seq.gestures.append(vtl.Gesture(value, 0., duration, tau, False))
+            warnings.warn("Duration is negative. Messed up! Skipping gesture.")
+        else:
+            # Finally, add the gesture for this time slice
+            seq.gestures.append(vtl.Gesture(value, 0., duration, tau, False))
     return gs
 
 
@@ -477,8 +477,7 @@ class ProductionExperiment(object):
         # Save frequencies for that sequence
         res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
 
-        net = self.model.build()
-        net.seed = self.seed
+        net = self.model.build(nengo.Network(seed=self.seed))
         with net:
             p_out = nengo.Probe(net.production_info.output, synapse=0.01)
 
@@ -603,8 +602,7 @@ class RecognitionExperiment(object):
         # Save frequencies for that sequence
         res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
 
-        net = self.model.build()
-        net.seed = self.seed
+        net = self.model.build(nengo.Network(seed=self.seed))
         with net:
             p_dmps = [nengo.Probe(dmp.state[0], synapse=0.01)
                       for dmp in net.syllables]
