@@ -1,5 +1,8 @@
+import numpy as np
+
 from . import sermo
-from .experiments import AuditoryFeaturesExperiment, ProductionExperiment
+from .experiments import (
+    AuditoryFeaturesExperiment, ProductionExperiment, RecognitionExperiment)
 from .timit import TIMIT
 
 
@@ -301,3 +304,45 @@ task_prod_outneurons = lambda: ProdOutputNeuronsTask(
 # #############################
 # Model 3: Syllable recognition
 # #############################
+
+recog_n_iters = 20
+
+class RecogScaleTask(ExperimentTask):
+
+    params = ['scale']
+
+    def __iter__(self):
+        for scale in self.scale:
+            model = sermo.Recognition()
+            model.syllable.scale = scale
+            expt = RecognitionExperiment(model,
+                                         n_syllables=1,
+                                         sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "scale:%.3f" % (experiment.model.syllable.scale)
+
+task_recog_scale = lambda: RecogScaleTask(
+    scale=np.arange(0.64, 0.91, 0.01), n_iters=recog_n_iters)()
+
+
+class RecogSimilarityTask(ExperimentTask):
+
+    params = ['similarity_th']
+
+    def __iter__(self):
+        for similarity_th in self.similarity_th:
+            model = sermo.Recognition()
+            model.syllable.scale = 0.78
+            model.syllable.similarity_th = similarity_th
+            expt = RecognitionExperiment(model,
+                                         n_syllables=1,
+                                         sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "similarity:%.3f" % (experiment.model.syllable.similarity_th)
+
+task_recog_similarity = lambda: RecogSimilarityTask(
+    similarity_th=np.arange(0.6, 1.05, 0.05), n_iters=recog_n_iters)()

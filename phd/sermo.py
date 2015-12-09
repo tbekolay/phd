@@ -265,6 +265,7 @@ class ProductionTrialParams(ParamsObject):
     dt = params.NumberParam(default=0.001)
     sequence = params.StringParam(default=None)
     t_release = params.NumberParam(default=0.14)
+    repeat = params.BoolParam(default=True)
 
 
 class Production(object):
@@ -413,6 +414,7 @@ class ClassifierParams(ParamsObject):
 class RecognitionTrialParams(ParamsObject):
     dt = params.NumberParam(default=0.001)
     trajectory = params.NdarrayParam(default=None, shape=('*', 48))
+    repeat = params.BoolParam(default=True)
 
 
 class Recognition(object):

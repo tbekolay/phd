@@ -34,7 +34,8 @@ def load_results(result_cls, keys):
     df = pd.DataFrame(data)
     for key in result_cls.to_float:
         df[key] = df[key].apply(float)
-    df['seed'] = df['seed'].apply(int)
+    for key in result_cls.to_int + ['seed']:
+        df[key] = df[key].apply(int)
     return df
 
 
@@ -157,9 +158,9 @@ def gs_align(left, right):
     def insert_placeholders(align, duration, start, end):
         for i, ch in enumerate(align):
             if ch == '-':
-                duration.insert(i, -1)
-                start.insert(i, -1)
-                end.insert(i, -1)
+                duration.insert(i, None)
+                start.insert(i, None)
+                end.insert(i, None)
     insert_placeholders(lalign, lduration, lstart, lend)
     insert_placeholders(ralign, rduration, rstart, rend)
     align_ix = [i for i in range(len(lalign)) if lalign[i] == ralign[i]]
@@ -272,9 +273,6 @@ def gs_cooccur(gs, targets, th=0.005):
 # Model 3: Syllable recognition
 # #############################
 
-# SOMEWHERE IN HERE WE SHOULD DO THE ALIGNMENTS,
-# USE THAT INFO IN THE ACC / TIMING STUFF
-
 def classinfo(classdata, dmpdata):
     dclass = np.diff((classdata > 0.001).astype(float), axis=0)
     time_ix, _ = np.where(dclass > 0)
@@ -284,10 +282,47 @@ def classinfo(classdata, dmpdata):
     return time_ix, class_ix
 
 
-def cl_accuracy():
-    # Also return the number of subst, deletions, ins
-    pass
+def cl2string(recorded, target):
+    all_labels = list(set([l for _, l in recorded] + [l for _, l in target]))
+    l2char = {all_labels[i]: string.ascii_letters[i]
+              for i in range(len(all_labels))}
+    rec_s = "".join(l2char[l] for _, l in recorded)
+    tgt_s = "".join(l2char[l] for _, l in target)
+
+    recalign, tgtalign = nw.global_align(rec_s, tgt_s)
+    rectimes = [t for t, _ in recorded]
+    tgttimes = [t for t, _ in target]
+
+    for i, (recchar, tgtchar) in enumerate(zip(recalign, tgtalign)):
+        if tgtchar == '-':
+            tgttimes.insert(i, None)
+        if recchar == '-':
+            rectimes.insert(i, None)
+    return recalign, tgtalign, rectimes, tgttimes
 
 
-def cl_timing(class_time, ):
-    pass
+def cl_accuracy(recorded, target):
+    recalign, tgtalign, _, _ = cl2string(recorded, target)
+
+    n_phones = len(target)
+    n_sub = n_del = n_ins = 0
+    for recchar, tgtchar in zip(recalign, tgtalign):
+        if tgtchar == '-':
+            n_ins += 1
+        elif recchar == '-':
+            n_del += 1
+        elif tgtchar != recchar:
+            n_sub += 1
+    acc = float(n_phones - n_sub - n_del - n_ins) / n_phones
+
+    return acc, n_sub, n_del, n_ins
+
+
+def cl_timing(recorded, target):
+    recalign, tgtalign, rectimes, tgttimes = cl2string(recorded, target)
+
+    correct_ix = [i for i in range(len(recalign))
+                  if recalign[i] == tgtalign[i]]
+    t_diff = [rectimes[i] - tgttimes[i] for i in correct_ix]
+
+    return np.mean(t_diff), np.var(t_diff)

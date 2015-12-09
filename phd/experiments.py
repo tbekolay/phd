@@ -31,6 +31,7 @@ class ExperimentResult(object):
 
     saved = []
     to_float = []
+    to_int = []
     subdir = None
 
     def __init__(self, **kwargs):
@@ -473,7 +474,10 @@ class ProductionExperiment(object):
             t += 1. / freq
 
         # Determine and save syllable sequence
-        seq_ix = rng.permutation(len(paths))[:self.sequence_len]
+        if self.model.trial.repeat:
+            seq_ix = rng.randint(len(paths), size=self.sequence_len)
+        else:
+            seq_ix = rng.permutation(len(paths))[:self.sequence_len]
         seq = [path2label(paths[i]) for i in seq_ix]
         seq_str = " + ".join(["%s*POS%d" % (label, i+1)
                               for i, label in enumerate(seq)])
@@ -584,22 +588,28 @@ class RecognitionExperiment(object):
         paths, freqs = get_syllables(
             self.n_syllables, self.minfreq, self.maxfreq, rng)
 
-        t = 0.2
-        gs_targets = []
         for path, freq in zip(paths, freqs):
-            gs = vtl.parse_ges(path)
-            gs_targets.append(gs)
-            traj = gs.trajectory(self.model.trial.dt)
+            traj = vtl.parse_ges(path).trajectory(self.model.trial.dt)
             label = path2label(path)
             self.model.add_syllable(label=label, freq=freq, trajectory=traj)
-            t += 1. / freq
 
         # Determine and save syllable sequence
-        seq_ix = rng.permutation(len(paths))[:self.sequence_len]
+        if self.model.trial.repeat:
+            seq_ix = rng.randint(len(paths), size=self.sequence_len)
+        else:
+            seq_ix = rng.permutation(len(paths))[:self.sequence_len]
         seq = [path2label(paths[i]) for i in seq_ix]
         seq_str = " + ".join(["%s*POS%d" % (label, i+1)
                               for i, label in enumerate(seq)])
         res.seq = np.array(seq)
+
+        # Determine how long to run
+        t = 0.0
+        tgt_time = []
+        for label in res.seq:
+            syllable = self.model.syllable_dict[label]
+            t += 1. / syllable.freq
+            tgt_time.append(t)
 
         # Set that sequence in the model
         traj = ideal_traj(self.model, seq)
@@ -608,6 +618,7 @@ class RecognitionExperiment(object):
         # Save frequencies for that sequence
         res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
 
+        # -- Run the model
         net = self.model.build(nengo.Network(seed=self.seed))
         with net:
             p_dmps = [nengo.Probe(dmp.state[0], synapse=0.01)
@@ -625,13 +636,26 @@ class RecognitionExperiment(object):
         # Save working memory similarities
         res.memory = spa.similarity(sim.data[p_mem], net.vocab, True)
 
-        # Determine if memory representation is correct
-        # res.memory_acc =
-
         # Determine classification times and labels
         t_ix, class_ix = analysis.classinfo(sim.data[p_class], res.dmps)
         res.class_time = sim.trange()[t_ix]
         res.class_labels = np.array([path2label(paths[ix]) for ix in class_ix])
+
+        # Calculate accuracy / timing metrics
+        recinfo = [(t, l) for t, l in zip(res.class_time, res.class_labels)]
+        tgtinfo = [(t, l) for t, l in zip(tgt_time, res.seq)]
+        res.acc, res.n_sub, res.n_del, res.n_ins = (
+            analysis.cl_accuracy(recinfo, tgtinfo))
+        res.tdiff_mean, res.tdiff_var = analysis.cl_timing(recinfo, tgtinfo)
+
+        # Determine if memory representation is correct
+        tgt_time = np.asarray(tgt_time)
+        mem_times = (tgt_time[1:] + tgt_time[:-1]) * 0.5
+        mem_ix = (mem_times / self.model.trial.dt).astype(int)
+        mem_class = np.argmax(res.memory[mem_ix])
+        slabels = [s.label for s in self.model.syllables]
+        actual = np.array([slabels.index(lbl) for lbl in res.seq[:-1]])
+        res.memory_acc = np.mean(mem_class == actual)
 
         return res
 
@@ -660,6 +684,19 @@ class RecognitionResult(ExperimentResult):
              'dmp_labels',
              'memory',
              'class_time',
-             'class_labels',]
-    to_float = []
+             'class_labels',
+             'acc',
+             'n_sub',
+             'n_del',
+             'n_ins',
+             'tdiff_mean',
+             'tdiff_var',
+             'memory_acc']
+    to_int = ['n_sub',
+              'n_del',
+              'n_ins']
+    to_float = ['acc',
+                'tdiff_mean',
+                'tdiff_var',
+                'memory_acc']
     subdir = "recog"
