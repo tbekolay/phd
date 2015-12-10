@@ -315,6 +315,7 @@ class RecogScaleTask(ExperimentTask):
         for scale in self.scale:
             model = sermo.Recognition()
             model.syllable.scale = scale
+            model.syllable.similarity_th = 0.8
             expt = RecognitionExperiment(model,
                                          n_syllables=1,
                                          sequence_len=3)
@@ -345,4 +346,4 @@ class RecogSimilarityTask(ExperimentTask):
         return "similarity:%.3f" % (experiment.model.syllable.similarity_th)
 
 task_recog_similarity = lambda: RecogSimilarityTask(
-    similarity_th=np.arange(0.6, 1.05, 0.05), n_iters=recog_n_iters)()
+    similarity_th=np.arange(0.7, 0.85, 0.01), n_iters=recog_n_iters)()
