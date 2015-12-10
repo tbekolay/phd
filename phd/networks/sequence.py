@@ -32,18 +32,18 @@ def SyllableSequence(n_per_d, syllable_d, syllables,
                                  neurons_per_dimension=n_per_d)
 
         # --- Input gated memories iterate through position vectors
-        net.pos = InputGatedMemory(
+        net.pos_curr = InputGatedMemory(
             n_per_d, dimensions=syllable_d, difference_gain=difference_gain)
         net.pos_next = InputGatedMemory(
             n_per_d, dimensions=syllable_d, difference_gain=difference_gain)
         # Switch from current to next with reciprocal connections
-        nengo.Connection(net.pos.output, net.pos_next.input)
-        nengo.Connection(net.pos_next.output, net.pos.input,
+        nengo.Connection(net.pos_curr.output, net.pos_next.input)
+        nengo.Connection(net.pos_next.output, net.pos_curr.input,
                          transform=vocab['INC'].get_convolution_matrix())
         # Switching depends on gate; get gate input elsewhere
         net.gate = nengo.Node(size_in=1)
         # pos gets gate
-        nengo.Connection(net.gate, net.pos.gate, synapse=None)
+        nengo.Connection(net.gate, net.pos_curr.gate, synapse=None)
         # pos_next gets 1 - gate
         net.gate_bias = nengo.Node(output=1)
         nengo.Connection(net.gate_bias, net.pos_next.gate, synapse=None)
@@ -57,7 +57,7 @@ def SyllableSequence(n_per_d, syllable_d, syllables,
             n_per_d, syllable_d, invert_a=False, invert_b=True)
         nengo.Connection(net.sequence.output, net.bind.A)
         nengo.Connection(net.sequence.output, net.bind_next.A)
-        nengo.Connection(net.pos.output, net.bind.B)
+        nengo.Connection(net.pos_curr.output, net.bind.B)
         nengo.Connection(net.pos_next.output, net.bind_next.B,
                          transform=vocab['INC'].get_convolution_matrix())
 

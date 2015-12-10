@@ -245,7 +245,7 @@ task_af_periphery = lambda: AFPeripheryTask(
 # Model 2: Syllable production
 # ############################
 
-prod_n_iters = 10
+prod_n_iters = 15
 
 class ProdSyllableNeuronsTask(ExperimentTask):
 
@@ -262,7 +262,7 @@ class ProdSyllableNeuronsTask(ExperimentTask):
         return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
 task_prod_syllneurons = lambda: ProdSyllableNeuronsTask(
-    n_neurons=[30, 50, 90, 180], n_iters=prod_n_iters)()
+    n_neurons=[30, 40, 50, 70, 90, 180, 250, 400], n_iters=prod_n_iters)()
 
 
 class ProdSequencerNeuronsTask(ExperimentTask):
@@ -299,6 +299,78 @@ class ProdOutputNeuronsTask(ExperimentTask):
 
 task_prod_outneurons = lambda: ProdOutputNeuronsTask(
     n_neurons=[8, 15, 30, 60], n_iters=prod_n_iters)()
+
+
+class ProdFreqTask(ExperimentTask):
+
+    params = ['freqs']
+
+    def __iter__(self):
+        for freq in self.freqs:
+            model = sermo.Production()
+            expt = ProductionExperiment(model, minfreq=freq, maxfreq=freq,
+                                        n_syllables=3, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "freq:%.2f" % (experiment.minfreq)
+
+task_prod_freqs = lambda: ProdFreqTask(
+    freqs=np.arange(1.6, 4.1, 0.4), n_iters=prod_n_iters)()
+
+
+class ProdNSyllablesTask(ExperimentTask):
+
+    params = ['n_syllables']
+
+    def __iter__(self):
+        for n_syllables in self.n_syllables:
+            model = sermo.Production()
+            expt = ProductionExperiment(
+                model, n_syllables=n_syllables, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "n_syllables:%d" % (experiment.n_syllables)
+
+task_prod_n_syllables = lambda: ProdNSyllablesTask(
+    n_syllables=np.arange(5, 55, 5), n_iters=prod_n_iters)()
+
+
+class ProdSequenceLenTask(ExperimentTask):
+
+    params = ['sequence_len']
+
+    def __iter__(self):
+        for sequence_len in self.sequence_len:
+            model = sermo.Production()
+            expt = ProductionExperiment(
+                model, n_syllables=3, sequence_len=sequence_len)
+            yield expt
+
+    def name(self, experiment):
+        return "sequence_len:%d" % (experiment.sequence_len)
+
+task_prod_sequence_len = lambda: ProdSequenceLenTask(
+    sequence_len=np.arange(3, 10), n_iters=prod_n_iters)()
+
+
+class ProdRepeatTask(ExperimentTask):
+
+    params = ['repeat']
+
+    def __iter__(self):
+        for repeat in self.repeat:
+            model = sermo.Production()
+            model.trial.repeat = repeat
+            expt = ProductionExperiment( model, n_syllables=3, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "repeat:%s" % (experiment.model.trial.repeat)
+
+task_prod_repeat = lambda: ProdRepeatTask(
+    repeat=[False, True], n_iters=prod_n_iters)()
 
 
 # #############################

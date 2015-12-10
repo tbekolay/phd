@@ -246,7 +246,7 @@ class SequencerParams(ParamsObject):
 
 
 class ProdSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=120)
+    n_per_d = params.IntParam(default=90)
     tau = params.NumberParam(default=0.025)
 
 
@@ -351,7 +351,7 @@ class Production(object):
         net.init_idx = nengo.Node(lambda t: vocab.parse('POS1').v
                                   if t < self.trial.t_release + 0.1
                                   else vocab.parse('0').v)
-        nengo.Connection(net.init_idx, net.sequence.pos.input)
+        nengo.Connection(net.init_idx, net.sequence.pos_curr.input)
 
         # the sequence is as given,
         net.seq_input = nengo.Node(vocab.parse(self.trial.sequence).v)

@@ -520,7 +520,9 @@ class ProductionExperiment(object):
         res.audio = audio
         res.fs = fs
 
-        # FIXME: also save the clean audio for comparison!
+        tgt_gs = analysis.gs_combine(gs_targets)
+        audio, _ = tgt_gs.synthesize()
+        res.clean_audio = audio
 
         return res
 
