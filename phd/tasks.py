@@ -218,7 +218,8 @@ class AFPeripheryTask(ExperimentTask):
                     model.add_derivative()
                     model.periphery.auditory_filter = auditory_filter
                     model.periphery.adaptive_neurons = adaptive_neurons
-                    expt = AuditoryFeaturesExperiment(model, phones=phones)
+                    expt = AuditoryFeaturesExperiment(
+                        model, phones=phones, upsample=True)
                     expt.timit.filefilt.region = 8
                     yield expt
 
@@ -230,12 +231,10 @@ class AFPeripheryTask(ExperimentTask):
 
 task_af_periphery = lambda: AFPeripheryTask(
     auditory_filters=['gammatone',
-                      'approximate_gammatone',
                       'log_gammachirp',
-                      'linear_gammachirp',
-                      'tan_carney',
                       'dual_resonance',
-                      'compressive_gammachirp'],
+                      'compressive_gammachirp',
+                      'tan_carney'],
     adaptive_neurons=[False, True],
     phones=af_phones,
     n_iters=af_iters)()

@@ -12,7 +12,8 @@ dummy_sound = bh.Sound(np.zeros(1))
 
 def erbspace(low, high, n_freq):
     """Sample ERB distribution; low and high in Hz."""
-    return bh.erbspace(low * br.Hz, high * br.Hz, n_freq)
+    f = np.linspace(low, high, n_freq) * 0.001  # original f in kHz
+    return 6.23 * np.square(f) + 93.39 * f + 28.52
 
 
 def melspace(low, high, n_freq):

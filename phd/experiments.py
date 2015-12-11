@@ -78,14 +78,14 @@ def mfccs(model, audio, zscore):
     return out
 
 
-def ncc(model, sample, zscore, seed):
-    if model.periphery.auditory_filter == "tan_carney":
-        # Tan Carney requires 50 kHz samples!
+def ncc(model, sample, zscore, seed, upsample=False):
+    if upsample:
         fs_scale = 50000. / TIMIT.fs
         resample_len = int(sample.shape[0] * fs_scale)
         sample = lengthen(sample, resample_len)
+        model.audio = sample
+        model.fs = 50000
 
-    model.audio = sample
     net = model.build(nengo.Network(seed=seed))
     with net:
         pr = nengo.Probe(net.output, synapse=0.01)
@@ -101,7 +101,7 @@ def ncc(model, sample, zscore, seed):
     return feat
 
 
-def nccs(model, audio, zscore, seed):
+def nccs(model, audio, zscore, seed, upsample):
     out = {label: [] for label in audio}
 
     if parallel.get_pool() is not None:  # Asynchronous / parallel version
@@ -117,7 +117,7 @@ def nccs(model, audio, zscore, seed):
     else:  # Synchronous / serial version
         for label in audio:
             for sample in audio[label]:
-                out[label].append(ncc(model, sample, zscore, seed))
+                out[label].append(ncc(model, sample, zscore, seed, upsample))
 
     return out
 
@@ -166,13 +166,14 @@ def test_svm(svm, x, y, data="Testing"):
 
 class AuditoryFeaturesExperiment(object):
     def __init__(self, model, phones=None, words=None,
-                 zscore=None, seed=None):
+                 zscore=None, seed=None, upsample=False):
         self.model = model
         assert phones is None or words is None, "Can only set one, not both"
         self.phones = phones
         self.words = words
         self.seed = np.random.randint(npext.maxint) if seed is None else seed
         self.zscore = zscore
+        self.upsample = upsample
         self.timit = TIMIT(config.timit_root)
 
     def _get_audio(self, corpus):
@@ -191,7 +192,7 @@ class AuditoryFeaturesExperiment(object):
             elif feature == 'ncc':
                 # Default to not zscoring for NCCs
                 zscore = False if self.zscore is None else self.zscore
-                x = nccs(self.model, audio, zscore, self.seed)
+                x = nccs(self.model, audio, zscore, self.seed, self.upsample)
             else:
                 raise ValueError("Possible features: 'mfcc', 'ncc'")
         log("%ss generated in %.3f seconds" % (feature.upper(), t.duration))
