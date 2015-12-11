@@ -2176,15 +2176,14 @@ Some work has also been done
 relating this work to
 vocal tract gestures.
 For example,
-
-??? 04.542.pdf and 05.54200a1.pdf
+\cite{zhuang2008,zhuang2009}
 showed that the vocal tract gesture score
 can be estimated
 from the continuous articulator positions,
 which can then be used
 to do word classification with
 over 80\% accuracy on a synthesized dataset.
-??? 01.10.1.1.294 and 01.JASMAN
+\cite{nam2010,nam2012}
 showed that a gesture score
 can be estimated from natural speech
 through a landmark-based time alignment procedure;
@@ -2230,7 +2229,8 @@ of recorded speech.
 The most well known integrated system
 is called DIVA
 (Direction Into Velocities of Articulators;
-see Figure~???) ???cite.
+see Figure~\ref{fig:diva};
+\cite{guenther1995,guenther2004,guenther2006,guenther2006a}).
 DIVA consists of an articulator synthesizer,
 and several interconnected artificial neural networks
 that drive the articulatory synthesizer
@@ -2248,14 +2248,14 @@ DIVA has been used to explain
 speech production phenomena
 like motor equivalence, contextual variability,
 and anticipatory and carryover coarticulation
-(??? cites from Guentheretalbrain.pdf intro).
+\cite{guenther1995,guenther2003,nieto2005}.
 Additionally, all of the neural networks
 in the model have been mapped
 to brain regions that are hypothesized
 to perform similar functions
 as the neural networks in the model.
 
-??? DIVA figure
+\fig{diva}{0.7}{???}{???}
 
 DIVA is a productive research tool
 for studying speech development.
@@ -2274,7 +2274,7 @@ stored speech plans with one artificial
 neuron per speech plan,
 where a speech plan can correspond to
 a single phoneme, a syllable, or one or more words.
-In ??? GuentheretalBrainLang.pdf,
+In \cite{guenther2006a},
 they note that ``it is expected that
 premotor cortex sound maps in the brain
 involve distributed representations
@@ -2308,7 +2308,7 @@ much easier than a learning procedure
 that must deal with delayed feedback,
 as happens in the real world.
 
-??? citeauthor kroger2009b proposed
+\cite{kroger2009} proposed
 a large integrated model
 similar to DIVA in that
 it is composed of
@@ -2319,13 +2319,13 @@ in which feedback from
 auditory and somatosensory systems
 tunes the weights between
 neural populations
-(???cite; see Figure~???).
+(see Figure~\ref{fig:kroger}).
 The primary improvements in
 Kr\"{o}ger's model compared to DIVA
 are the introduction of a phonetic map,
 and a motor planning network.
 
-??? kroger figure
+\fig{kroger}{0.7}{???}{???}
 
 In DIVA, auditory and somatosensory feedback
 is directly associated with a cell
@@ -2357,7 +2357,7 @@ In Kr\"{o}ger's neurocomputational model,
 phonetic information is extracted
 in an unsupervised manner
 using self-organizing maps
-(???cite Kohonen),
+\cite{kohonen1982,kohonen2007},
 which cause
 local clusters of neurons
 in the phonetic map to become active
@@ -2419,19 +2419,3 @@ from incoming sound,
 which makes integration between
 the perception and production aspects
 of the model more straightforward.
-
-%% ~8-20 pages
-
-%% - More than a literature review
-%% - Organize related work - impose structure
-%% - Be clear as to how previous work being described relates to your own.
-%% - The reader should not be left wondering why you've described something!!
-%% - Critique the existing work - Where is it strong where is it weak?
-%%   What are the unreasonable/undesirable assumptions?
-%% - Identify opportunities for more research (i.e., your thesis).
-%%   Are there unaddressed, or more important related topics?
-%% - After reading this chapter, one should understand the motivation for
-%%   and importance of your thesis
-%% - You should clearly and precisely define all of the key concepts
-%%   dealt with in the rest of the thesis, and teach the reader what s/he
-%%   needs to know to understand the rest of the thesis.
