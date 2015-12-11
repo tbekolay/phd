@@ -11,8 +11,10 @@ DOIT_CONFIG = {
     'verbosity': 2,
 }
 
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-def task_paper(root='.'):
+
+def task_paper():
     d = os.path.join(root, 'paper')
 
     def forsurecompile(fname, bibtex=True):
@@ -27,6 +29,25 @@ def task_paper(root='.'):
                 'actions': [pdf, bib, pdf, pdf] if bibtex else [pdf, pdf],
                 'targets': [pdf_file]}
     yield forsurecompile('phd')
+
+
+def task_svg2pdf():
+
+    def svg2pdf(svgpath, pdfpath):
+        return 'inkscape --export-pdf=%s %s' % (pdfpath, svgpath)
+
+    d = os.path.join(root, 'figures')
+
+    for fdir, _, fnames in os.walk(d):
+        for fname in fnames:
+            if fname.endswith('svg'):
+                svgpath = os.path.join(root, fdir, fname)
+                pdfpath = os.path.join(root, fdir, "%s.pdf" % fname[:-4])
+                yield {'name': os.path.basename(svgpath),
+                       'actions': [svg2pdf(svgpath, pdfpath)],
+                       'file_dep': [svgpath],
+                       'targets': [pdfpath]}
+
 
 
 def main():
