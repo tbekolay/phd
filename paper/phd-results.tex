@@ -682,22 +682,133 @@ comparison between MFCCs and NCCs.
 
 \subsubsection{Auditory periphery model}
 
-This final experiment varies the auditory periphery model
+The final experiment varies the auditory periphery model
 used at the beginning of the NCC pipeline.
+We looked at two choices in the auditory periphery
+and how those choices impacted classification accuracy.
 
-6 models, with and without outer/middle ear, and with and without adaptive LIF;
-18 conditions in all
+The first choice is auditory filter model.
+We ran 20 trials with each of the five
+auditory filter models presented in Section~???.
+While most of the parameters are the same
+as those in Table~???,
+the current implementation of the Tan Carney model
+can only be used for audio signals
+with a 50 kHz sampling rate;
+for this reason, all TIMIT samples
+were upsampled to 50 kHz,
+and all models (the MFCC model and all NCC models)
+used the upsampled audio.
+Additionally, the Tan Carney model
+has numerical instabilities for auditory filters
+with low characteristic frequencies,
+so all models use frequencies
+evenly distributed over the Mel scale
+from 100 Hz to 8000 Hz.
+
+??? periphmodel results
+
+The results are plotted in Figure~???.
+The Gammatone and Tan Carney models
+both perform well,
+with around 40\% better relative testing accuracy
+than the MFCC model.
+The compressive Gammachirp model
+also performed well,
+though statistically worse
+than the Gammatone and Tan Carney models.
+The log Gammachirp and Dual Resonance models
+both perform significantly worse
+than the other three,
+achieving only around 20--24\%
+more accurately than the MFCC model.
+
+??? periphmodel speed
+
+However, as seen in Figure~???,
+the compressive Gammachirp
+and Tan Carney models are
+computationally expensive
+(3--4 times slower)
+compared to the other three models.
+As the least expensive model,
+the Gammatone filter
+provides by far the best tradeoff
+between accuracy and computational cost.
+
+??? adaptive lif results
+
+We also varied whether we used
+normal LIF neuron or adaptive LIF neurons,
+as spiral ganglion cells
+have facilitating and depressing behavior
+that is partly captured in the adaptive LIF neuron.
+As shown in Figure~???,
+using adaptive LIF neurons had no impact
+on accuracy in any of the five periphery model.
+The only effect may be a reduction
+in the testing accuracy variance
+for the Tan Carney model,
+but more trials would be needed
+in order to determine this definitively.
 
 \subsection{Scaling}
 
-Give main metrics of the network (number of neurons, etc)
-and discuss scaling
+The model used in these experiments
+represents a small portion
+of the human auditory system;
+it is matched primarily to the parameters
+commonly used in ASR systems.
+However, since our model is
+implemented with biologically realistic parts,
+it is important to determine
+if a scaled up version of the model
+matches known neuroanatomical constraints.
+
+The number of spiking neurons used
+in the model is
+\begin{equation}
+  N = N_f |f| + N_c |c| + \sum_{i=0}^{|d|} 2 N_d |c|,
+\end{equation}
+where $N_f$ is the number of neurons per frequency,
+$|f|$ is the number of frequencies modeled,
+$N_c$ is the number of neurons per cepstral coefficient,
+$|c|$ is the number of cepstral coefficients,
+$|d|$ is the number of derivatives,
+and $N_d$ is the number of neurons per derivative.
+
+With the parameters used
+in the majority of the experiments above,
+$N=1036$ neurons.
+According to the BioNumbers database,
+the human cochlea has 3500 inner hair cells
+\cite[BNID~100697]{milo2010}.
+Assuming that each inner hair cell
+represents a separate auditory filter
+(which is not necessarily true,
+but a worst case assumption),
+we conservatively estimate
+that a scaled up version
+of the NCC model
+would use 20 cepstral coefficients,
+1 derivative, and 50 neurons per feature,
+resulting in $N=7.3 \times 10^4$ neurons.
+If we are somewhat more generous
+and use 40 cepstral coefficients,
+2 derivatives, and 200 neurons per feature,
+we get $N=1.8 \times 10^5$ neurons.
+\cite{smiley2013} estimated
+that human A1 alone contains
+2$\times 10^7$--3$\times 10^7$ neurons,
+meaning that the NCC model
+fits well within human neuroanatomical constraints.
 
 \subsection{Summary}
 
 ??? main results
 
 \section{Syllable sequencing and production}
+\label{sec:results-production}
 
 The goal of the syllable sequencing and production model
 is to generate a continuous trajectory
@@ -863,7 +974,10 @@ numerical gestures are assigned
 a digit from \texttt{0} to \texttt{9}
 depending on the relative value
 in the gesture's range.
-We then do a global pairwise alignment
+We then do a global pairwise alignment\footnote{
+  Using the Needleman-Wunsch algorithm \cite{needleman1970},
+  implemented by the \texttt{nwalign} Python package
+  \url{https://pypi.python.org/pypi/nwalign/}.}
 of the string determined
 from the target gesture
 and the reconstructed gesture,
@@ -952,30 +1066,186 @@ or intelligible.
 
 \subsection{Experiments and results}
 
-??? Hyperopt the main parameters: nneurons
+For each trial in each experiment,
+we randomly select a set of syllables
+and a syllable sequence
+from a repository of 417 German syllables.
+Of these syllables,
+48 have CCV structure,
+184 have CV structure,
+162 have CVC structure,
+and 23 have V structure;
+we do not bias the random sample
+toward any of the structures,
+meaning that we will generally
+have more CV syllables
+than any other type in these experiments.
+Each randomly selected syllables
+has a semantic pointer,
+an ensemble in the associative memory,
+and a DMP network associated with it.
+The intrinsic frequency (speed)
+of each syllable is randomly assigned
+between 0.8 and 3.0 Hz,
+except where noted otherwise.
+For each trial,
+both the syllable repository
+and the length and order
+of the syllable sequence
+to be produced are randomly generated,
+in order to obtain robust metrics
+not biased toward certain syllables
+or sequences of syllables.
+
+As with the NCC model,
+we begin by varying the number of neurons
+in different parts of the model.
+Specifically, we vary the number of neurons
+used in each DMP network,
+the number of neurons used in the
+timing ensemble in the sequencing network,
+and the number of neurons used
+in the readout population that
+aggregates the trajectories
+from each DMP.
+For each experimental condition,
+we run 20 trials using
+a sequence of three syllables
+from a repository of three syllables,
+meaning that syllable repetition can occur,
+but is not guaranteed.
+
+??? fig: nneurons
+
+As shown in Figure~???,
+the number of neurons in each DMP network
+significantly impacts the performance
+of the overall model.
+Accuracy is either very low or
+highly variable until around
+90 neurons per dimension
+in the DMP;
+in subsequent simulations,
+we will use 90 neurons per dimension
+for each DMP network.
+On the other hand,
+both the timing ensemble
+and the readout ensembles
+can have relatively few neurons
+with little impact on
+the performance of the overall network.
+The timing ensemble
+has some dynamics when the reset signal is active,
+so ??? test with smaller nneurons.
+The readout ensembles
+only represent positive scalar values
+computed by the DMP networks,
+so they require very few neurons.
+In subsequent experiments,
+we will use 8 neurons per readout ensemble
+in order to speed up simulations.
 
 ??? how much can we crank up the syllable speed?
+% freq task
 
 ??? Does adding more syllables to the vocabulary affect anything?
+% n_syllables task
 
 ??? How long can the sequences get before things break down?
+% sequence_len task
+
+??? repeating two syllables vs. different syllables
+% repeat task
 
 \subsection{Scaling}
 
-% Give main metrics of the network (number of neurons, etc)
-% and discuss scaling
+The number of neurons in the
+sequencing and production model is
+\begin{equation}
+  N = N_{\text{SPA}} + N_S + N_{\text{DMP}} + N_O,
+\end{equation}
+where these variables
+are the number of neurons in
+a subset of the model.
+$N_{\text{SPA}}$ is the number of
+neurons for all SPA modules,
+which is
+\begin{equation}
+  N_{\text{SPA}} = 5 D_{\text{SYLL}} N_D_{\text{SYLL}} +
+      |DFT_{\text{SYLL}}| N_D_{\text{SYLL}}
+      + 2 N_{\text{AM}} (3 |\text{SYLL}| + 1),
+\end{equation}
+where $D_{\text{SYLL}}$ is the dimensionality
+of syllable semantic pointers,
+$N_D_{\text{SYLL}}$ is the number of neurons
+per syllable dimension,
+$|DFT_{\text{SYLL}}|$ is the number of
+discrete Fourier transform coefficients
+used by the binding operator,
+$N_{\text{AM}}$ is the number of neurons
+per associative memory ensemble,
+and $|\text{SYLL}|$ is the number of
+syllables in the syllabary.
+$N_S$ is the number of neurons
+in the sequencer network,
+which is
+\begin{equation}
+  N_S = 4 N_D_S + 140,
+\end{equation}
+where $N_D_S$ is the number of neurons
+per dimension in the sequencer network,
+and 140 neurons come from ensembles
+with fixed size.
+$N_{\text{DMP}}$ is the number of neurons
+in DMP networks, which is
+\begin{equation}
+  N_{\text{DMP}} = 3 |\text{SYLL}| N_{|\text{DMP}|} + 40,
+\end{equation}
+where $N_{|\text{DMP}|}$ is the number of neurons
+per DMP dimension,
+and 40 neurons comes from esnembles with fixed size.
+$N_O$ is the number of neurons
+in readout ensembles, which is
+\begin{equation}
+  N_O = 48 N_{|O|}
+\end{equation}
+where 48 is the number of gestures,
+and $N_{|O|}$ is the number of neurons
+per readout ensemble.
 
-% - Take the control system and look at how much cortex (neurons, synapses)
-%   is taken up by each element (word, syllable, phone, etc).
-
-% - Extrapolate to human sized vocabularies, make sure it'll scale
-
-% - Show that if we had a separate oscillator / population
-%   for each word or syllable that this wouldn't scale
-
-% ??? important: scaling. Show that adding new syllables
-% to the syllabary doesn't affect the voicing
-% of a given sequence; show how many neurons are added.
+With the parameters used
+in the majority of the experiments above,
+$N=49030$ neurons,
+with most of those neurons
+in the SPA populations
+($N_{\text{SPA}}=44600$)
+and the readout ensembles ($N_O=2880$).
+Fortunately, these parts of the model
+grow at a slow rate
+as additional syllables are added
+to the syllabary.
+If we assume a conservative syllabary
+with around 2000 syllables,
+and increase the dimensionality
+of each syllable to 256,
+the model uses
+$N=2.75 \times 10^5$ neurons.
+If we assume a more generous estimate
+with 4000 syllables
+and 512 dimensions
+the semantic pointer representations,
+then the model uses
+$N=5.47 \times 10^5$ neurons.
+Given that there are approximately
+2.7 \times 10^4 neurons per mm$^3$ (on average)
+in human cortex \cite[BNID 112050]{milo2010},
+a human scale syllabary would take up
+approximately 20 mm$^3$ of cortex
+in the generous case,
+which is a very small portion of cortex,
+especially considering that this model
+would be distributed over
+several cortical areas.
 
 \subsection{Summary}
 

@@ -14,6 +14,7 @@ using the Neural Engineering Framework
 and Semantic Pointer Architecture.
 
 \section{Auditory periphery models}
+\label{sec:periphery-models}
 
 In order to extract a feature vector
 from an audio signal
@@ -192,52 +193,54 @@ with a parameter that is optimized
 to minimize the error between
 $H_C(f)$ and $H_A(f)$.
 
-\subsection{Linear Gaborchirp}
+% \subsection{Linear Gaborchirp}
 
-Another auditory filter
-in the same vein as the
-Gammatone and Log Gammachirp
-filters is the Linear Gaborchip filter.
-The impulse response is defined as
-\begin{equation} \label{gaborchirp}
-  \text{IR}(t) = e^{-t / 2 \sigma^2}
-    \cos\left(2 \pi \left(ft + \frac{c}{2t^2}\right)\right),
-\end{equation}
-where $\sigma$ determines the duration
-of the impulse response
-(see Figure~???).
+% This one doesn't actually work / isn't tested...
 
-??? IR Figure
+% Another auditory filter
+% in the same vein as the
+% Gammatone and Log Gammachirp
+% filters is the Linear Gaborchip filter.
+% The impulse response is defined as
+% \begin{equation} \label{gaborchirp}
+%   \text{IR}(t) = e^{-t / 2 \sigma^2}
+%     \cos\left(2 \pi \left(ft + \frac{c}{2t^2}\right)\right),
+% \end{equation}
+% where $\sigma$ determines the duration
+% of the impulse response
+% (see Figure~???).
 
-Unlike the Gammatone and Gammachrip filters,
-which convolve the cosine with
-a Gamma function,
-this filter uses a Gaussian
-as the envelope;
-convolving a cosine with
-a Gaussian yeilds a Gabor filter.
-Also unlike the Gammatone and Gammachirp filters,
-the Linear Gaborchirp is implemented
-as a finite impulse response (FIR) filter.
-Therefore, a fixed length history of the
-audio is kept,
-and the output of the filter
-is the convolution
-of the audio signal
-with the Linear Gaborchirp
-impulse response \eqref{gaborchirp}
-(implemented by taking the
-Fourier transform of both signals,
-multiplying them,
-and taking the inverse Fourier transform
-of the result).
+% ??? IR Figure
 
-??? wagner recorded auditory responses
-to clicks in the barn owl,
-and found that the Linear Gaborchirp filter
-provided the best match
-to the empirically derived auditory filters
-($n=132$).
+% Unlike the Gammatone and Gammachrip filters,
+% which convolve the cosine with
+% a Gamma function,
+% this filter uses a Gaussian
+% as the envelope;
+% convolving a cosine with
+% a Gaussian yeilds a Gabor filter.
+% Also unlike the Gammatone and Gammachirp filters,
+% the Linear Gaborchirp is implemented
+% as a finite impulse response (FIR) filter.
+% Therefore, a fixed length history of the
+% audio is kept,
+% and the output of the filter
+% is the convolution
+% of the audio signal
+% with the Linear Gaborchirp
+% impulse response \eqref{gaborchirp}
+% (implemented by taking the
+% Fourier transform of both signals,
+% multiplying them,
+% and taking the inverse Fourier transform
+% of the result).
+
+% ??? wagner recorded auditory responses
+% to clicks in the barn owl,
+% and found that the Linear Gaborchirp filter
+% provided the best match
+% to the empirically derived auditory filters
+% ($n=132$).
 
 \subsection{Dual resonance nonlinear filter}
 

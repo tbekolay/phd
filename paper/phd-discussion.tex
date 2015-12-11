@@ -74,7 +74,51 @@ We view the final NCC experiment,
 in which the auditory periphery model was varied,
 as being the main contribution
 of this model.
-???more
+Because the model bridges the gap
+between detailed auditory periphery models
+and automatic speech recognition systems,
+we are able to do apples-to-apples comparisons
+of how well the periphery models
+process realistic speech samples.
+In general, the more realistic the model,
+the better it is for speech,
+with the notable exception of the Gammatone filter,
+which is the least realistic,
+but the cheapest to compute,
+and as accurate as
+the most complicated Tan Carney model.
+
+There are two reasons why we might
+be skeptical of the impressive Gammatone results.
+For one, the determination of good parameter sets
+in the other experiments in Section~???
+all used the Gammatone filter.
+It is possible that performing the same
+experiments with other filters
+would find parameters sets that
+allow those auditory periphery models
+to perform as well or better than
+the Gammatone filter.
+Additionally, arguably the most difficult part
+of continuous ASR systems is
+determining where phone boundaries lie,
+rather than classifying pre-segmented phones.
+While we believe that the experiments
+performed in Section~???
+are a useful comparison between MFCCs and NCCs,
+some of the benefits of more sophisticated models
+like the Tan Carney model
+may lie in their ability to segment speech.
+The same argument holds
+for adaptive neuron types;
+while they may not be essential
+for differentiating between pre-segmented speech samples,
+they may be essential for
+segmenting continuous speech.
+Looking at the impact of these
+NCC representation choices
+in a continuous ASR system
+is therefore an important next step.
 
 \subsection{Syllable sequencing and production}
 

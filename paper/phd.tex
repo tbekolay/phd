@@ -9,7 +9,7 @@
 \newcommand{\href}[1]{#1}
 
 % This package allows if-then-else control structures.
-\usepackage{ifthen}
+\usepackage{xifthen}
 \newboolean{PrintVersion}
 \setboolean{PrintVersion}{false}
 
@@ -18,6 +18,33 @@
 \usepackage{microtype}
 \usepackage{tipa}
 \let\ipa\textipa
+
+% Set figure directories
+\graphicspath{{../figures/background/}}
+
+% Includes a figure. Usage:
+%
+% \fig{filename}{width}{caption}{shortcaption}
+%
+% - Filename will be used as label
+% - Width is in proportion of column width
+% - Shortcaption is optional
+\newcommand{\fig}[4]{
+  \begin{figure}[ht!]
+    \centering
+    \includegraphics[width=#2\columnwidth]{#1}
+    \ifthenelse{\isempty{#4}}{\caption{#3}}{\caption[#3]{#4}}
+    \label{fig:#1}
+  \end{figure}}
+
+% \newcommand{\scalefigtwo}[4]{
+%   \begin{figure}[ht!]
+%     \centering
+%     \includegraphics[width=#3\columnwidth]{#1}
+%     \includegraphics[width=#3\columnwidth]{#2}
+%     \caption{#4}
+%     \label{fig:#1}
+%   \end{figure}}
 
 % Font stuff
 \usepackage{heuristica}
@@ -58,11 +85,9 @@
 \renewcommand*\copyright{{\usefont{OT1}{lmr}{m}{n}\textcopyright}}
 
 % Do this last
-\usepackage[pdftex,letterpaper=true,pagebackref=false]{hyperref}
+\usepackage[pdftex,pagebackref=false]{hyperref}
 \hypersetup{
     plainpages=false,
-    pdfpagelabels=true,
-    bookmarks=true,
     unicode=false,
     pdftoolbar=true,
     pdfmenubar=true,
