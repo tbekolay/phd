@@ -392,10 +392,11 @@ class RecogSyllableNeuronsTask(ExperimentTask):
             yield expt
 
     def name(self, experiment):
-        return "n_neurons:%d" % (experiment.model.syllable.n_per_d)
+        return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
 task_recog_syllneurons = lambda: RecogSyllableNeuronsTask(
-    n_neurons=[200, 300, 400, 500], n_iters=recog_n_iters)()
+    n_neurons=[200, 250, 300, 350, 400, 450, 500, 550, 600],
+    n_iters=recog_n_iters)()
 
 
 class RecogScaleTask(ExperimentTask):
@@ -438,3 +439,75 @@ class RecogSimilarityTask(ExperimentTask):
 
 task_recog_similarity = lambda: RecogSimilarityTask(
     similarity_th=np.arange(0.7, 0.85, 0.01), n_iters=recog_n_iters)()
+
+
+class RecogFreqTask(ExperimentTask):
+
+    params = ['freqs']
+
+    def __iter__(self):
+        for freq in self.freqs:
+            model = sermo.Recognition()
+            expt = RecognitionExperiment(model, minfreq=freq, maxfreq=freq,
+                                        n_syllables=3, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "freq:%.2f" % (experiment.minfreq)
+
+task_recog_freqs = lambda: RecogFreqTask(
+    freqs=np.arange(0.6, 5.1, 0.4), n_iters=recog_n_iters)()
+
+
+class RecogNSyllablesTask(ExperimentTask):
+
+    params = ['n_syllables']
+
+    def __iter__(self):
+        for n_syllables in self.n_syllables:
+            model = sermo.Recognition()
+            expt = RecognitionExperiment(
+                model, n_syllables=n_syllables, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "n_syllables:%d" % (experiment.n_syllables)
+
+task_recog_n_syllables = lambda: RecogNSyllablesTask(
+    n_syllables=np.arange(5, 25, 5), n_iters=recog_n_iters)()
+
+
+class RecogSequenceLenTask(ExperimentTask):
+
+    params = ['sequence_len']
+
+    def __iter__(self):
+        for sequence_len in self.sequence_len:
+            model = sermo.Recognition()
+            expt = RecognitionExperiment(
+                model, n_syllables=3, sequence_len=sequence_len)
+            yield expt
+
+    def name(self, experiment):
+        return "sequence_len:%d" % (experiment.sequence_len)
+
+task_recog_sequence_len = lambda: RecogSequenceLenTask(
+    sequence_len=np.arange(3, 10), n_iters=recog_n_iters)()
+
+
+class RecogRepeatTask(ExperimentTask):
+
+    params = ['repeat']
+
+    def __iter__(self):
+        for repeat in self.repeat:
+            model = sermo.Recognition()
+            model.trial.repeat = repeat
+            expt = RecognitionExperiment( model, n_syllables=3, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "repeat:%s" % (experiment.model.trial.repeat)
+
+task_recog_repeat = lambda: RecogRepeatTask(
+    repeat=[False, True], n_iters=recog_n_iters)()

@@ -510,7 +510,7 @@ class ProductionExperiment(object):
         res.accuracy = analysis.gs_accuracy(gs, gs_targets)
         res.timing_mean, res.timing_var = analysis.gs_timing(gs, gs_targets)
         res.cooccur, res.co_chance = analysis.gs_cooccur(gs, gs_targets)
-        log("Accuracy: %.3f" % res.acc)
+        log("Accuracy: %.3f" % res.accuracy)
 
         # Get the reconstructed trajectory and audio
         reconstructed = gs.trajectory(dt=self.model.trial.dt)
@@ -522,7 +522,7 @@ class ProductionExperiment(object):
         res.audio = audio
         res.fs = fs
 
-        tgt_gs = analysis.gs_combine(gs_targets)
+        tgt_gs = analysis.gs_combine([vtl.parse_ges(paths[i]) for i in seq_ix])
         audio, _ = tgt_gs.synthesize()
         res.clean_audio = audio
 

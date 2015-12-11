@@ -377,7 +377,7 @@ class Production(object):
 # #############################
 
 class RecogSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=400)
+    n_per_d = params.IntParam(default=500)
     similarity_th = params.NumberParam(default=0.8)
     scale = params.NumberParam(default=0.67)
     reset_scale = params.NumberParam(default=2.5)
