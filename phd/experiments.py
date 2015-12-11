@@ -559,7 +559,8 @@ class ProductionResult(ExperimentResult):
              'cooccur',
              'co_chance',
              'audio',
-             'fs']
+             'fs',
+             'clean_audio']
     to_float = ['simrmse',
                 'reconstructedrmse',
                 'accuracy',
