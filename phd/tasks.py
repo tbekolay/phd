@@ -378,6 +378,26 @@ task_prod_repeat = lambda: ProdRepeatTask(
 
 recog_n_iters = 20
 
+class RecogSyllableNeuronsTask(ExperimentTask):
+
+    params = ['n_neurons']
+
+    def __iter__(self):
+        for n_neurons in self.n_neurons:
+            model = sermo.Recognition()
+            model.syllable.n_per_d = n_neurons
+            expt = RecognitionExperiment(model,
+                                         n_syllables=3,
+                                         sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "n_neurons:%d" % (experiment.model.syllable.n_per_d)
+
+task_recog_syllneurons = lambda: RecogSyllableNeuronsTask(
+    n_neurons=[200, 300, 400, 500], n_iters=recog_n_iters)()
+
+
 class RecogScaleTask(ExperimentTask):
 
     params = ['scale']

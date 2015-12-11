@@ -510,6 +510,7 @@ class ProductionExperiment(object):
         res.accuracy = analysis.gs_accuracy(gs, gs_targets)
         res.timing_mean, res.timing_var = analysis.gs_timing(gs, gs_targets)
         res.cooccur, res.co_chance = analysis.gs_cooccur(gs, gs_targets)
+        log("Accuracy: %.3f" % res.acc)
 
         # Get the reconstructed trajectory and audio
         reconstructed = gs.trajectory(dt=self.model.trial.dt)
@@ -651,6 +652,7 @@ class RecognitionExperiment(object):
         res.acc, res.n_sub, res.n_del, res.n_ins = (
             analysis.cl_accuracy(recinfo, tgtinfo))
         res.tdiff_mean, res.tdiff_var = analysis.cl_timing(recinfo, tgtinfo)
+        log("Accuracy: %.3f" % res.acc)
 
         # Determine if memory representation is correct
         tgt_time = np.asarray(tgt_time)

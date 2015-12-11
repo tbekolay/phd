@@ -1229,18 +1229,19 @@ with around 2000 syllables,
 and increase the dimensionality
 of each syllable to 256,
 the model uses
-$N=2.75 \times 10^5$ neurons.
+$N=1.34 \times 10^6$ neurons.
 If we assume a more generous estimate
 with 4000 syllables
 and 512 dimensions
 the semantic pointer representations,
 then the model uses
-$N=5.47 \times 10^5$ neurons.
+$N=2.67 \times 10^6$ neurons.
 Given that there are approximately
 2.7 \times 10^4 neurons per mm$^3$ (on average)
 in human cortex \cite[BNID 112050]{milo2010},
 a human scale syllabary would take up
-approximately 20 mm$^3$ of cortex
+approximately 102.7 mm$^3$ of cortex
+(0.1027 cm$3$)
 in the generous case,
 which is a very small portion of cortex,
 especially considering that this model
@@ -1359,8 +1360,96 @@ of a syllable.
 
 \subsection{Scaling}
 
-% Give main metrics of the network (number of neurons, etc)
-% and discuss scaling
+The number of neurons in the
+syllable recognition model is
+\begin{equation}
+  N = N_{in} + N_{\text{SPA}} + N_{\text{iDMP}} + N_C,
+\end{equation}
+where these variables
+are the number of neurons in
+a subset of the model.
+$N_{in}$ is the number of neurons
+in trajectory input ensembles, which is
+\begin{equation}
+  N_{in} = 48 N_{|in|}
+\end{equation}
+where 48 is the number of gestures,
+and $N_{|in|}$ is the number of neurons
+per input ensemble.
+$N_{\text{SPA}}$ is the number of
+neurons for all SPA modules,
+which is
+\begin{equation}
+  N_{\text{SPA}} = 3 |\text{SYLL}| N_{\text{AM}}
+    + D_{\text{SYLL}} N_D_{\text{SYLL}},
+\end{equation}
+where $|\text{SYLL}|$ is the number of
+syllables in the syllabary,
+$N_{\text{AM}}$ is the number of neurons
+per associative memory ensemble,
+$D_{\text{SYLL}}$ is the dimensionality
+of syllable semantic pointers,
+and $N_D_{\text{SYLL}}$ is the number of neurons
+per syllable dimension.
+$N_{\text{iDMP}}$ is the number of neurons
+in iDMP networks, which is
+\begin{equation}
+  N_{\text{iDMP}} = |\text{SYLL}| \left( \left(\bar{D_{\text{iDMP}}} + 2 \right)
+    N_D_{|\text{iDMP}|} + 20 \right),
+\end{equation}
+where $\bar{D_{\text{iDMP}}}$ is the average
+number of gestures in each syllable,
+$N_D_{|\text{iDMP}|}$ is the number of neurons
+per iDMP dimension,
+and 40 neurons come from ensembles with fixed size.
+$N_C$ is the number of neurons
+in the classifier,
+which is $N_C = 20$.
+
+With the parameters used
+in the majority of the experiments above,
+$N\approx18500$ neurons,
+with most of those neurons
+in the iDMP populations
+($N_{\text{iDMP}}\approx10500$).
+Note that these values are approximate
+because the number of gestures per syllable
+varies depending on the syllable,
+which is randomly selected.\footnote{
+  If we did not sparsify the syllable representation,
+  then we would be using all 48 gesture dimensions.
+  Typically, $bar{D_{\text{iDMP}}}$ is around 6--7,
+  which is a significant savings in terms
+  of neural resources used.}
+Unlike the recognition model,
+this portion of the model
+grows as the number of syllables grows.
+While the growth is linear,
+it is scaled by $N_D_{|\text{iDMP}}$,
+the number of neurons per iDMP dimensions,
+which has to be relatively high
+(???, as determined in the experiments above).
+If we assume a conservative syllabary
+with around 2000 syllables,
+and increase the dimensionality
+of each syllable to 256,
+the model uses
+$N \approx 7.29 \times 10^6$ neurons,
+which is more than the generous
+estimate for the production model.
+If we assume a more generous estimate
+with 4000 syllables
+and 512 dimensions
+for syllable semantic pointers,
+then the model uses
+$N \approx 1.3 \times 10^7$ neurons.
+The estimate represents approximately
+500 mm$^3$ of cortex (0.5 cm$^3$),
+which is still a small amount
+considering the size of the brain areas
+involved in sensorimotor integration,
+but represent poorer scaling
+than the other two models presented in this thesis.
 
 \subsection{Summary}
 
