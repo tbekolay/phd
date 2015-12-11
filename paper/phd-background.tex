@@ -45,7 +45,8 @@ We limit our coverage
 of human speech recognition
 to the topics drawn upon
 in the model that will be presented
-in Chapters~???:
+in Chapters~\ref{chapt:model}
+and \ref{chapt:implementation}:
 basic ear physiology,
 psychoacoustics,
 and neurobiology.
@@ -103,20 +104,21 @@ separating the air pressure level fluctuations
 into instantaneous frequency components,
 which is the basic representation
 that the brain receives.
+Figure~\ref{fig:an-overview} illustrates
+the major structures that will be discussed.
 
-??? basic physio figure
-% https://github.com/tbekolay/2015-02-27-seminar/blob/master/img/an-overview.svg
+\fig{an-overview}{0.8}{??? caption}{??? shortcap}
 
 The outer ear (pinna) funnels air
 into the ear canal.
 Functionally, it selectively boosts
 air pressure fluctuations at
-around 3 kHz (see Figure~???),
+around 3 kHz (see Figure~\ref{fig:ear-tf}),
 and modifies the air pressure wave
 such that the directionality
 of sound can be determined.
 
-??? outer / middle ear transfer function
+% \fig{ear-tf}{0.7}{??? caption}{??? shortcap}
 
 In the middle ear,
 air pressure fluctuations
@@ -131,10 +133,9 @@ such that when the eardrum vibrates,
 the stapes moves in and out of the oval window,
 causing disturbances in the liquid
 in the cochlea
-(see Figure~???).
+(see Figure~\ref{fig:cochlea}).
 
-??? middle and inner ear figure
-% https://github.com/tbekolay/2015-02-27-seminar/blob/master/img/cochlea.svg
+\fig{cochlea}{0.5}{??? caption}{??? shortcap}
 
 The inner ear transduces vibrations
 of the liquid in the cochlea
@@ -201,6 +202,7 @@ which represents 13 orders of magnitude
 of absolute air pressure.
 
 \subsection{Psychoacoustics}
+\label{sec:psychoacoustics}
 
 While the human ear can be thought of
 as a spectrum analyzer for air pressure waves,
@@ -218,7 +220,8 @@ a frontend for speech recognition.
 Therefore, the psychoacoustical findings
 discussed in this chapter
 are presented as motivation for the
-auditory periphery models described in Section~???.
+auditory periphery models described
+in Section~\ref{sec:periphery-models}.
 
 % ??? Either here or in previous section,
 % introduce the idea of formants
@@ -240,17 +243,17 @@ are perceived as louder for higher frequencies.
 The exact relationship between
 sound pressure level and
 loudness was originally proposed
-by ???Fletcher and Munson,
+by \cite{fletcher1933},
 and further standardized
-by the international standards organization;
-% ??? can that be cited;
-see Figure~???.
+by the international standards organization
+(ISO-226:2003);
+see Figure~\ref{fig:el-curves}.
 In general, perceived loudness,
 as expressed in the phon scale,
 increases for higher frequency sounds
 up to around 7000 Hz.
 
-??? fig: equal loudness curves
+% \fig{el-curves}{0.8}{??? caption}{??? caption}
 
 Another scale, the sone,
 quantifies the relative differences
@@ -261,7 +264,9 @@ is linear with perceived loudness;
 a sound played with twice the sone value
 should be perceived as twice as loud.
 The sone for a particular frequency is
-$$\text{sone} \approx 2^{\frac{\text{phon} - 40}{10}},$$
+\begin{equation}
+  \text{sone} \approx 2^{\frac{\text{phon} - 40}{10}},
+\end{equation}
 above signals of 40 phon or louder.
 % However, while it is easy to compare
 % the relative volumes of two sound presented
@@ -278,14 +283,14 @@ suggests that a better model
 of the ear (instead of a spectrum analyzer)
 is as a bank of narrowband filters.
 Support for this model was provided
-in ???Zwicker,
+in \cite{zwicker1957},
 who showed that when two tones
 have frequencies that are close enough,
 their perceived loudness sums,
 suggesting that the two tones
 are within the bandwidth of one of the
 auditory system's filters.
-???Moore and Glasberg
+\cite{moore1983}
 summarized other attempts to
 determine the bandwidth
 of auditory filters
@@ -293,10 +298,12 @@ in a simple equation
 describing the equivalent
 rectangular bandwidth (ERB)
 of auditory filters:
-$$\text{ERB} = 6.23 f^2 + 93.39 f + 28.52,$$
+\begin{equation}
+  \text{ERB} = 6.23 f^2 + 93.39 f + 28.52,
+\end{equation}
 where $f$ is the center frequency
 of the auditory filter of interest.
-See Figure~??? for a visualization of
+See Figure~\ref{fig:erb} for a visualization of
 this measure for frequencies of relevance
 for the human auditory system.
 Auditory filters are not rectangular,
@@ -307,8 +314,7 @@ the ERB measure has been productive and is still used
 to determine the bandwidths
 of filters in auditory periphery models.
 
-??? ERB figure, Fig 1 of Moore and Glasberg
-% python script, erbspace
+% \fig{erb}{0.8}{???}{???}
 
 Like volume,
 humans perceive
@@ -316,13 +322,15 @@ the frequency of incoming sounds
 in subjective ways.
 The subjective perception of frequency
 is referred to as pitch.
-???Stevens et al. quantified
+\cite{stevens1937} quantified
 the relationship between
 frequency and pitch
 with a simple equation,
-$$\text{mel} = 2595 \log_{10} \left(1 + \frac{f}{700}\right),$$
+\begin{equation}
+  \text{mel} = 2595 \log_{10} \left(1 + \frac{f}{700}\right),
+\end{equation}
 resulting in the mel scale
-(see Figure~???).
+(see Figure~\ref{fig:mel}).
 As with volume, humans are adept at
 noticing when two tones differ in pitch;
 however, absolute perceptions of pitch
@@ -337,8 +345,7 @@ so pitches can only
 be easily differentiated
 relative to their position in an octave.
 
-??? Mel scale figure -- include octaves!
-% python script
+% \fig{mel}{0.8}{???}{???}
 
 \subsubsection{Temporal psychoacoustical effects}
 
@@ -352,13 +359,13 @@ which are important for speech.
 The first is that the length
 of a sound affects its perceived volume.
 Specifically, short sounds are harder to hear
-(see Figure~???).
+(see Figure~\ref{fig:short-sounds}).
 As a result, humans find
 consonant sounds more difficult
 to recognize in situations with background noise
 than vowel sounds,
-as consonants are shorter than vowels.
-% ??? prolly cite everest? or wherever 3-12 came from.
+as consonants are shorter than vowels
+\cite[Chapter~3]{everest2001}.
 There is evidence that sounds with constant volume
 are perceived as being monotonically louder
 up to approximately 200 ms;
@@ -366,10 +373,10 @@ this finding suggests that
 at some point in the auditory system,
 the power for a given characteristic frequency
 is integrated over a time window
-of approximately 200 ms.
-??? cite kollmeier's cite p. 64
+of approximately 200 ms
+\cite[p.64]{kollmeier2008}.
 
-??? Figure 3-12 from Everest
+\fig{short-sounds}{0.4}{???}{???}
 
 Another temporal effect is forward and backward masking.
 When two sounds are made in quick succession,
@@ -399,12 +406,11 @@ and shortly thereafter when it is reflected
 back to us off of the walls.
 Yet, we perceive this as a single utterance,
 a phenomenon known as auditory fusion.
-Haas ???1972 found that auditory fusion occurs
+\citeauthor{haas1972} found that auditory fusion occurs
 best when similar sounds are separated by roughly
 20 to 30 milliseconds.
 When similar sounds are separated by 50 to 80 milliseconds,
 we perceive them as discrete echoes.
-??? (The influence of a single echo on the audibility of speech).
 
 Together, these temporal psychoacoustical effects
 suggest that the incoming frequency information
@@ -412,14 +418,8 @@ from the filters implemented by the auditory periphery
 are further temporally filtered
 by auditory regions of the brain.
 
-% - ``Psychoacoustics is the scientific discipline that
-%   measures and models the relation between physical
-%   acoustic quantities (e.g., the intensity of a sinusoidal
-%   stimulus specified by sound pressure level, frequency,
-%   and duration) and their respective subjective impression
-%   (e.g., loudness, pitch, and perceived temporal extent).''
-
 \subsection{Neurobiology}
+\label{sec:recog-neurobio}
 
 Brain structures in the primate auditory system
 are organized in several parallel
@@ -451,11 +451,11 @@ the core.
 The belt provides input
 to the parabelt.
 % which is made up of ???.
-See Figure~??? for a summary of
+See Figure~\ref{fig:corebelt} for a summary of
 the neuroanatomical structures and connections
 in the auditory hierarchy.
 
-??? core, belt, parabelt
+\fig{corebelt}{0.9}{???}{???}
 
 The parabelt provides input
 to several areas,
@@ -479,7 +479,7 @@ assigns roles to much larger portions
 of the superior temporal gyrus
 and the superior temporal sulcus.
 We will discuss this in more detail
-in Section~???.
+in Section~\ref{sec:sm-neurobio}.
 
 While we do not yet know how auditory information
 is transformed through the connections
@@ -511,11 +511,11 @@ like the parabelt
 are more broadly tuned
 to larger parts of the frequency spectrum.
 % ???more, cites
-See Figure~??? for visualizations
+See Figure~\ref{fig:aud-tonotopy} for visualizations
 of the tonotopic organization
 of primary auditory cortical regions.
 
-??? tonotopic organization figure
+\fig{aud-tonotopy}{0.6}{???}{???}
 
 Neurons at various levels in the auditory hierarchy
 respond to their selected frequency range
@@ -535,22 +535,18 @@ based on the
 Spectral-Temporal Receptive Field (STRF).
 STRFs summarize how a neuron responds
 to incoming stimuli both spatially
-and temporally ???cite Aertsen 1981.
+and temporally \cite{aertsen1981}.
 Unfortunately, despite many decades
 of determining STRFs in
-primate ???cite and human auditory cortex ???cite
+primate ??? cite and
+human auditory cortex ???cite
 the exact temporal properties of
 each area are not known.
 In general, STRFs have been found that
 show delays of 5--250 ms
-(see, e.g., ??? Mesgarani et al, supplementary material).
-% While ringing can be observed
-% in some STRFs, leading some
-% (e.g., ???Kollmeier gabor paper)
-% to hypothesize Gabor-like filters;
-% however, the primary response comes
-% after a particular delay
-See ???kaas; semple and scott for reviews.
+(see, e.g., \cite[Supplementary material]{mesgarani2014}).
+See \cite{kaas1999,kaas2000,scott2003,semple2003}
+for reviews.
 
 It should be noted
 that the information gleaned from
@@ -558,21 +554,20 @@ spectro-temporal tuning curves
 still describes a linear relationship
 between the incoming frequency spectrum
 and how a particular neuron responds.
-???Tian Rauschecker 2004
+\citeauthor{tian2004}
 suggest that belt neurons
 in rhesus monkeys respond nonlinearly
 to frequency-modulated sweep stimuli,
-but ???Kowalski et al. 1995
+but \cite{kowalski1995}
 found that cat A1 responses were linear.
 It is difficult to evaluate
 the responses of cells
 as traditionally the STRF
 is determined using simple stimuli
 like white noise;
-however, see ???Theunissen 2000
+however, see \cite{theunissen2000},
 for a method using complex sounds.
-% and ???Griffiths et al for ?.
-??? Escabi \& Schreiner 2002
+\cite{escabi2002}
 found nonlinear responses
 in approximately 40\%
 of the midbrain inferior colliculus
@@ -615,7 +610,7 @@ important information.
 Automatic speech recognition (ASR) has been
 an active field of research
 in artificial intelligence since 1952,
-when ??? Davis Biddulph Balashek bell-labs.pdf
+when \citeauthor{davis1952}
 presented a system for recognizing
 spoken digits by a single individual
 with accuracy above 97\%.
@@ -657,8 +652,8 @@ to emit phoneme labels,
 which are then composed into words
 using large corpora of
 lexical and linguistic information
-(see Figure~??? and ??? mjfgNOW.pdf
-and ??? hmm tutorial for reviews).
+(see Figure~\ref{fig:asr} and
+\ref{rabiner1989,gales2008} for reviews).
 The first part of the pipeline
 that produces feature vectors
 is often called the ``frontend;''
@@ -666,25 +661,25 @@ the second part that uses
 statistical methods to infer labels
 is called the ``backend.''
 
-??? something like fig 2.1 of mjfgnow.pdf
+\fig{asr}{0.6}{???}{???}
 
 HMM-based systems
 were among the first systems
 successful enough to be
 used commercially
-(see ??? p94-huang.pdf).
-In 1989, ??? lee and hon
-achieved a word accuracy rate of
+(see \cite{huang2014}).
+In 1989, \citeauthor{lee1989}
+achieved a phone accuracy rate of % ??? look up: phone or word accuracy?
 66.08\% on a subset of the
 TIMIT speech corpus.
 Four years later,
-??? lamel and gauvain
+\citeauthor{lamel1993}
 used a more sophisticated HMM-based system
-to achieve 72.9\% word accuracy on
+to achieve 72.9\% phone accuracy on
 all of the TIMIT speech corpus.
 Improvements from then until
 the mid-2000s were modest
-(see ??? InTech...pdf).
+(see \cite{lopes2011}).
 
 Since 2006, a series of learning algorithms
 and network structures in artificial neural networks (ANNs)
@@ -694,19 +689,18 @@ the domain of automatic speech recognition
 with considerable success
 both in academic research
 and in commercial application.
-In 2013, Google reported
-(??? Vanhoucke presentation?)
-phoneme classification error rates on TIMIT
-(a more difficult task than
-the word classification task previous mentioned)
-of 17.7\%,
+In 2013, \cite{graves2013}
+achieved
+phone classification accuracy on TIMIT
+of 82.3\%,
 significantly better than the most sophisticated
-HMM-based model's error rate of 27.3\%.
-% ??? probably cite more
+HMM-based model's error rate of 72.9\%.  % ??? check!
+% look at zen2007 zen2009
 
 The architecture of DNN-based systems
 is simpler than that of HMM-based systems
-(see Figure~??? and ??? for a review).
+(see Figure~\ref{fig:dnn}
+and \cite{hinton2012}).
 Instead of distinct steps in which
 an explicit statistical acoustic model
 is evaluated and then combined with language models,
@@ -730,8 +724,10 @@ to developing complicated learning algorithms
 that have many parameters
 which must be carefully tuned.
 
-??? DNN architecture
-something like slide 8 of Vanhoucke2013
+% \fig{dnn}{0.5}{???}{???}
+% ??? DNN architecture
+% something like slide 8 of Vanhoucke2013
+% or check hinton2012
 
 One additional benefit of DNN-based approaches
 is that they have analogies to
@@ -749,7 +745,7 @@ under certain biological constraints,
 mappings between DNNs
 and biologically plausible spiking neural networks
 are currently being developed
-??? cite Hunsberger.
+\cite{hunsberger2015}.
 
 \subsection{Auditory periphery modeling}
 
@@ -758,7 +754,7 @@ power spectral analysis
 with variants of the Fourier transform,
 mimicking the function
 of the human auditory periphery.
-However, as discussed in Section~??? psychoacoustics,
+However, as discussed in Section~\ref{sec:psychoacoustics},
 the human ear's frequency decomposition
 is far from ideal.
 Some differences in how the ear
@@ -788,7 +784,7 @@ for speech recognition.
 Several approaches to auditory periphery modeling
 have progress in parallel over the past century.
 Detailed mechanical models
-like those reviewed in ??? 159637.pdf
+like those reviewed in \cite{ni2014}
 aim to model ear physiology
 as accurately as possible.
 Unfortunately, efficient implementations
@@ -800,7 +796,7 @@ as closely as possible
 using simplified mathematical models;
 efficient implementations of these
 models are freely available
-??? cite Brian hears.
+\cite{fontaine2011}.
 We will focus only on phenomenological
 models of the auditory periphery.
 
@@ -821,11 +817,12 @@ For reviews of prominent
 auditory periphery models and
 the auditory-nerve response characteristic
 reproduced by those models,
-see ???lopez-poveda2005
-and ???lyon2010.pdf.
+see \cite{lopez2005}
+and \cite{lyon2010}.
 The auditory periphery models used
 in this thesis will be discussed
-in further detail in Section~??? methods.
+in further detail in
+Section~\ref{sec:periphery-models}.
 
 \section{Human speech production}
 
@@ -833,7 +830,8 @@ We limit our coverage
 of human speech production
 to the topics drawn upon
 in the model that will be presented
-in Chapters~???:
+in Chapters~\ref{chapt:model}
+and \ref{chapt:implementation}:
 basic vocal tract physiology,
 phonetics and phonology,
 and neurobiology.
@@ -854,14 +852,14 @@ translating electrical brain activity
 into muscle activations
 which cause fluctuations in air pressure.
 
-??? Vocal tract figure
-% Generate from Kroger synth, label
+% \fig{vt}{0.4}{???}{???}
+% % Generate from Kroger synth, label
 
 The vocal tract consists of
 the layrngeal cavity,
 the pharynx, the oral cavity,
 and the nasal cavity
-(see Figure~???).
+(see Figure~\ref{vt}).
 Air expelled from the lungs
 is transformed
 by these four structures
@@ -955,23 +953,12 @@ movements that can be done with the nose.
 Exact definitions of the articulators
 do vary between phoneticians,
 and play an important role
-we later describe articulatory speech synthesizers
-in Section~???.
+in the design of a speech production system.
+We will discuss this in further detail
+in Section~\ref{sec:results-production}.
 
 \subsection{Phonetics and phonology}
-
-% ???brief intro, explain the difference
-% between phonetics and phonology
-% % http://www.phon.ox.ac.uk/jcoleman/PHONOLOGY1.htm
-% ???include phonemic vs phonetic transcription
-% ??? - phonetics: describing the sounds we use in speaking.
-%   Relating to the way we produce them and the way they sound.
-%   phonology: more abstract parts of sounds; look at restrictions
-%   and regularities in a language by studying syllables;
-%   suprasegmental parts (i.e., prosody:
-%   things that extend over several segments (phonemes)).
-%   - phonemic transcription: just the phonemes. Phonetic transcription:
-%     includes diacritics and other marks to differentiate allophones.
+\label{sec:phonology}
 
 Our treatment of phonetics and phonology
 focuses on the hierarchical levels
@@ -998,11 +985,11 @@ the lower levels of language that
 phonetics and phonology examine,
 and these constraints will
 inform the structure of the model
-we present in Chapter~???ref.
+we present in Chapter~\ref{chapt:model}.
 
 The specific hierarchy that we will
 present in this section is pictured
-in Figure~???ref.
+in Figure~\ref{fig:prod-hierarchy}.
 We will arbitrarily begin at
 the lowest (rightmost???) level and work upwards
 (though a presentation starting at
@@ -1011,28 +998,19 @@ For clarity, we will use English for examples,
 except when demonstrating that a particular
 quality differs across languages.\footnote{
   When not explicitly cited,
-  the information in Section~???ref
+  the information in Section~\ref{sec:phonology}
   should be considered
   basic phonetics and phonology
   that would be covered in an
   introductory undergraduate level
   class or textbook
-  (I used ???refRoach as a general reference).
+  (I used \cite{roach2010} as a general reference).
 }\footnote{The International Phonetic Alphabet (IPA)
   will be used this and subsequent sections.
-  See ???typography for more details.}
+  See Section~\ref{typography} for more details.}
 
-% Things I didn't put in but maybe could
-% - Pronunciation is way different in connected speech versus
-%   careful pronunciation in isolation. E.g.,
-%   Assimilation: phonemes in a syllable change due to the phoneme
-%   directly after or before.
-%   Elision: Sometimes sounds disappear; deleted phonemes.
-% - Rhythm: Stress-timing: English is stress timed?
-%   Evidence isn't strong.
-%   French and others are syllable-timed.
-%   Foot: a unit of rhythm. Starts with stressed syllable, includes
-%   all other syllables until the next stress.
+% \fig{prod-hierarchy}{0.5}{???}{???}
+% box-arrow diagram with the stuff from this sect
 
 \subsubsection{Vocal tract gestures}
 
@@ -1041,7 +1019,7 @@ the fundamental unit of speech production
 is the ``gesture,''
 which describes some movement
 of the articulators in the vocal tract
-??? Browman \& Goldstein.
+\cite{browman1989}.
 Gestures are pre-linguistic,
 in that a vocal tract gesture
 does not necessarily produce
@@ -1058,7 +1036,7 @@ indicating that gestures develop
 before language,
 and are leveraged when
 developing language
-???refBrowmanGoldstein.
+\cite{browman1989}.
 
 Gestures are stereotyped movements
 of sets of articulators in the vocal tract.
@@ -1107,7 +1085,7 @@ sets of gestures overlap
 or occur in tight succession.
 Therefore, gestures are often
 grouped into gestural scores
-(see Figure~???)
+(see Figure~\ref{fig:gs})
 which embody the spatiotemporal
 coordination of several gestures
 to produce a linguistically
@@ -1125,17 +1103,18 @@ stretched depending on
 the global parameter, stiffness.
 Gestural scores can also
 be visualized as a graph,
-as in Figure~???,
+as in Figure~\ref{fig:gs},
 which highlights that
 certain gestures must co-occur
 or have tight temporal couplings
 such that one gesture
 must start as another gesture ends.
 
-??? Fig: gestural score
+\fig{gs}{0.5}{???}{???}
 
 As will be discussed in detail
-in Section~???, there is a mapping
+in Section~\ref{sec:model-motorcontrol},
+there is a mapping
 between gestures and vocal tract articulators;
 in human speech, the mapping links
 gestures and vocal tract muscle activations.
@@ -1155,10 +1134,10 @@ temporal sequencing of gestures
 have resulted in different
 definitions of gesture sets,
 with different graph structures as
-the one shown in Figure~???.
+the one shown in Figure~\ref{fig:gs}.
 We will discuss our interpretation
 of gestures and gesture sets
-in Section~???.
+in Section~\ref{sec:results-production}.
 % Development of better human vocal tract models
 % will help researchers
 % determine a complete set of
@@ -1231,10 +1210,10 @@ not a purely objective exercise.
 For example, while most dialects
 of English recognize 24 consonant phonemes,
 General American English has been transcribed
-as having 16 vowel phonemes ???cite,
+as having 16 vowel phonemes,
 while Received Pronunciation English
 has been transcribed as having 25 vowel phonemes
-???citeWells1982.
+\cite{wells1982}.
 
 Vowel phonemes occur when air is freely
 moving through the open vocal tract.
@@ -1262,7 +1241,7 @@ and /u???/ (closed, back).
 Most of the remaining vowel sounds
 can be expressed as being
 a blend of one of these three vowel sounds
-(see ???fig for a visualization).
+(see Figure~\ref{fig:vowels} for a visualization).
 
 Pure vowel phonemes (also called monophthongs)
 occur when the glottis phonates
@@ -1285,7 +1264,7 @@ the word ???
 is often voiced with the
 triphthong ???.
 
-??? vowel figure
+% \fig{vowels}{0.8}{???}{???}
 % should be able to make with TIPA
 
 Consonant phonemes occur when some point
@@ -1318,9 +1297,10 @@ The narrow channel causes
 the hissing sounds associated
 with phonemes like /s???/ and /f???/.
 Several other places and manners exist;
-those defined by the IPA are shown in Figure~???.
+those defined by the IPA are shown
+in Figure~\ref{fig:consonants}.
 
-??? consonant figure
+% \fig{consonants}{0.8}{???}{???}
 % also from TIPA;
 % http://www.ling.ohio-state.edu/events/lcc/tutorials/tipachart/tipachart.pdf
 
@@ -1332,7 +1312,7 @@ the prior or upcoming vowel sound.
 In the word /bat???/ for example,
 the /b???/ and /t???/ sounds
 occur in the context of /a???/.
-???kroger theorizes that
+\cite{kroger1993} theorizes that
 each consonant sound is composed
 of speech gestures which force some
 articulators to change in a particular way,
@@ -1388,14 +1368,15 @@ and an optional cluster of consonant
 phonemes (called the coda).
 In English, the onset is also optional,
 though this is not true in all languages.
-Figure~??? summarizes this grouping.
+Figure~\ref{fig:syllables} summarizes this grouping.
 Note that other ways to describe
 syllables exist
-(cf. ???mora, Chinese model),
+(e.g. the \textit{mora}; \cite{otake1993}),
 but we adopt this method
-as it is the most common.
+as it is the most common
+for Germanic languages like English.
 
-??? syllable structure figure
+\fig{syllables}{0.6}{???}{???}
 
 Phonetically, syllables are a useful
 level of organization because
@@ -1466,6 +1447,7 @@ may be limited.
 
 % ??? Here or somewhere else, summarize
 % the ``mental syllabary'' from Levelt and Wheeldon, 1994
+% also Burki 2015
 
 \subsubsection{Tone-units}
 
@@ -1513,7 +1495,7 @@ a stressed (and therefore heavy) syllable.
 The tail consists of all syllables
 following the tonic syllable.
 
-??? tone-unit structure figure
+% ??? tone-unit structure figure
 % maybe don't worry for now
 
 Not all heavy syllables are necessarily stressed;
@@ -1629,6 +1611,7 @@ recognition rates for
 non-linguistic speech.
 
 \subsection{Neurobiology}
+\label{sec:prod-neurobio}
 
 Traditionally, speech production
 was tightly linked to Broca's area,
@@ -1666,7 +1649,7 @@ of both brain hemispheres
 that temporally controls a series
 of tightly timed activations
 of motor cortex.
-??? Flinker et al.
+\cite{flinker2015}
 showed through Granger causality analysis
 that Broca's area is activated
 before motor cortex,
@@ -1677,7 +1660,7 @@ We will discuss its role in
 transforming incoming linguistic
 information from sensory areas
 to representations useful for production
-in Section~???,
+in Section~\ref{sec:sm-neurobio},
 and instead focus here on
 how motor areas effect vocal tract movements.
 
@@ -1715,9 +1698,9 @@ and neurobiological support
 for these variants
 can be found if certain
 analysis techniques are used
-(see ???Trescha and Jarc 2009
+(see \cite{tresch2009}
 for a review in general
-and ???smith and zelaznik / smith 2006
+and \cite{smith2004,smith2006}
 for evidence of speech synergies).
 We limit our discussion
 of motor synergies to the abstract concept,
@@ -1725,20 +1708,20 @@ and do not choose a specific variant.
 As such, our primary interest
 is in what brain areas correspond
 to the level of the speech hierarchy
-(??? reference phonology figures).
+(see Figure~\ref{fig:prod-hierarchy}).
 
 Motor synergies, then,
 can be thought of as the highest level
 of the human speech motor hierarchy.
 There is evidence that these motor synergies
 exist in the ventral sensorimotor cortex (vSMC).
-???Bouchard et al found that activations
+\cite{bouchard2013} found that activations
 of vSMC during the voicing of a syllable
 represent activation of vocal tract articulators,
 and that the vSMC is organized somatotopically
 (i.e., distinct regions of the vSMC
 influence different vocal tract articulators).
-???Breshears 2015 built on this work
+\cite{breshears2015} built on this work
 by directly stimulating vSMC in humans
 who were undergoing brain surgery.
 vSMC stimulation in different subsections
@@ -1748,51 +1731,50 @@ of vSMC varied for each subject,
 but all subjects' vSMCs were organized
 in dorsal-ventral articulator order.
 
-??? DeWolf integrated neurobiological research
+\cite{dewolf2010} integrated neurobiological research
 into a model of the motor hierarchy
 that involves the interaction of
 supplementary motor areas,
 basal ganglia, cerebellum,
 primary motor cortex,
 and nuclei in the brain stem and spinal cord
-(see Figure~???).
+(see Figure~\ref{fig:noch}).
 We assume that vocal tract movements
 use the same hierarchy,
 with vSMC as the top level of that hierarchy
 (i.e., it is the supplementary motor area
 for the vocal tract).
-??? Wildgruber 2001 provides support
+\cite{wildgruber2001} provides support
 for the role of basal ganglia
 and cerebellum in speech,
-and ??? Brown et al 2010
+and \cite{brown2009}
 provides support for
 the role of primary motor cortex
 in speech.
 
-??? NOCH figure
-% just steal
+% \fig{noch}{0.4}{???}{???}
+% % just steal
 
 The motor synergies for vocal tract movements
 provide a method for implementing
 vocal tract gestures,
 but there remains a link
 between the phonemic
-speech hierarchy in Figure ???
+speech hierarchy in Figure~\ref{fig:prod-hierarchy}
 and the motor hierarchy
-in Figure~???.
+in Figure~\ref{fig:noch}.
 Neurobiologically,
 that missing link appears to be
 implemented by the anterior insula,
 which is located in the lateral sulcus
 separating the temporal lobe from
 the parietal and frontal lobes.
-As reviewed in ???Ackermann and Ricker 2003,
+As reviewed in \cite{ackermann2004},
 the insula seems to be responsible
 for the coordination of the up to 100 muscles
 that shape the vocal tract during speech
 and non-speech vocalizations.
-They (and others like ???ivry and robertson,
-``The two sides of perception'')
+They (and others like \cite{ivry1998})
 hypothesize that the mapping from
 from vocal tract gestures to articulator movements
 is lateralized such that
@@ -1805,9 +1787,6 @@ suggesting that these two timescales
 would be represented
 with separate neural resources
 in a neural model of the speech system.
-
-% ??? random: speech and oral motor coordination patterns
-% still develop after age 14 (smith 2006)
 
 \section{Sensorimotor integration}
 
@@ -1841,12 +1820,12 @@ they become increasingly sensitive
 to the phonemes that they hear regularly,
 and increasingly less sensitive
 to phonemes that they hear rarely or never
-??? ref 979.full.pdf.\footnote{
+\cite{kuhl2008}.\footnote{
   Interestingly, it has been shown that
   remaining sensitive to phoneme
   that are not regularly encountered
   is predictive of poor language performance
-  at two years of age ??? ref 979.full.pdf.}
+  at two years of age \cite{kuhl2008}.}
 Up until puberty,
 children have a sensitivity for
 acquiring language in general;
@@ -1854,7 +1833,7 @@ after puberty, formal instruction
 is less effective,
 and speaking foreign languages
 without an accent is more difficult
-??? ref something from Converging mech...pdf.
+\cite{hurford1991}.
 This finding suggests that
 parts of our model
 that include learning
@@ -1873,7 +1852,7 @@ the vocal babbling of children
 may be directed toward the goal of
 matching speech templates learned
 through auditory input
-??? ref something from Conv...pdf.
+\cite{bolhuis2010}.
 This finding suggests that
 we develop a repository of speech templates
 that we attempt to match when
@@ -1883,7 +1862,7 @@ Despite the prominent role of sensorimotor integration
 in development,
 it is not the case that this system
 plays no role in the adult speech system.
-One influential study by Houde and Jordan ???
+One influential study by \citeauthor{houde1998)
 investigated sensorimotor learning
 by manipulating adult speech
 through a device that recorded
@@ -1900,6 +1879,7 @@ to other syllables that had not yet
 been tested.
 
 \subsection{Neurobiology}
+\label{sec:sm-neurobio}
 
 Unlike recognition and production,
 in which we have a sensor and actuator to measure,
@@ -1916,7 +1896,7 @@ a fruitful framework for many studies.
 
 The first theory
 is the dual-stream model of speech processing
-proposed by ??? hickok and poeppel.
+proposed by \cite{hickok2007}.
 This model is conceptually similar
 to the dual-stream model of visual processing,
 in which the ventral stream
@@ -1928,11 +1908,11 @@ in guiding actions.\footnote{The dual-stream
   and the dorsal ``where'' pathway,
   assigning the dorsal stream
   the role of determining object locations
-  ???cite.
+  \cite{ungerleider1982}.
   However, more recent studies have made
   strong links between dorsal stream
-  activity and motor actions ???cite, Hickok2007 72,73
-  more.}
+  activity and motor actions
+  \cite{andersen1997,rizzolatti1997,rizzolatti2003}.}
 In the speech processing case,
 the ventral stream
 is involved in lexical processing
@@ -1945,7 +1925,7 @@ but developing an
 interacting ventral pathway
 would be a logical extension.
 
-Hickok and Poeppel ???cite
+\cite{hickok2007}
 suggest that the dorsal stream
 is strongly involved in
 speech development,
@@ -1955,7 +1935,7 @@ of motor pathways to effect speech;
 the role of the dorsal pathway may
 be reduced over time as motor pathways
 reliably produce recognizable speech
-???cite Hickok2007 81-83?.
+\cite{schmidt1975,doyon2003}.
 Anatomically, the dorsal stream begins with
 the dorsal superior temporal gyrus (STG; i.e., Wernicke's area)
 and the superior temporal sulcus (STS),
@@ -1968,19 +1948,20 @@ which also takes in input from other sensory modalities
 Spt then projects to higher-level articulatory areas,
 including the posterior inferior frontal gyrus (pIFG; i.e., Broca's area),
 premotor cortex (PM) and the anterior insula.
-As was discussed in sections~??? and ???,
+As was discussed in
+Sections~\ref{recog-neurobio} and \ref{prod-neurobio},
 the STG has clear roles in auditory processing,
 and the anterior insula has clear roles in
 motor processing;
 area Spt, therefore, is a strong candidate
 for where sensorimotor integration might occur.
 
-Hickock, Okada and Serences ???
+\cite{hickok2009}
 provide human fMRI evidence that
 area Spt is significantly active
 during both sensory and motor aspects
 of a speech task.
-However, Cogan et al 2014 ???
+However, \cite{cogan2014}
 performed electrocorticography
 in human epilepsy patients
 and found electrodes that activated
@@ -2000,7 +1981,7 @@ motor theory of speech perception.
 The central tenet of this theory
 is that perceiving speech
 is perceiving vocal tract gestures
-??? cite 3.nihms-136...pdf.\footnote{
+\cite{galantucci2006}.\footnote{
   The motor theory of speech perception has a long history
   and has made some claims that are not supported by evidence.
   We will ignore these claims, and focus only on
@@ -2017,7 +1998,7 @@ the direct perception of gestures
 influences how we perceive the sound.
 A well-known demonstration of
 this phenomenon is the McGurk effect
-???cite 3.nihm,
+\cite{mcgurk1976},
 in which the same audio waveform
 in perceived as representing a different syllable
 when accompanied by a video
@@ -2032,7 +2013,7 @@ when imitating a cue syllable
 compared to when reacting
 to the cue syllable
 with a predetermined syllable
-???cite Fowler et al from 3.nihms.\footnote{
+\cite{fowler2003}.\footnote{
   For clarity, in the task, subjects
   shadowed a recording voicing the ??? /a/ phoneme,
   which switched to either /pa/ /ta/ or /ka/??? at an
@@ -2080,7 +2061,7 @@ a representation which might be vocal tract gestures.
 Indeed, while much of the auditory literature
 attempts to decode phonemes
 from these brain areas
-(e.g., ???cite),
+(e.g., ??? cite),
 neural activities representing vocal tract gestures
 would necessarily be capable of
 decoding phonemes due to the fact that
@@ -2088,7 +2069,7 @@ vocal tract gestures are responsible
 for effecting movements that produce
 those phonemes.
 While they do not make this link directly,
-??? Science-2014-Mesgarani.pdf
+\cite{mesgarani2014}
 showed support for the motor theory of speech recognition
 by showing that in the STG,
 which is typically thought of
@@ -2096,7 +2077,7 @@ as an auditory-specific brain region,
 there is topographic organization
 based on the acoustic properties
 of the phoneme being listened to
-(see Figure~???).
+(see Figure~\ref{fig:stg-phones}).
 These acoustic properties are
 directly linked to the articulators
 producing the phoneme
@@ -2104,7 +2085,7 @@ producing the phoneme
 and therefore it is plausible that
 the STG represents vocal tract gestures.
 
-??? figure 2 from Science-2014-...pdf
+\fig{stg-phones}{0.8}{???}{???}
 
 Given that neurobiological evidence can
 support both theories,
@@ -2123,8 +2104,7 @@ by explicitly representing vocal tract gestures.
 In terms of higher-level biological organization,
 almost all speech recognition systems
 can be mapped most directly
-to the ventral stream of the human speech system
-(see Section~???),
+to the ventral stream of the human speech system,
 as they attempt to decode
 lexical information in order to
 transcribe speech to text.
@@ -2139,7 +2119,7 @@ Several labs have investigated
 using measurements
 related to speech production
 as part of a speech recognition system
-(see ??? 00.King.pdf for a review).
+(see \cite{king2007} for a review).
 The primary advantage of this approach
 is that speech production information
 is not locked to each phoneme,
@@ -2149,17 +2129,17 @@ of the same phoneme.
 The existence of large datasets
 with continuous acoustic
 and articulator position recordings
-(e.g., ??? x-ray database, ??? mngu0)
+(e.g., \cite{westbury1990,wrench2000,steiner2012})
 has spurred development of
 systems that use both
 acoustic and articulatory information
 as input to an ASR system.
-??? Zlokarnik (1995) from 00.King.pdf
+\cite{zlokarnik1995}
 used continuous acoustic and articulatory
 information with an HMM-based system
 and reduced word error rates
 by more 60\% (relative).
-??? Eide (2011) from 00.King.pdf
+\cite{eide2001}
 augmented the feature vector
 in a standard HMM system
 articulatory features and
@@ -2167,9 +2147,9 @@ reduced word error rates
 by 34\% (relative).
 Similar studies have been done
 with traditional artificial neural networks
-(e.g., ??? Kirchoff)
+(e.g., \cite{kirchhoff2002})
 and dynamic Bayesian networks
-(e.g., ??? Stephenson 2000, 2004).
+(e.g., \cite{stephenson2000,stephenson2004}).
 
 Deep neural networks have been used for
 a related task,
@@ -2180,12 +2160,12 @@ that is, the input of the network
 is still an acoustic feature vector,
 but the desired output
 is articulator positions.
-??? articulatorinversion.pdf
+\cite{uria2011}
 obtained a root mean square error
 of 0.95 mm on the MNGU0 dataset,
 which is 0.04 mm better than prior
 efforts using Guassian mixture models
-??? ISO90544.pdf.
+\cite{richmond2009}.
 The extracted articulatory information
 could be used by another ASR system
 to lower phone or word error rates.
@@ -2196,6 +2176,7 @@ Some work has also been done
 relating this work to
 vocal tract gestures.
 For example,
+
 ??? 04.542.pdf and 05.54200a1.pdf
 showed that the vocal tract gesture score
 can be estimated
