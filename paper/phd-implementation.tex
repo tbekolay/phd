@@ -16,6 +16,7 @@ that could be incorporated in
 non-neural speech recognition and synthesis systems.
 
 \section{Neural cepstral coefficients}
+\label{sec:ncc}
 
 \probbox{A raw audio waveform has high temporal resolution,
   but low spatial resolution, as it is a one-dimensional signal.
@@ -126,7 +127,7 @@ The NCC pipeline is implemented
 in a Nengo network that uses
 the Brian hears library
 of auditory filter models
-??? cite Brian hears,
+\cite{fontaine2011},
 and two layers of
 leaky integrate-and-fire (LIF) neurons ensembles
 connected in a feed-forward manner
@@ -640,6 +641,7 @@ that are defined manually.\footnote{
 % ??? Do some fine tuning?
 
 \subsection{Neural model}
+\label{sec:impl-prod-neuralmodel}
 
 ??? Neural model figure
 
@@ -1168,6 +1170,7 @@ of congitive intentions.
 % Or, obvious next step!
 
 \section{Syllable recognition}
+\label{sec:impl-recog}
 
 \probbox{Speech production information is decoded
   from integrated auditory
@@ -1204,6 +1207,7 @@ between the syllable production
 and recognition systems.
 
 \subsection{Model overview}
+\label{sec:impl-recog-overview}
 
 The first part of the model is to
 recognize incoming production information trajectories

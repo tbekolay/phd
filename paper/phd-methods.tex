@@ -6,7 +6,7 @@ for auditory processing
 and trajectory generation
 online and in continuous time,
 meeting Sermo's criteria
-outlined in Section~???.
+outlined in Section~\ref{sec:sermo}.
 Additionally,
 we construct spiking neuron models
 that implement or interact with those methods
@@ -22,30 +22,32 @@ in a biologically plausible manner,
 we use models of the auditory periphery
 to perform a continuous spectral analysis
 of the audio signal.
-We compare six existing
+We compare five existing
 auditory periphery model implementations
 in the model described in
-Section~???.
+Section~\ref{sec:ncc}.
 
 \subsection{Gammatone filter}
 
 The Gammatone filter was proposed
-in ???Johannesma 1972 also de Boer 1975?
+in the 1970 (see \cite{johannesma1972,deboer1975,patterson1976}
 and has become
 the most widely used auditory filter
 as it emulates the basic function
-of the inner ear
+of the inner ear,
 yet can be implemented efficiently
 on general purpose computers.
-It does not capture many of the
+It capture many of the
 psychoacoustical phenomena discussed
-in Section~???
-(e.g., the auditory filter is symmetric),
-but can process audio online
+in Section~\ref{sec:psychoacoustics},
+but does not capture some basic phonemena
+(e.g., the auditory filter is symmetric).
+However, most importantly,
+it can process audio online
 and in continuous time,
 making it applicable to Sermo.
 
-As described in ??? patterson,
+As described in \cite{patterson1976},
 the Gammatone filter has
 an impulse response of the form
 \begin{equation}
@@ -63,13 +65,12 @@ and an envelope
 (a Gamma function, hence the name Gammatone).
 Fourth order Gammatone filters
 are the most common
-??? cite patterson1992.
-See Figure~??? for a plot of the impulse response
-and frequency response.
+\cite{patterson1992}.
+See Figure~\ref{fig:gammatone} for ???.
 
-??? fig: impulse, freq response
+\fig{gammatone}{0.8}{???}{???}
 
-Slaney ??? cite proposed an efficient
+\cite{slaney1993} proposed an efficient
 digital filter implementation
 of the Gammatone filter.
 The filter is an eighth order
@@ -110,7 +111,7 @@ where $T$ is is the sampling interval,
 $f$ is the characteristic frequency of the filter,
 and $B$ controls the bandwidth of the filter
 ($B = 2 \pi b \text{ERB}(f)$).
-See ??? slaney for the derivation
+See \cite{slaney1993} for the derivation
 of the Z-transforms.
 
 \subsection{Log Gammachirp filter}
@@ -132,19 +133,19 @@ computationally efficient,
 like the Gammatone filter,
 but have an asymmetric frequency response.
 They are based on spectral masking experiments
-(see Section~????)
+(see Section~\ref{sec:psychoacoustics})
 in which the listener has to
 detect a brief sinusoidal signal
 along ``notched'' white noise,
 in which the power spectrum of the noise
 at frequencies just above and just below
 the frequency of the sinusoid
-are set to zero ??? cite Patterson 1976.
+are set to zero \cite{patterson1976}.
 The Log Gammachirp filter,
-proposed by ??? unoki et al
-in an improvement over
+proposed by \cite{unoki2001}
+is an improvement over
 the original Gammachirp filter
-??? irino patterson from unoki
+\cite{irion1997}
 in that it is more numerically stable.
 
 The impulse response
@@ -158,12 +159,12 @@ of the auditory filter;
 typically, $c$ is set to a negative value,
 raising the response to lower frequency sounds
 and attenuating the response to higher frequency sounds.
-See Figure~??? for a plot of the impulse response.
+See Figure~\ref{fig:log-gammachirp} for a plot of the impulse response.
 Unlike the Gammatone impulse response,
 the Gammachirp ???more,
 use the word frequency sweep
 
-??? Figure, impulse response and freq sepctrum
+\fig{log-gammachirp}{0.8}{???}{???}
 
 Gammachirp filters are closely related
 to Gammatone filters.
@@ -176,13 +177,13 @@ $|G_T(f)|$ is the amplitude sepctrum
 of the Gammatone filter,
 and $|H_A(f)|$ is the asymmetric function
 that depends on the parameter $c$.
-See Figure~??? for a visualization.
+See Figure~\ref{???} for a visualization.
 The final IIR filter
 is designed by determining
 an asymmetric filter $H_C(f)$
 that simulated the
 asymmetric function $H_A(f)$
-(see ??? for details).
+(see \cite{unoki2001} for details).
 The Log Gammachirp improves upon
 the original Gammachirp filter
 by identifying parameter values
@@ -193,77 +194,29 @@ with a parameter that is optimized
 to minimize the error between
 $H_C(f)$ and $H_A(f)$.
 
-% \subsection{Linear Gaborchirp}
-
-% This one doesn't actually work / isn't tested...
-
-% Another auditory filter
-% in the same vein as the
-% Gammatone and Log Gammachirp
-% filters is the Linear Gaborchip filter.
-% The impulse response is defined as
-% \begin{equation} \label{gaborchirp}
-%   \text{IR}(t) = e^{-t / 2 \sigma^2}
-%     \cos\left(2 \pi \left(ft + \frac{c}{2t^2}\right)\right),
-% \end{equation}
-% where $\sigma$ determines the duration
-% of the impulse response
-% (see Figure~???).
-
-% ??? IR Figure
-
-% Unlike the Gammatone and Gammachrip filters,
-% which convolve the cosine with
-% a Gamma function,
-% this filter uses a Gaussian
-% as the envelope;
-% convolving a cosine with
-% a Gaussian yeilds a Gabor filter.
-% Also unlike the Gammatone and Gammachirp filters,
-% the Linear Gaborchirp is implemented
-% as a finite impulse response (FIR) filter.
-% Therefore, a fixed length history of the
-% audio is kept,
-% and the output of the filter
-% is the convolution
-% of the audio signal
-% with the Linear Gaborchirp
-% impulse response \eqref{gaborchirp}
-% (implemented by taking the
-% Fourier transform of both signals,
-% multiplying them,
-% and taking the inverse Fourier transform
-% of the result).
-
-% ??? wagner recorded auditory responses
-% to clicks in the barn owl,
-% and found that the Linear Gaborchirp filter
-% provided the best match
-% to the empirically derived auditory filters
-% ($n=132$).
-
 \subsection{Dual resonance nonlinear filter}
 
 The filters discussed to this point
 are independent linear filters.
-However, as discussed in Section~???,
+However, as discussed in
+Section~\ref{sec:recog-neurobio},
 there are many nonlinearities
 in the human auditory system,
 including at the level of the auditory periphery.
 
 The Dual Resonance Nonlinear (DRNL) filter,
-proposed in ??? lopezpoveda
-based on earlier work by ??? meddis,
+proposed in \cite{lopez2001}
+based on earlier work by \cite{meddis2001},
 consists of two parallel pathways
 that are summed together
-(see Figure~???).
-The linear path (top, Figure~???)
+(see Figure~\ref{fig:drnl-structure}).
+The linear path (top, Figure~\ref{fig:drnl-structure})
 scales the input by some gain $g$,
 filters the signal through
 two or three first-order Gammatone filters,
 and then through a cascade of
 four second-order low-pass filters.
-The non-linear path (bottom, Figure~???)
+The non-linear path (bottom, Figure~\ref{fig:drnl-structure})
 filters the signal through
 three first-order Gammatone filters,
 a nonlinear gain,
@@ -280,7 +233,8 @@ the final result of the filter,
 which models the velocity of
 basilar membrane deflection.
 
-??? fig 3
+% \fig{drnl-structure}{0.7}{???}{???}
+% fig 3 of lopez-poveda
 
 The nonlinear gain in the nonlinear path
 is a ``broken stick'' nonlinearity;
@@ -295,30 +249,32 @@ Like the parameters of the linear path's filters,
 these parameters are fit to human data.
 Detail on the fitting procedure
 and the digital filter implementation
-of the filter can be found in ??? lopezpoveda.
+of the filter can be found in \cite{lopez2001}
 
-??? fig: impulse, freq response
+\fig{drnl}{0.8}{???}{???}
 
 Due to its complexity,
 the DRNL impulse response does not have a simple closed form.
 However, its impulse response
 and frequency response can be simulated;
-see Figure~???.
+see Figure~\ref{fig:drnl}?.
 
 \subsection{Dynamic compressive Gammachirp model}
 
 Just as the DRNL filter can be thought of
 as an nonlinear extension of Gammatone filters,
 the Dynamic Compressive Gammachirp model (DCGC)
-??? cite
+\cite{irino2006}
 is a nonlinear extension of Gammachirp filters.
 It also consists of two pathways,
-which unlike the DRNL,
+which, unlike the DRNL,
 interact nonlinearly.
 
-??? fig 3
+% \fig{dcgc-structure}{0.7}{???}{???
+% fig 3 from paper
 
-Figure~??? gives the overall structure of the filter.
+Figure~\ref{fig:dcgc-structure}
+gives the overall structure of the filter.
 In the control pathway,
 the signal is filtered by
 a bank of passive Gammachirp filters,
@@ -337,14 +293,14 @@ and can be inverted in order to
 synthesize audio
 from transformed versions
 of filter output
-??? cite.
+\cite{irino2006}.
 Like the DRNL filter, it is too complicated
 to express the impulse response
 in a simple closed form,
 but simulated impulse and frequency response
-curves are shown in Figure~???.
+curves are shown in Figure~\ref{fig:dcgc}.
 
-??? imp, freq response curves
+\fig{dcgc}{0.8}{???}{???}
 
 \subsection{Full auditory periphery modeling}
 
@@ -363,10 +319,11 @@ into inner hair cell activity,
 and a method for generating
 action potentials from the inner hair cell activity,
 mimicking the function of spiral ganglion cells.
-See Figure~??? for the full pipeline
+See Figure~\ref{fig:periphmodel} for the full pipeline
 of an auditory periphery model.
 
-??? figure: hierarchy from wilson et al
+% ??? figure: hierarchy from wilson et al
+% \fig{periphmodel}{0.6}{???}{??? \cite{wilson2005}}
 
 The middle ear function...
 ??? figure out
@@ -378,7 +335,7 @@ to account for two effects.
 First, the basilar membrane may deflect
 positively or negatively
 (as can be seen in the impulse response
-in Figure~???),
+in Figure~\ref{fig:gammatone}),
 but only positive deflections result in
 inner hair cell activity.
 Second, the amount of inner hair cell activity
@@ -398,18 +355,21 @@ The result of equation~\eqref{filter-compress}
 is interpreted as the inner hair cell activity,
 which is the input to a simulated neuron.
 Synapses and neurons are simulated with Nengo;
-see Section~??? for details.
+see Section~\ref{sec:nengo} for details.
 
 \subsection{Tan \& Carney model}
 
 Finally, we also test
 an auditory periphery model
-presented in ??? cite
+presented in \cite{tan2003}
 which takes into account
 the full auditory periphery pathway
-in Figure~???.
+in Figure~\ref{fig:periphmodel}.
 
-The model, depicted in Figure~???,
+\fig{tancarney-structure}{0.8}{???}{???}
+
+The model, depicted in
+Figure~\ref{fig:tancarney-structure},
 consists of a middle ear model,
 a auditory filter consisting
 of a control path and signal path,
@@ -430,13 +390,14 @@ their complex conjugates,
 and a tenth-order zero
 on the real axis.
 Despite this complexity,
-??? authors
+\citeauthor{tan2003}
 state that these poles and zero
 are the minimum number required
 to capture physiological effects
 like frequency glides
 and sharp frequency response curves.
 
+% \fig{tancarney}{0.8}{???}{???}
 % ??? fig impulse, freq
 
 The bandwidth and gain of the linear filter
@@ -460,25 +421,31 @@ into the start of the control path
 to control the bandwidth of the initial
 wideband filter.
 
-Finally, the output of the signal path
+In the full model, the output of the signal path
 is used to simulate an inner hair cell,
 and the synapse between an inner hair cell
 and a spiral ganglion cell
-??? cite Zhang 2001.
+\cite{{zhang2001}.
 The IHC model
 consists of a log-sigmoid transfer function
 and a seventh-order lowpass filter.
 The synapse model is a three-store
-diffusion model ??? cite 1993 craney,
+diffusion model \cite{carney1993},
 which generates the instantaneous
 rate of a spiral ganglion cell.
+However, in this thesis,
+we will instead use a synapse
+and neuron model in Nengo
+to reduce computational complexity
+and make the five models more consistent.
 
 \subsection{Brian hears software}
+\labec{sec:brian-hears}
 
 The \textit{Brian hears} software
-???cite
+\cite{fontaine2011}
 provides implementations
-of the six models described above.
+of the five models described above.
 \textit{Brian hears} is part of the
 \textit{Brian} package,
 which is a general purpose
@@ -486,7 +453,7 @@ neural simulator capable
 of simulating spiking neural networks
 with relatively high precision
 but slow speed
-(see ??? nengo paper for benchmark results).
+(see \cite{bekolay2013} for benchmark results).
 Due in part to its slow speed,
 we use \textit{Brian} only for
 the auditory periphery model implementations
@@ -495,21 +462,23 @@ and use Nengo (described below)
 for all other model implementations.
 
 \section{Dynamic movement primitives}
+\label{sec:methods-dmp}
 
 Dynamic movement primitives (DMPs)
 are a method for planning and controlling trajectories
 that requires little parameter tuning
 and is stable for trajectories
 with many degrees of freedom.
-DMPs were originally proposed by ??? Schaal,
-reformulated and refined by ??? ijspeert,
+DMPs were originally proposed
+by \cite{schaal2005,schaal2006},
+reformulated and refined by \cite{ijspeert2007},
 and simplified for use in spiking neural networks
-by ??? dewolf.
+by \cite{dewolf2014}.
 Here, we summarize the essential aspects
-of the DMP framework as described by ??? dewolf,
+of the DMP framework as described by \cite{dewolf2014},
 but invite interested readers to
 the previously cited works
-and ??? some more DMP cites
+and \cite{vijayakumar2005,ijspeert2013}
 for further details and extensions.
 
 DMPs use dynamical systems
@@ -564,13 +533,14 @@ the state evolves with
   \label{dmp-rhythmic}
 \end{align}
 
-??? Figure 3.1 from dewolf thesis
+% \fig{dewolf}{0.5}{???}{???}
+% ??? Figure 3.1 from dewolf thesis
 
 The forcing function $f(x, g)$ is
 the weighted sum
 over some basis functions
 $\psi_i$
-(see Figure~???).
+(see Figure~\ref{fig:dewolf}).
 In the discrete case,
 the basis functions are evaluated
 for the system state $x$ directly.
@@ -599,18 +569,20 @@ Typically, Gaussian functions
 tiling the range of $x$ with some overlap
 are used as the basis functions
 for the forcing function
-(as are used in Figure~???).
-??? dewolf showed that
+(as are used in Figure~\ref{fig:dewolf}).
+\cite{dewolf2014} dewolf showed that
 the response curves of spiking neurons
 could be used as the
 basis functions instead
 (as is done for general function approximation
 in the Neural Engineering Framework;
-see Section~???).
+see Section~\ref{sec:nef}).
 
 \section{Neural Engineering Framework (NEF)}
+\label{sec:nef}
 
-The Neural Engineering Framework (NEF; ??? cite)
+The Neural Engineering Framework
+(NEF; \cite{eliasmith2004})
 provides a unified method of
 representing and transforming information
 in spiking neural networks
@@ -633,14 +605,14 @@ using any spiking or non-spiking neuron model.
 The representation scheme in the NEF
 is based on \textit{population coding},
 which was first proposed by
-??? Georgoplous et al
+\cite{georgopoulos1986}
 based on experiments in monkey cortex.
 Population coding is a type of distributed representation,
 theorizing that an ensemble of neurons
 collectively represents information.
-In the original ??? Georgoplous experiment,
+In the original \cite{georgopoulos1986|} experiment,
 the ensemble of neurons coded
-for the direction of a reach ??? check;
+for the direction of a reach;
 in other words,
 a two-dimensional vector.
 The NEF generalizes
@@ -715,7 +687,7 @@ that will represent $\V{x}$.
 \end{itemize}
 Then, the amount of current that is injected
 in that neuron is
-\begin{equation}
+\begin{equation} \label{eq:encoding}
   J(\V{x}) = \alpha \V{e} \cdot \V{x} + J^{bias},
 \end{equation}
 where $\cdot$ is the dot product.
@@ -783,7 +755,7 @@ in the vector space,
 and $A$ is a matrix with the activities
 of all neurons for all neurons;
 i.e.,
-\begin{equation*}
+\begin{equation*} \label{eq:decoding}
   \label{A}
   \V{A} =
   \begin{bmatrix}
@@ -796,8 +768,8 @@ i.e.,
 This equation is in the form
 of a linear least squares problem,
 which can be solved with standard methods
-??? cite lawson and hanson 1974.
-See Figure~??? for an illustration
+\cite{lawson1974}.
+See Figure~\ref{fig:dec-scalar} for an illustration
 of how the decoding vectors
 result in an estimate of the encoded vector.
 
@@ -816,7 +788,7 @@ result in an estimate of the encoded vector.
 % \end{figure}
 
 For neurons with instantaneous rate equations,
-like the LIF neuron (see Equation~??? ref),
+like the LIF neuron (see Equation~\eqref{eq:lif-activity-j}),
 the description to this point
 is sufficient to encode and decode information.
 However, to deal with spiking neuron models,
@@ -861,7 +833,7 @@ using spiking neuron models,
   \label{dec-time}
   \V{\hat{x}}(t) = \sum_{i=0}^n \V{d}_i \sum_{s_i} h(t-t_{s_i}).
 \end{equation}
-See Figure~??? for an illustration of
+See Figure~\ref{fig:temporal-dec} for an illustration of
 the decoding process.
 
 % \scalefigonesumm{temporal-dec}{0.8}{Decoding a time-varying
@@ -971,7 +943,7 @@ $f(\V{x})$. I.e., equations~\eqref{...} and \eqref{...} become
 \end{align*}
 and the remaining equations only change
 in the set of decoding weights used.
-See Figure~??? for an illustration
+See Figure~\ref{fig:dec-func} for an illustration
 of decoding a nonlinear function.
 
 % \begin{figure}[ht!]
@@ -1021,14 +993,15 @@ the transformation principle
 is used as previously described.
 The dynamics principle
 is instead a type of network architecture
-(see Figure~???) that can
+(see Figure~\ref{fig:dynamics}) that can
 implement differential equations
 as are descried in dynamical systems
 and control theory.
 
+\fig{dynamics}{0.6}{???}{???}
 % ??? fig 6.5 from dewolf, or htbab 2.12
 
-The architecture depicted in Figure~???
+The architecture depicted in Figure~\ref{fig:dynamics}
 implements a linear control system,
 and can be expressed as
 \begin{equation}
@@ -1047,7 +1020,7 @@ The Laplace transform of $h(t)$ is
 $H'(s) = \frac{1}{1 + s\tau}$.
 By accounting for the difference
 between these two filters
-(see ??? NEF book or htbab
+(see \cite{eliasmith2004,eliasmith2013}
 for a full derivation),
 we get
 \begin{align}
@@ -1074,10 +1047,10 @@ recognize that the synaptic filter $h(t)$
 introduces an exponential ``forgetting''
 of the system state
 which must be accounted for by scaling
-connections with the time constant $\tau$
-(see ??? something for more details).
+connections with the time constant $\tau$.
 
 \section{Semantic Pointer Architecture (SPA)}
+\label{sec:methods-spa}
 
 The Neural Engineering Framework (NEF)
 allows us to manipulate dynamical systems
@@ -1091,7 +1064,7 @@ to linguistic and cognitive systems
 that have traditionally been described
 with static symbols
 and rule-based algorithms.
-The Semantic Pointer Architecture (SPA; ??? cite)
+The Semantic Pointer Architecture (SPA; \cite{eliasmith2013})
 provides a method to implement
 symbol-like representations
 and transformations in spiking neural networks,
@@ -1104,7 +1077,7 @@ using the NEF.
 While many vector symbolic architectures exist,
 the SPA specifically uses
 Holographic Reduced Representations (HER),
-developed by ??? plate 2003,
+developed by \cite{plate1994},
 as it scales well to high dimensional spaces,
 and can be implemented naturally
 with the NEF.
@@ -1152,7 +1125,7 @@ no longer of unit length.
 To limit the number of situations
 in which this occurs,
 we can use random \textit{unitary} vectors
-??? cite plate.
+\cite{plate1994}.
 
 A unitary vector is a vector with
 the same exact inverse
@@ -1292,14 +1265,13 @@ mixes the two vectors together,
 they cannot be recovered exactly.
 However, vectors can be subsequently
 ``cleaned up'' to known
-vocabulary items using an autoassociative memory
-(see Section~???).
+vocabulary items using an autoassociative memory.
 
 It is important to note that
 the HRR definitions for merging and binding
 do not change the dimensionality
 of the vector space, unlike other VSAs
-(e.g., ??? cite tensor products).
+(e.g., \cite{smolensky1990}).
 One can therefore think of the
 merging and binding operators
 as compressing the information
@@ -1330,8 +1302,8 @@ as semantic pointers.
 
 The SPA has been used to implement
 models of large-scale knowledge representation
-using WordNet ???cite,
-serial working memory ??? cite choo,
+using WordNet \cite{crawford2015},
+serial working memory \cite{choo2010},
 and other cognitive tasks.
 An integrated model called Spaun
 combined several previous models
@@ -1342,16 +1314,18 @@ In these tasks, input was provided
 through a simulated visual system,
 and output was produced
 as motor commands driving
-a three link arm model ??? cite spaun.
+a three link arm model
+\cite{eliasmith2012,eliasmith2013}.
 
 \section{Nengo software}
+\label{sec:nengo}
 
 Nengo is a piece of software
 for designing and simulating
 models using the representations,
 transformations, and dynamics
 of the NEF and SPA
-??? cite.
+\cite{bekolay2013}.
 The NEF provides a level of abstraction
 that allows modelers to generate
 spiking neural networks
@@ -1380,7 +1354,7 @@ rather than manually specifying
 all model parameters;
 for example, instead of specifying
 the gain and bias
-(see equation~???),
+(see Equation~\eqref{eq:encoding}),
 one can specify the desired
 $x$-intercepts and maximum firing rates
 of the ensemble's tuning curves.
@@ -1416,7 +1390,7 @@ or in neuron space
 by fulling specifying the connection weight matrix.
 When functions are provided,
 the decoder solving process
-(see equation~???)
+(see Equation~\eqref{eq:decoding})
 is done automatically,
 though parameters affecting
 how the decoders are solved for
@@ -1430,10 +1404,11 @@ impose any constraints on how
 that data is used;
 for the models in this thesis,
 the data was analyzed with
-NumPy ???cite and SciPy ???<
+NumPy \cite{vanderwalt2011}
+and SciPy \cite{jones2014}
 and visualized with
-Matplotlib ???cite
-and Seaborn ???cite.
+Matplotlib \cite{hunter2007}
+and Seaborn \cite{waskom2014}.
 However, other analysis and plotting packages
 could be used.
 
@@ -1448,7 +1423,7 @@ described in the previous section
 are implemented as a several
 interacting networks.
 The models described
-in Chapter~??? consist
+in Chapter~\ref{chapt:implementation} consist
 of some instances of
 these SPA networks,
 and several networks
@@ -1456,12 +1431,12 @@ that we have constructed.
 
 Python scripts using Nengo to construct
 the models discussed in the next chapter
-are available at ???,
+are available at \url{https://github.com/tbekolay/phd},
 and in simplified form in the appendix.
 
 \subsection{Integrating Brian in Nengo}
 
-As discussed in Section~???,
+As discussed in Section~\ref{sec:brian-hears},
 we use the Brain neural simulator's
 Brian Hears package
 to simulate auditory periphery models.
