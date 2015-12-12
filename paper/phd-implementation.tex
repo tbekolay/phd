@@ -15,7 +15,7 @@ we also present analogous non-neural models
 that could be incorporated in
 non-neural speech recognition and synthesis systems.
 
-\section{Neural cepstral coefficients}
+\section{Neural cepstral coefficients (NCCs)}
 \label{sec:ncc}
 
 \probbox{A raw audio waveform has high temporal resolution,
@@ -29,9 +29,9 @@ non-neural speech recognition and synthesis systems.
 
 The frontend of most automatic speech recognition systems
 extracts a feature vector from the incoming audio waveform.
-As reviewed in section ???,
+As reviewed in Section~\ref{sec:prev-mfcc},
 mel-frequency cepstral coefficients (MFCCs)
-have been used successfully in many ASR systems ???cite.
+have been used successfully in many ASR systems.
 To a certain extent, MFCCs are motivated
 by the organization of the human auditory system.
 We propose neural cepstral coefficients (NCCs)
@@ -46,10 +46,11 @@ spiking neural networks.
 
 \subsection{Model overview}
 
-??? Figure: NCC pipeline, like AuditoryBasedFeatureVectors.pdf
-or KumarKimSternICA11.pdf
+% \fig{ncc}{0.8}{???}{???}
+% ??? Figure: NCC pipeline, like abdulla.pdf
+% or kumar.pdf
 
-Figure~??? shows the NCC processing pipeline,
+Figure~\ref{fig:ncc} shows the NCC processing pipeline,
 as compared to the MFCC processing pipeline.
 While the pipeline implements
 essentially the same computations,
@@ -112,7 +113,7 @@ directly to cepstral coefficients,
 which enables us to embed this matrix
 in the connection weights between
 two neural population
-(see ??? network diagram for more details).
+(see Figure~\ref{fig:ncc-network}).
 By restricting $\V{T}$
 to the first $M$ rows,
 equation \eqref{idct} yields the first
@@ -122,6 +123,7 @@ use $N\ge26$ auditory filter outputs
 and $M=13$ cepstral coefficients.
 
 \subsection{NCC neural model}
+\label{sec:ncc-neural}
 
 The NCC pipeline is implemented
 in a Nengo network that uses
@@ -131,14 +133,14 @@ of auditory filter models
 and two layers of
 leaky integrate-and-fire (LIF) neurons ensembles
 connected in a feed-forward manner
-(see ??? figure).
+(see Figure~\ref{fig:ncc-network} figure).
 While Brian has the capability
 to simulate spiking neurons,
 we only use Brian's implementation of
 auditory periphery models,
 which do not emit spikes.
 These models,
-summarized in ??? sect methods,
+summarized in \ref{sec:periphery-models},
 emulate the effect of the
 audio waveform on the basilar membrane,
 and the resulting inner hair cell activity
@@ -158,7 +160,8 @@ which is unsurprising as MFCC extraction
 is designed to emulate certain aspects
 of the human auditory system.
 
-??? figure: net diagram
+% \fig{ncc-network}{0.8}{???}{???}
+% net diagram -- include the derivatives
 
 The simulation timesteps
 for the Nengo model and the contained
@@ -229,7 +232,7 @@ the $\V{T}$ matrix.
 Since this is a linear transform,
 it is done by computing
 normal decoding weights
-according to equation~\eqref{???}
+according to equation~\eqref{eq:linear-trans}
 and scaling the decoders by $T_{i,j}$.
 Since the currents coming from
 multiple connections to an ensemble
@@ -270,14 +273,7 @@ called Double Delta-Cepstral Coefficients [DDCC])
 further improves recognition,
 though by a smaller margin than
 the improvement from the first derivative
-??? find good cite.
-??? Kumar et al kumarkimsternica11.pdf
-used the derivative of the auditory filter output
-instead of the raw auditory filter output
-in a MFCC-like pipeline
-(called Delta-Spectral Cepstral Coefficients [DSCC])
-and found that the ASR system
-was more robust to noise and reverberation.
+\cite{furui1986,kumar2011}.
 
 Temporal derivatives in these systems
 are typically computed through straightforward
@@ -294,18 +290,8 @@ where $N$ is a small number of frames
 The double delta applies the same operation
 to the $\delta_k$ vectors.
 
-% An additional nonlinearity is applied
-% for DSCCs,
-% as they use the derivative of the power spectrum.
-% Using the raw power spectrum derivatives
-% results in very small cepstral coefficients,
-% so ??? Kim et al proposed a ``Gaussianization''
-% step in which the power spectrum
-% is made to follow a Gaussian distribution
-% by inverting the normal cumulative distribution function.
-% ??? more?
-
-\subsection{NDCC and NSCC neural models}
+\subsection{Delta NCC neural model}
+\label{sec:impl-deriv}
 
 Implementing temporal differentiation
 in spiking neural networks
@@ -321,7 +307,7 @@ to build networks that maintain
 information from the past
 and can therefore implement temporal differentiation.
 
-??? ref Tripp describes six such models,
+\cite{tripp2010} describes six such models,
 two of which use feedforward connections,
 two use adaptive neuron models,
 and two implement linear time-invariant (LTI) filters
@@ -334,14 +320,14 @@ with the assumption that
 more sophisticated temporal differentiation
 models could be used if desired.
 
-??? Figure: both derivs
+\fig{tripp}{0.8}{???}{???}
 
 In the first feedforward differentiation model,
 an intermediate ensemble is introduced
 between the ensemble representing the input signal
 and the ensemble that we want to represent
 the derivative of the input signal
-(see Figure~???).
+(see Figure~\ref{fig:tripp}).
 The \textit{derivative} ensemble
 receives direct positively scaled input from
 the \textit{input} ensemble,
@@ -377,14 +363,14 @@ with a relatively long time constant
 as the synaptic filter model.\footnote{
   Synaptic filter time constants of around 100 ms
   are consistent with NMDA glutamate receptors,
-  which ??? cite 1213.full.pdf have suggested
+  which \cite{young2003} have suggested
   are part of differentiator circuits
   underlying respiratory rhythm.
   Additionally, in terms of
   the biological plausibility of the network as a whole,
-  ??? Tripp notes that this form of network
-  has been observed in \textit{C. elegans} ??? cite Dunn
-  and may underlie chemotaxis.}
+  \cite{trip2010} notes that this form of network
+  has been observed in \textit{C. elegans}
+  \cite{dunn2004} and may underlie chemotaxis.}
 
 In the second feedforward differentiation model,
 two connections are made between
@@ -397,7 +383,7 @@ uses a synaptic filter with a slow time constant
 ($\tau_s=0.1 \text{ s}$).\footnote{
   Synaptic filter time constants of 5 ms
   are consistent with some types of
-  AMPA receptors ??? cite Jonasetal.}
+  AMPA receptors \cite{jonas1993}5.}
 Like the first model,
 this approach exploits the delays introduced
 by synaptic filtering,
@@ -413,22 +399,16 @@ contain both fast and slow
 neurotransmitter receptors.\footnote{
   Since AMPA and NMDA are both glutamate receptors,
   no constraint is placed on the \textit{input} population.
-  ??? Tripp notes that a derivative circuit
+  \cite{tripp2001} notes that a derivative circuit
   in the vestibular system of oyster toadfish
-  ??? PNAS-2004-Hols
+  \cite{holstein2004}
   is likely to match the form of the second
   feedforward differentiation model.}
 
 These differentiator networks
 are added to the NCC network
-shown in Figure~???
+shown in Figure~\ref{fig:ncc-network}
 to compute the desired derivative.
-
-??? Figure of whole NCC circuit
-
-% ?? discuss whether we can do gaussianization?
-% we probably can... but maybe not in a bioplaus manner.
-% Depends if it's necessary anyhow
 
 % ??? make an appendix with a simplified Nengo model
 % and a table of parameters and typical values
@@ -456,7 +436,7 @@ that control an articulatory synthesizer.\footnote{
   The model described in this section was created
   in collaboration with Bernd Kr\"{o}ger.
   A preliminary version of the model was presented
-  in ??? cite kroger.2014.pdf}
+  in \cite{kroger2014}.}
 We employ several modules in the semantic pointer architecture
 to iterate though the syllable sequence,
 and use DMPs to generate production information trajectories.
@@ -465,6 +445,7 @@ and a set of DMP networks
 that we call a \textit{temporal output associative memory}.
 
 \subsection{Model overview}
+\label{sec:impl-prod-overview}
 
 A sequence of syllables is represented
 by a semantic pointer
@@ -485,7 +466,7 @@ Representing a syllable sequence
 by binding syllables to list positions
 allows us to query the sequence
 for its constituent syllables,
-as was done in ??? Choo 2010, eliasmith2012.
+as was done in \cite{choo2010,eliasmith2012}.
 For example, to query the model
 for the first syllable,
 we can bind the sequence semantic pointer
@@ -513,9 +494,10 @@ are also randomly generated.\footnote{
     \text{A} \bind \text{NUCLEUS}$,
   where semantic pointers for the individual phonemes
   and syllable parts are randomly generated.
-  However, as we will show in section~???,
+  However,
+  as we will show in the remainder of this section,
   we do not need this information to
-  produce or recognize syllables.
+  produce syllables.
   Therefore, we deliberately do not impose
   any structure on the syllable semantic pointers
   in this model because we anticipate
@@ -539,7 +521,7 @@ It should be noted that
 this choice of representation
 sets a soft upper bound
 on the number of syllables in a sequence.
-In ??? eliasmith2012,
+In \cite{eliasmith2012},
 it was shown that a similar network
 could represent lists with six elements accurately;
 elements in the middle of
@@ -551,7 +533,7 @@ syllable sequences to be voiced
 are organized at the level of words,
 meaning that most syllable sequences
 will be between one and three syllables
-on average (see ??? Pellegrino.pdf).
+on average (see \cite{pellegrino2007}).
 Linguistic subsystems would themselves
 use hierarchical representations
 of higher level linguistic structures,
@@ -566,7 +548,7 @@ Each syllable semantic pointer
 is associated with a
 trajectory generation subsystem
 based on dynamic movement primitives (DMP)
-??? cite Schall, DeWolf.
+\cite{schaal2006,dewolf2014}.
 DMPs allow for reliable trajectory generation
 that can be temporally scaled,
 allowing for syllables to be voiced
@@ -614,9 +596,9 @@ the limit cycle continued undisturbed.
 The implementation of this network
 depends heavily on neural inhibition,
 and therefore will be discussed
-in Section~???.
+in Section~\ref{sec:impl-prod-neuralmodel}.
 
-As reviewed in ??? Methods sect,
+As reviewed in \ref{sec:methods-dmp},
 DMPs typically consist of a point attractor
 and a forcing function.
 Currently, we do not implement
@@ -635,17 +617,11 @@ that are defined manually.\footnote{
   We leave the incorporation of this learning process
   into the Sermo model as future work.}
 
-% ??? should we do all of this with direct production info
-% and not gestures? It's worth looking into...
-
-% ??? Do some fine tuning?
-
 \subsection{Neural model}
 \label{sec:impl-prod-neuralmodel}
 
-??? Neural model figure
-
-??? Figure: zoom in on sequencer also
+% \fig{prod-network}{0.8}{???}{???}
+% ??? Neural model figure
 
 SPA modules implemented in Nengo are used
 to robustly iterate through
@@ -656,7 +632,7 @@ which does not modify the sequence.
 The current and next position pointers
 is tracked by two interconnected
 \textit{working memory} modules,
-as was done in ??? eliasmith2012.
+as was done in \cite{eliasmith2012}.
 The current syllable is computed
 by binding the \textit{state}
 with the inverse of the
@@ -693,7 +669,7 @@ manipulations on those pointers
 have been previously created
 for Spaun.
 This model uses those networks
-as described in ??? cite.
+as described in \cite{eliasmith2013}.
 
 The binding module computes
 circular convolution,
@@ -701,7 +677,7 @@ implemented as multiplication
 in the Fourier domain.
 The design of this network
 is described in more detail in
-???.
+\cite{choo2010}.
 
 The working memory module
 maintains a memory trace
@@ -709,7 +685,7 @@ through recurrent connections
 implementing an integrator.
 While the general design of the working memory
 is described in more detail elsewhere
-(??? choo),
+(\cite{choo2010}),
 how the two working memory modules
 interact warrants further explanation.
 In order to calculate the next position,
@@ -780,7 +756,7 @@ the circuit can go through a syllable sequence
 fast enough for spirited conversation.
 However, one aspect of the circuit as described
 poses a timing challenge.
-As discussed in section~??? derivs,
+As discussed in Section~\ref{sec:impl-deriv} derivs,
 there is a slight transmission delay
 when sending a signal between two ensembles.
 Yet, humans are capable of producing
@@ -790,8 +766,7 @@ Therefore, the next syllable to be voiced
 must follow the current syllable very quickly,
 even overlapping when appropriate.
 The \textit{sequencer} network,
-discussed in Section~???,
-facilitates this.
+discussed below, facilitates this.
 
 The associative memories
 map possibly noisy input pointers
@@ -817,7 +792,7 @@ and the ensemble representing
 the similarity to the desired pointer.
 The weights on this linear connection
 are set to be the semantic pointer itself;
-the encoding process (see equation~\eqref{???})
+the encoding process (see Equation~\eqref{eq:encoding})
 therefore computes the dot product
 between the desired semantic pointer
 and the input signal.
@@ -841,13 +816,14 @@ semantic pointer represented by
 the input signal being active.
 
 \subsubsection{DMP networks}
+\label{sec:impl-dmp}
 
 The rhythmic DMP networks
 generate repetitive
 production information trajectories.
 The networks are based on
 the general design
-presented in ??? dewolf thesis,
+presented in \cite{dewolf2014},
 with some modifications
 to enable interactions between
 the DMP networks
@@ -876,7 +852,8 @@ a manually defined
 vocal tract gesture score over time.
 The gesture scores are
 designed to be used with the VocalTractLab
-articulatory synthesizer ??? cite.
+articulatory synthesizer
+\cite{birkholz2006,birkholz2013}.
 While a full speech production system
 would also include a mapping from
 the gesture score to
@@ -892,7 +869,7 @@ by VocalTractLab.
 
 We have made two modifications
 to the DMP network design
-in ??? dewolf
+in \cite{dewolf2014}
 to allow multiple DMPs
 to operate in quick succession.
 The first modification
@@ -1070,7 +1047,7 @@ the ideal time to switch the regimes
 of the working memories
 is right after the timing pulse starts,
 and right after it ends
-(see Figure~???).
+(see Figure~\ref{fig:prod-switching}).
 This timing is ideal because
 we want both associative memories
 to emit the ``next'' syllable
@@ -1119,11 +1096,12 @@ successive syllables,
 not necessarily to allow them
 to coarticulate,
 though some slight overlap is possible.
-Figure~??? illustrates the timeline
+Figure~\ref{fig:prod-switching} illustrates the timeline
 of events at the end of a syllable trajectory.
 
-% ??? conceptual figure of when switching
-% should happen
+% \fig{prod-switching}{0.6}{???}{???}
+% % ??? conceptual figure of when switching
+% % should happen
 
 \subsubsection{Temporal output associative memory}
 
@@ -1158,16 +1136,6 @@ other types of motor behavior
 (e.g., a reach)
 from static representations
 of congitive intentions.
-
-% \subsection{Vocal tract parameters}
-
-% ??? Instead of gestures, we could instead
-% generate parameters. Pro: continuous, lower dimension.
-% Con: can't optimize the mapping between
-% gesture and parameters.
-% However, worth trying out?
-
-% Or, obvious next step!
 
 \section{Syllable recognition}
 \label{sec:impl-recog}
@@ -1241,7 +1209,7 @@ i.e., the same motor command can occur
 at multiple points in the trajectory.
 Therefore, we use an approach
 inspired by HMMs and GVF
-(see Section~???)
+(see Section~\ref{sec:prev-classification})
 to approximate this function.
 
 The basic idea of iDMPs
@@ -1417,16 +1385,7 @@ we solve the trajectory subpath problem
 by introducing competition
 between iDMPs with
 common trajectory subpaths
-(see ??? neural model for more details).
-
-% In the syllable recognition model,
-% a discrete iDMP is associated with
-% each syllable in the vocabulary.
-% While using the discrete formulation
-% of the iDMP breaks the symmetry
-% between the syllable recognition
-% and syllable production models,
-% recognition does not
+(see \ref{sec:impl-recog-neural} for more details).
 
 In the syllable recognition model,
 a discrete iDMP is associated
@@ -1438,8 +1397,10 @@ used by the syllable production system
 to produce that syllable.
 
 \subsection{Neural model}
+\label{sec:impl-recog-neural}
 
-??? figure of organization
+% \fig{recog-neural}{0.8}{???}{???}
+% ??? figure of organization
 
 The spiking neural implementation of
 the syllable recognition model
@@ -1464,12 +1425,14 @@ ensemble is used to monitor the
 state of the associative memory
 and reset the iDMP state ensembles
 once a classification has been made.
+See Figure~\ref{fig:recog-neural}
+for the overall structure.
 
 \subsubsection{iDMP networks}
 
 The iDMP associated with each syllable
 is similar in structure to the DMPs
-described in Section~???.
+described in Section~\ref{sec:impl-dmp}.
 The core of the iDMP network
 is an ensemble that represents
 the estimated state of the dynamical system.
@@ -1557,7 +1520,8 @@ even when high accuracy is required,
 the number of neurons needed
 is reasonable given some assumptions
 about adult vocabularies;
-see Section~??? for more details.
+see Section~\ref{sec:res-prod-scaling}
+for more details.
 
 In the previous section, we discussed
 the \textit{trajectory subpath problem},
@@ -1662,13 +1626,14 @@ can receive input from both sources,
 and achieve faster or more correct classification
 as a result.
 
-??? assoc memory figure
+% \fig{am}{0.6}{???}{???}
+% ??? assoc memory figure
 
 The mutual inhibition and thresholding options
 are critical to the proper functioning
 of the associative memory
 in the recognition model.
-Figure~??? shows all of the
+Figure~\ref{fig:am} shows all of the
 ensembles and connections present
 ??? for each input/output semantic pointer pair.
 When thresholding is used,
@@ -1771,14 +1736,13 @@ from the associative memory to the classifier,
 and from the classifier to the iDMPs;
 specifically, the time constant is 100 ms,
 which is consistent with some NMDA receptors
-??? cite from Tripp paper.
+\cite{sah1990}.
 Second, we use a different neuron model.
 All other ensembles mentioned in this thesis
 are composed of leaky integrate-and-fire neurons.
 In the classifier ensemble,
 we use an adaptive leaky integrate-and-fire neuron model
-(??? cite Koch, Christof.
-Biophysics of Computation: Information Processing in Single Neurons).
+\cite{koch1998}.
 While a true bursting neuron model
 would be better,
 the adaptive LIF at least will produce
@@ -1812,7 +1776,7 @@ passes a threshold.\footnote{
   of the well known drift diffusion model
   that has been used to model
   human behavior in two-alternative forced choice tasks
-  ??? cite.}
+  \cite{bogacz2006}.}
 While this classification method
 is straightforward to implement,
 it may make arbitrary choices

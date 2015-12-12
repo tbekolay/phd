@@ -16,7 +16,7 @@
 
 Here,
 we present evaluation metrics for the three models
-described in Chapter~???,
+described in Chapter~\ref{chapt:implementation},
 gather those metrics
 for several experimental conditions,
 and present the results.
@@ -70,7 +70,7 @@ and tested on trajectories
 corresponding to phones
 in the TIMIT testing corpus.
 
-TIMIT ??? cite is a corpus of read speech
+TIMIT \cite{garofolo1993} is a corpus of read speech
 with time-aligned phone and word transcriptions.
 The corpus contains ten speech samples
 from 630 speakers across eight dialects
@@ -136,7 +136,7 @@ using simple linear interpolation.
 An alternative method
 for stretching the trajectory
 would be to use dynamic time warping
-??? cite DTW paper.
+\cite{ratanamahatana2004}.
 However, dynamic time warping
 involves aligning each speech sample
 to a representative example,
@@ -168,11 +168,12 @@ by further categorizing
 the phones with similar properties;
 e.g., grouping together all
 plosives, fricatives, etc.
-??? cite InTech.
+\cite{lopes2011}.
 We will use the reduced set of 39 phones.\footnote{
   The set of 39 phones includes a ``silence'' phone,
-  which
-}
+  which we include when using all phones,
+  but do not include in either the vowel or consonant
+  phone set.}
 Because vowels are typically voiced
 longer than consonants,
 we will investigate whether
@@ -212,10 +213,10 @@ support vector machine classifier
 that does not use the kernel trick
 (i.e., a linear SVM).
 We use LibLinear's fast implementation
-of linear SVMs (??? cite linblinear.pdf),
+of linear SVMs \cite{fan2008},
 exposed to Python through
 the scikit-learn package
-(??? cite scikit-learn).  % http://scikit-learn.org/stable/about.html#citing-scikit-learn
+\cite{pedregosa2011}.
 
 The metric that we collect
 in the experiments below
@@ -247,7 +248,7 @@ Since we use correctness
 rather than accuracy,
 we can only compare our approach
 to some reported results
-??? cite InTech.pdf,
+\cite{lopes2011},
 but even then the comparison is flawed.
 Hence, we generate both MFCCs
 and NCCs for the same speech samples
@@ -271,7 +272,7 @@ which advance 10 ms on each timestep,
 as is standard in many ASR systems.
 NCCs are generated
 by running the model described in
-Section~??? with a 1 ms simulation timestep.
+Section~\ref{sec:ncc-neural} with a 1 ms simulation timestep.
 Because NCC generation takes several minutes,
 and because the SVM fitting procedure
 is quadratic in the number of samples,
@@ -320,14 +321,15 @@ by splitting the trajectory
 into equally spaced time bins
 and taking the average
 for each bin.
-See Figure~??? for
+See Figure~\ref{fig:temp-scaling} for
 an illustration of temporal scaling,
 and example MFCC and NCC trajectories.
 
-??? figure: scaling; plot a bunch of
-pcolormeshes of the same phoneme
-in a set, some MFCCs lengthened,
-some NCCs shortened
+% \fig{temp-scaling}{0.7}{???}{???}
+% ??? figure: scaling; plot a bunch of
+% pcolormeshes of the same phoneme
+% in a set, some MFCCs lengthened,
+% some NCCs shortened
 
 Each trajectory is then flattened
 to produce a vector of length
@@ -459,6 +461,8 @@ generate NCCs
 (see Figure~???),
 so we add only one derivative
 to keep the experiments tractable.
+
+??? Also try ff deriv vs int deriv
 
 Note that in both of these experiments,
 it is accuracy is generally higher
@@ -690,7 +694,8 @@ and how those choices impacted classification accuracy.
 
 The first choice is auditory filter model.
 We ran 20 trials with each of the five
-auditory filter models presented in Section~???.
+auditory filter models presented
+in Section~\ref{sec:periphery-models}.
 While most of the parameters are the same
 as those in Table~???,
 the current implementation of the Tan Carney model
@@ -833,7 +838,7 @@ While the syllable sequencing and production model
 can be used to control any articulatory synthesizer,
 we use the VocalTractLab synthesizer
 because of its high quality speech
-and available API ??? cite.
+and available API \cite{birkholz2013}.
 The vocal tract gestures representation
 in VocalTractLab is based on a set of
 predefined articular positions.
@@ -860,7 +865,7 @@ controlling 22??? articulators.\footnote{
 
 ??? table of vocal tract gestures
 
-As discussed in Section~???,
+As discussed in Section~\ref{sec:impl-prod-overview},
 the input to the model
 is a semantic pointer
 representing a sequence of syllables.
@@ -950,7 +955,7 @@ First, we calculate the accuracy
 of the reconstructed gesture score
 with the same equation as phoneme classification accuracy;
 specifically,
-\begin{equation}
+\begin{equation} \label{eq:accuracy}
   \text{Acc} = \frac{N_g - S - D - I}{N_g},
 \end{equation}
 Therefore, we must find the number of
@@ -983,7 +988,7 @@ of the string determined
 from the target gesture
 and the reconstructed gesture,
 which is then evaluated
-according to equation~???.
+according to Equation~\eqref{eq:accuracy}.
 In order to evaluate whether
 accuracy scores are good
 (since we know of no comparable
@@ -1159,6 +1164,7 @@ in order to speed up simulations.
 % repeat task
 
 \subsection{Scaling}
+\label{sec:res-prod-scaling}
 
 The number of neurons in the
 sequencing and production model is
@@ -1298,7 +1304,8 @@ First, we calculate
 classification accuracy
 using the same formula
 as is used to calculate
-phoneme classification accuracy ??? cite intech.
+accuracy in the production model
+(see Equation~\eqref{eq:accuracy}.
 Specifically,
 we generate a list of all of the
 syllables classified by the model,
