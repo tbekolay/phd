@@ -502,6 +502,7 @@ class ProductionExperiment(object):
 
         simtraj = sim.data[p_out][delay_frames:]
         simtraj = simtraj[:traj.shape[0]]
+        traj = traj[:simtraj.shape[0]]
         res.simtraj = simtraj
         res.simrmse = npext.rmse(traj, simtraj)
 
