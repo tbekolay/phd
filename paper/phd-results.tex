@@ -1072,6 +1072,8 @@ or intelligible.
 
 \subsection{Experiments and results}
 
+??? Basic operation fig and text
+
 For each trial in each experiment,
 we randomly select a set of syllables
 and a syllable sequence
@@ -1125,14 +1127,16 @@ but is not guaranteed.
 
 As shown in Figure~???,
 the number of neurons in each DMP network
-significantly impacts the performance
+impacts the performance
 of the overall model.
 Accuracy is either very low or
 highly variable until around
 90 neurons per dimension
-in the DMP;
+in the DMP, after which
+performance is essentially the same;
 in subsequent simulations,
-we will use 90 neurons per dimension
+we will therefore
+use 90 neurons per dimension
 for each DMP network.
 On the other hand,
 both the timing ensemble
@@ -1151,17 +1155,67 @@ In subsequent experiments,
 we will use 8 neurons per readout ensemble
 in order to speed up simulations.
 
-??? how much can we crank up the syllable speed?
-% freq task
+??? fig : freq
 
-??? Does adding more syllables to the vocabulary affect anything?
-% n_syllables task
+Next, we investigated the
+range of frequencies in which the model
+can produce accurate trajectories.
+In this experiment, we use a random sequence
+of three syllables from a
+repository of three random syllables
+with the same frequency.
+Figure~??? shows the accuracy
+of the model as a function of the frequency.
+Interestingly, the model is least accurate
+when operating at relatively low frequencies.
+It performs well above 2 Hz,
+but starts to break down ??? higher freqs.
 
-??? How long can the sequences get before things break down?
-% sequence_len task
+??? fig : nsyllables
 
-??? repeating two syllables vs. different syllables
-% repeat task
+We then investigated whether the model
+behavior changes when the size
+of the syllabary changes.
+Since adults have a repository
+of thousands of commonly uttered syllables,
+the size of the syllabary should have
+little effect on the model.
+However, as is shown in Figure~???,
+model accuracy decreases
+as the size of the syllabary increases.
+??? more, look into the SPA stuff
+
+??? fig : sequencelen
+
+In a similar vein,
+we investigated whether model behavior
+depends on the length of the syllable sequence,
+with the size of the syllabary fixed.
+In this case, we know from \cite{choo2010}
+that sequences of length five or greater
+tend to have difficulty with elements
+in the middle of the sequence.
+As shown in Figure~???,
+accuracy does indeed drop off steadily
+after five syllables.
+
+??? fig : repeat
+
+Finally, to this point we have
+allowed syllables to repeat
+under the assumption that our network design
+(specifically the choice to use rhythmic DMPs)
+resulted in similar performance when
+repeating syllables compared to
+a sequence of unique syllables.
+Therefore, we investigated whether
+accuracy is impacted when
+sequences of length three
+are constrained to be unique.
+As can be seen in Figure~???,
+the model performs the same
+whether syllables are allowed to repeat or not,
+verifying our assumption.
 
 \subsection{Scaling}
 \label{sec:res-prod-scaling}
@@ -1357,14 +1411,184 @@ of a syllable.
 
 \subsection{Experiments and results}
 
-??? Hyperopt the main parameters
+??? basic operation fig and text
 
-??? similar to prod: how much can we crank syllable speed?
-??? will have to modify scale depending on speed... tweaky!
+The basic experimental setup
+in the following experiments
+is similar to that of the production model.
+However, instead of using
+a sequence of syllables
+as input and producing
+a production information trajectory,
+the recognition model
+uses a production information trajectory
+as input and produces
+a sequence of syllable classifications.
+Again, for each trial in each experiment,
+we randomly select a set of syllables
+and a syllable sequence
+from which to generate a trajectory.
+The random selection process
+is the same as in the production model.
+The randomly selected
+gesture scores are combined
+into a single trajectory,
+and that trajectory
+is provided to the network
+through a node.
+The intrinsic frequency (speed)
+of each syllable is randomly assigned
+between 1.3 and 1.5 Hz, % verify???
+except where noted otherwise.
 
-??? does adding more trajectories into vocab affect anything?
+Again, we begin by varying the number of neurons
+in different parts of the model.
+In the recognition model,
+we only vary the number of neurons
+used in each iDMP network.
+For each experimental condition,
+we run 20 trials using
+a trajectory made from
+three random syllables
+in a repository of three syllables,
+meaning that syllable repetition can occur,
+but is not guaranteed.
 
-??? how long can sequences get? Probably forever, try that
+??? fig: nneurons
+
+As shown in Figure~???,
+the number of neurons in each iDMP network
+has a significant impact on the performance
+of the overall model.
+Accuracy is relatively low
+until around 350 neurons per dimension,
+and continues to increase
+to the maximum size attempted,
+1000 neurons per dimension.
+??? more with new results
+we will therefore
+use ??? neurons per dimension
+for each iDMP network.
+
+??? similarity thresh fig
+
+In the case of the recognition model,
+two parameters other than the number of neurons
+have a large effect on model behavior.
+??? similarity thresh
+
+??? scale fig
+
+??? scale text
+
+??? fig : freq
+
+Next, we investigated the
+range of frequencies in which the model
+can successfully classify trajectories.
+In this experiment, we use a random sequence
+of three syllables from a
+repository of three random syllables
+with the same frequency.
+Figure~??? shows the accuracy
+of the model as a function of the frequency.
+Accuracy is initially poor;
+however, as shown in Figure~???,
+this is due to a large number
+of insertions,
+which are likely to be insertions
+of the correct syllable.
+Maximal accuracy around 75\%
+occurs at 1.5 Hz,
+which is also the frequency at which
+deletions become more common
+than insertions.
+The monotonic decrease in accuracy
+from 1.5 Hz onward
+is therefore a result of deletions
+(i.e., a failure to classify),
+though some substitutions also occur
+up to 2.5 Hz.
+As can be seen in Figure~???,
+the variance of the timing difference
+(i.e., when the classification occurs
+relative to the end of the syllable)
+is very small from about 1 Hz and above.
+The mean timing difference
+is negative in for all frequencies
+above 1.0 Hz,
+indicating that classifications
+occur before the syllable trajectory
+is complete.
+
+??? fig : nsyllables
+
+We then investigated whether the model
+behavior changes when the size
+of the syllabary changes.
+As shown in Figure~???,
+accuracy drops off quickly when
+more than five syllables
+are part of the syllabary.
+Unlike in the production system,
+this effect is easy to predict
+from the structure of the network,
+due to the competitive nature
+of the iDMPs;
+all iDMPs are constantly tracking
+the system state,
+except when a classification has occurred
+and the iDMP networks are being inhibited.
+
+??? fig : sequencelen
+
+The length of the sequence,
+on the other hand,
+has little effect on classification accuracy,
+as can be seen in Figure~???.
+In this case, the trajectories
+of the three syllables in the syllabary
+are repeated several times.
+The iDMP networks continue to operate
+at the same accuracy rate
+regardless of how long they have been active,
+which is a benefit of this method
+over HMMs which must be renormalized
+and reset often.
+However, as seen in Figure~???,
+the accuracy of the memory representation
+decreases as the length of the sequence decreases.
+This result suggests that
+the current memory system,
+which is a simple decaying integrator,
+is not sufficient for syllable recognition.
+Instead, it should be replaced with
+an input-gated working memory module,
+as is used in the production system
+for representing syllable position.
+
+??? fig : repeat
+
+Finally, we verified that the model
+operate well in situations with
+sequences of unique or repeated syllables.
+As shown in Figure~???,
+the overall accuracy is indistinguishable
+whether repeated syllables are allowed or not.
+All other measure are similar as well.
+However, there is some indication
+in Figure~??? that repeated syllables
+increase the proportion of insertions
+while lowering the proportion of
+deletions and substitutions.
+Intuitively, this result makes sense,
+as the previously classified syllable
+will have a slightly higher system state
+even after the iDMPs are reset
+through neural inhibition.
+However, more trials are required
+to show this result
+with strong statistical significance.
 
 \subsection{Scaling}
 

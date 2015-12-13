@@ -122,6 +122,36 @@ is therefore an important next step.
 
 \subsection{Syllable sequencing and production}
 
+The syllable sequencing and production model
+can generate production information trajectories
+for up to ??? syllables from a repository of ???,
+and those trajectories can result in
+intelligible speech when synthesized
+with an articulatory synthesizer.
+
+It is surprisingly that the model is able
+to perform at relatively high speeds
+(2--??? Hz),
+but has trouble with lower speeds.
+We believe the source of this difficulty
+is in the sequencer network.
+When a syllable is about to end,
+it starts the DMP network
+associated with the next syllable,
+while also pushing the current syllable's
+DMP network to the starting position.
+When frequencies are high,
+the drive to the starting position
+is approximately the same as the
+intrinsic dynamics, so the system
+moves as expected.
+However, for low frequencies,
+the additional drive in the current syllable
+forces it to finish the current syllable
+too quickly.
+
+??? the size of the syllabary shouldn't matter... but it does..?
+
 % ??? note that we are doing a lot of stuff
 % here with inhibition.
 % While it is possible to do this stuff
@@ -159,8 +189,77 @@ is therefore an important next step.
 
 % Or, obvious next step!
 
+\subsection{Syllable classification}
 
-\subsection{Extensive use of DMPs}
+In its current state,
+the syllable classification model
+is extremely sensitive to the
+frequency of the syllable
+(see Figure~???).
+Like the production model,
+it performs poorly for
+slow syllable trajectories,
+in this case due to
+a large number of insertions
+(although it could be argued that
+repeated identification of the correct
+syllable is acceptable).
+Unlike the production model,
+performance is best at around 1.5 Hz,
+then monotonically worsens
+for higher frequencies.
+We believe the decreased accuracy
+is due to a coupling between
+the speed of the syllable
+and other parameters in the model
+(e.g., the scale).
+In other words, the iDMPs
+must progress their state forward
+at a higher rate when
+the syllable is voiced at a higher rate.
+Methods for estimating speech rate
+should therefore be investigated
+and used to dynamically modify
+the effective scale
+depending on the overall speech rate.
+
+The poor results of the model
+obtained when increasing the number
+of syllables in the syllabary
+indicate that the competition
+introduced to isolate a relatively small
+number of iDMPs is insufficient
+to allow only one syllable iDMP to be active.
+However, the model does operate well
+with few syllables,
+and many syllables are similar
+and would be often confused by people
+without linguistic context.
+Therefore, we conclude that
+the iDMP networks are still suitable
+for trajectory classification,
+but are not used in a
+drift-diffusion style classification system
+in which the first iDMP to reach
+a threshold value makes a classification.
+Instead, we hypothesize that
+the sensorimotor integration system
+would allow the iDMPs to continuously operate,
+and integrate the information from those iDMPs
+as well as information from other sources
+(including top-down linguistic influences)
+to make a final determination
+of the uttered syllable.
+Aside from sensorimotor learning,
+it is possible that
+this type of syllable classifier
+may only be used in cases where
+the linguistic systems
+disambiguate between two similar choices anyhow.
+
+
+
+% \subsection{Extensive use of DMPs}
 
 % DMPs: they are useful.
 % For different things though, depending on the task.
