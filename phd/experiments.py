@@ -499,7 +499,8 @@ class ProductionExperiment(object):
 
         # Reconstruct gesture score; compare to originals
         gs = gesture_score(simtraj, dt)
-        res.accuracy = analysis.gs_accuracy(gs, gs_targets)
+        res.accuracy, res.n_sub, res.n_del, res.n_ins = (
+            analysis.gs_accuracy(gs, gs_targets))
         res.timing_mean, res.timing_var = analysis.gs_timing(gs, gs_targets)
         res.cooccur, res.co_chance = analysis.gs_cooccur(gs, gs_targets)
         log("Accuracy: %.3f" % res.accuracy)
@@ -547,6 +548,9 @@ class ProductionResult(ExperimentResult):
              'reconstructed',
              'reconstructedrmse',
              'accuracy',
+             'n_sub',
+             'n_del',
+             'n_ins',
              'timing_mean',
              'timing_var',
              'cooccur',
@@ -554,6 +558,9 @@ class ProductionResult(ExperimentResult):
              'audio',
              'fs',
              'clean_audio']
+    to_int = ['n_sub',
+              'n_del',
+              'n_ins']
     to_float = ['simrmse',
                 'reconstructedrmse',
                 'accuracy',

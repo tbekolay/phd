@@ -192,7 +192,8 @@ def gs_accuracy(gs, targets):
             n_del += 1
         elif lchar != rchar:
             n_sub += 1
-    return float(n_gestures - n_sub - n_del - n_ins) / n_gestures
+    return (float(n_gestures - n_sub - n_del - n_ins) / n_gestures,
+            n_sub, n_del, n_ins)
 
 
 def _gs_accuracy_baseline():
@@ -213,7 +214,7 @@ def _gs_accuracy_baseline():
     gests = [vtl.parse_ges(path) for path in paths]
     for i in range(len(paths)):
         for j in range(i+1, len(paths)):
-            acc.append(gs_accuracy(gests[i], [gests[j]]))
+            acc.append(gs_accuracy(gests[i], [gests[j]])[0])
 
     return np.mean(acc)
 

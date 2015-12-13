@@ -257,7 +257,7 @@ class ProdSyllable(ParamsObject):
 
 
 class ProductionInfoParams(ParamsObject):
-    n_per_d = params.IntParam(default=60)
+    n_per_d = params.IntParam(default=15)
     threshold = params.NumberParam(default=0.3)
 
 

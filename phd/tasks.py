@@ -109,6 +109,28 @@ task_af_derivatives = lambda: AFDerivativesTask(
     n_derivatives=[0, 1, 2], phones=af_phones, n_iters=af_iters)()
 
 
+class AFDerivTypeTask(ExperimentTask):
+
+    params = ['deriv_type', 'phones']
+
+    def __iter__(self):
+        for deriv_type in self.deriv_type:
+            for phones in self.phones:
+                model = sermo.AuditoryFeatures()
+                model.add_derivative(klass=deriv_type)
+                expt = AuditoryFeaturesExperiment(model, phones=phones)
+                expt.timit.filefilt.region = 8
+                yield expt
+
+    def name(self, experiment):
+        derivtype = experiment.model.derivatives[0].__class__.__name__[:-6]
+        return "derivtype:%s,%s" % (derivtype, phone_str(experiment))
+
+task_af_derivtype = lambda: AFDerivTypeTask(
+    deriv_type=['FeedforwardDeriv', 'IntermediateDeriv'],
+    phones=af_phones, n_iters=af_iters)()
+
+
 class AFPeripheryNeuronsTask(ExperimentTask):
 
     params = ['n_neurons', 'phones']
@@ -283,24 +305,6 @@ class ProdSequencerNeuronsTask(ExperimentTask):
 
 task_prod_seqneurons = lambda: ProdSequencerNeuronsTask(
     n_neurons=[10, 20, 30, 50, 90, 180, 250, 400], n_iters=prod_n_iters)()
-
-
-class ProdOutputNeuronsTask(ExperimentTask):
-
-    params = ['n_neurons']
-
-    def __iter__(self):
-        for n_neurons in self.n_neurons:
-            model = sermo.Production()
-            model.production_info.n_per_d = n_neurons
-            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
-            yield expt
-
-    def name(self, experiment):
-        return "outneurons:%d" % (experiment.model.production_info.n_per_d)
-
-task_prod_outneurons = lambda: ProdOutputNeuronsTask(
-    n_neurons=[8, 15, 30, 60], n_iters=prod_n_iters)()
 
 
 class ProdFreqTask(ExperimentTask):
