@@ -141,9 +141,9 @@ def timeseries(data, columns, x_keys, x_label, y_label,
     # data.sort_values(by=group_by, inplace=True)
 
     # plot_args.setdefault("err_style", "ci_bars")
-    plot_args.setdefault("estimator", stats.nanmedian)
-    # plot_args.setdefault("estimator", stats.nanmean)
-    plot_args.setdefault("ci", [68, 95])
+    # plot_args.setdefault("estimator", stats.nanmedian)
+    plot_args.setdefault("estimator", stats.nanmean)
+    plot_args.setdefault("ci", 95)
 
     sns.tsplot(data=data,
                time=group_by,

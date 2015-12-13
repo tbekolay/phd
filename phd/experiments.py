@@ -579,7 +579,7 @@ class ProductionResult(ExperimentResult):
 
 class RecognitionExperiment(object):
     def __init__(self, model, n_syllables, sequence_len,
-                 minfreq=0.8, maxfreq=1.6, seed=None):
+                 minfreq=1.3, maxfreq=1.5, seed=None):
         self.model = model
         self.n_syllables = n_syllables
         self.sequence_len = sequence_len

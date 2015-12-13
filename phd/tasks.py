@@ -244,7 +244,7 @@ task_af_periphery = lambda: AFPeripheryTask(
 # Model 2: Syllable production
 # ############################
 
-prod_n_iters = 15
+prod_n_iters = 25
 
 class ProdSyllableNeuronsTask(ExperimentTask):
 
@@ -279,7 +279,7 @@ class ProdSequencerNeuronsTask(ExperimentTask):
         return "seqneurons:%d" % (experiment.model.sequencer.n_per_d)
 
 task_prod_seqneurons = lambda: ProdSequencerNeuronsTask(
-    n_neurons=[30, 50, 90, 180], n_iters=prod_n_iters)()
+    n_neurons=[10, 20, 30, 50, 90, 180], n_iters=prod_n_iters)()
 
 
 class ProdOutputNeuronsTask(ExperimentTask):
@@ -395,7 +395,7 @@ class RecogSyllableNeuronsTask(ExperimentTask):
         return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
 task_recog_syllneurons = lambda: RecogSyllableNeuronsTask(
-    n_neurons=[200, 250, 300, 350, 400, 450, 500, 550, 600],
+    n_neurons=[200, 250, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000],
     n_iters=recog_n_iters)()
 
 
@@ -407,7 +407,6 @@ class RecogScaleTask(ExperimentTask):
         for scale in self.scale:
             model = sermo.Recognition()
             model.syllable.scale = scale
-            model.syllable.similarity_th = 0.8
             expt = RecognitionExperiment(model,
                                          n_syllables=1,
                                          sequence_len=3)
@@ -427,7 +426,6 @@ class RecogSimilarityTask(ExperimentTask):
     def __iter__(self):
         for similarity_th in self.similarity_th:
             model = sermo.Recognition()
-            model.syllable.scale = 0.78
             model.syllable.similarity_th = similarity_th
             expt = RecognitionExperiment(model,
                                          n_syllables=1,
