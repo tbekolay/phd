@@ -51,6 +51,7 @@ class ExperimentTask(object):
 af_iters = 10
 af_phones = [TIMIT.consonants]
 
+
 def phone_str(experiment):
     if experiment.phones is TIMIT.consonants:
         s = "consonants"
@@ -244,7 +245,8 @@ task_af_periphery = lambda: AFPeripheryTask(
 # Model 2: Syllable production
 # ############################
 
-prod_n_iters = 25
+prod_n_iters = 20
+
 
 class ProdSyllableNeuronsTask(ExperimentTask):
 
@@ -254,14 +256,15 @@ class ProdSyllableNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             model = sermo.Production()
             model.syllable.n_per_d = n_neurons
-            expt = ProductionExperiment(model, n_syllables=3, sequence_len=3)
+            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
             yield expt
 
     def name(self, experiment):
         return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
 task_prod_syllneurons = lambda: ProdSyllableNeuronsTask(
-    n_neurons=[30, 40, 50, 70, 90, 180, 250, 400], n_iters=prod_n_iters)()
+    n_neurons=[30, 40, 50, 70, 90, 120, 150, 180, 250, 400],
+    n_iters=prod_n_iters)()
 
 
 class ProdSequencerNeuronsTask(ExperimentTask):
@@ -272,14 +275,14 @@ class ProdSequencerNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             model = sermo.Production()
             model.sequencer.n_per_d = n_neurons
-            expt = ProductionExperiment(model, n_syllables=3, sequence_len=3)
+            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
             yield expt
 
     def name(self, experiment):
         return "seqneurons:%d" % (experiment.model.sequencer.n_per_d)
 
 task_prod_seqneurons = lambda: ProdSequencerNeuronsTask(
-    n_neurons=[10, 20, 30, 50, 90, 180], n_iters=prod_n_iters)()
+    n_neurons=[10, 20, 30, 50, 90, 180, 250, 400], n_iters=prod_n_iters)()
 
 
 class ProdOutputNeuronsTask(ExperimentTask):
@@ -290,7 +293,7 @@ class ProdOutputNeuronsTask(ExperimentTask):
         for n_neurons in self.n_neurons:
             model = sermo.Production()
             model.production_info.n_per_d = n_neurons
-            expt = ProductionExperiment(model, n_syllables=3, sequence_len=3)
+            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
             yield expt
 
     def name(self, experiment):
@@ -308,7 +311,7 @@ class ProdFreqTask(ExperimentTask):
         for freq in self.freqs:
             model = sermo.Production()
             expt = ProductionExperiment(model, minfreq=freq, maxfreq=freq,
-                                        n_syllables=3, sequence_len=3)
+                                        n_syllables=2, sequence_len=3)
             yield expt
 
     def name(self, experiment):
@@ -325,6 +328,7 @@ class ProdNSyllablesTask(ExperimentTask):
     def __iter__(self):
         for n_syllables in self.n_syllables:
             model = sermo.Production()
+            # Also up syllable_d
             expt = ProductionExperiment(
                 model, n_syllables=n_syllables, sequence_len=3)
             yield expt
@@ -333,7 +337,7 @@ class ProdNSyllablesTask(ExperimentTask):
         return "n_syllables:%d" % (experiment.n_syllables)
 
 task_prod_n_syllables = lambda: ProdNSyllablesTask(
-    n_syllables=np.arange(5, 55, 5), n_iters=prod_n_iters)()
+    n_syllables=list(range(9)), n_iters=prod_n_iters)()
 
 
 class ProdSequenceLenTask(ExperimentTask):
@@ -344,7 +348,7 @@ class ProdSequenceLenTask(ExperimentTask):
         for sequence_len in self.sequence_len:
             model = sermo.Production()
             expt = ProductionExperiment(
-                model, n_syllables=3, sequence_len=sequence_len)
+                model, n_syllables=2, sequence_len=sequence_len)
             yield expt
 
     def name(self, experiment):
@@ -362,7 +366,7 @@ class ProdRepeatTask(ExperimentTask):
         for repeat in self.repeat:
             model = sermo.Production()
             model.trial.repeat = repeat
-            expt = ProductionExperiment( model, n_syllables=3, sequence_len=3)
+            expt = ProductionExperiment(model, n_syllables=3, sequence_len=3)
             yield expt
 
     def name(self, experiment):
@@ -378,25 +382,25 @@ task_prod_repeat = lambda: ProdRepeatTask(
 
 recog_n_iters = 20
 
-class RecogSyllableNeuronsTask(ExperimentTask):
 
-    params = ['n_neurons']
+class RecogSimilarityTask(ExperimentTask):
+
+    params = ['similarity_th']
 
     def __iter__(self):
-        for n_neurons in self.n_neurons:
+        for similarity_th in self.similarity_th:
             model = sermo.Recognition()
-            model.syllable.n_per_d = n_neurons
+            model.syllable.similarity_th = similarity_th
             expt = RecognitionExperiment(model,
-                                         n_syllables=3,
+                                         n_syllables=1,
                                          sequence_len=3)
             yield expt
 
     def name(self, experiment):
-        return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
+        return "similarity:%.3f" % (experiment.model.syllable.similarity_th)
 
-task_recog_syllneurons = lambda: RecogSyllableNeuronsTask(
-    n_neurons=[200, 250, 300, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000],
-    n_iters=recog_n_iters)()
+task_recog_similarity = lambda: RecogSimilarityTask(
+    similarity_th=np.arange(0.65, 0.91, 0.01), n_iters=recog_n_iters)()
 
 
 class RecogScaleTask(ExperimentTask):
@@ -419,24 +423,26 @@ task_recog_scale = lambda: RecogScaleTask(
     scale=np.arange(0.64, 0.91, 0.01), n_iters=recog_n_iters)()
 
 
-class RecogSimilarityTask(ExperimentTask):
+class RecogSyllableNeuronsTask(ExperimentTask):
 
-    params = ['similarity_th']
+    params = ['n_neurons']
 
     def __iter__(self):
-        for similarity_th in self.similarity_th:
+        for n_neurons in self.n_neurons:
             model = sermo.Recognition()
-            model.syllable.similarity_th = similarity_th
+            model.syllable.n_per_d = n_neurons
             expt = RecognitionExperiment(model,
-                                         n_syllables=1,
+                                         n_syllables=3,
                                          sequence_len=3)
             yield expt
 
     def name(self, experiment):
-        return "similarity:%.3f" % (experiment.model.syllable.similarity_th)
+        return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
-task_recog_similarity = lambda: RecogSimilarityTask(
-    similarity_th=np.arange(0.7, 0.85, 0.01), n_iters=recog_n_iters)()
+task_recog_syllneurons = lambda: RecogSyllableNeuronsTask(
+    n_neurons=[200, 250, 300, 350, 400, 450, 500,
+               550, 600, 700, 800, 900, 1000],
+    n_iters=recog_n_iters)()
 
 
 class RecogFreqTask(ExperimentTask):
@@ -447,7 +453,7 @@ class RecogFreqTask(ExperimentTask):
         for freq in self.freqs:
             model = sermo.Recognition()
             expt = RecognitionExperiment(model, minfreq=freq, maxfreq=freq,
-                                        n_syllables=3, sequence_len=3)
+                                         n_syllables=3, sequence_len=3)
             yield expt
 
     def name(self, experiment):
@@ -501,7 +507,7 @@ class RecogRepeatTask(ExperimentTask):
         for repeat in self.repeat:
             model = sermo.Recognition()
             model.trial.repeat = repeat
-            expt = RecognitionExperiment( model, n_syllables=3, sequence_len=3)
+            expt = RecognitionExperiment(model, n_syllables=3, sequence_len=3)
             yield expt
 
     def name(self, experiment):

@@ -1,5 +1,4 @@
 import brian.hears as bh
-import dill
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np

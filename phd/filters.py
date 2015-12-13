@@ -1,4 +1,3 @@
-import brian as br
 import brian.hears as bh
 import numpy as np
 

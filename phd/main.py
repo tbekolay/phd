@@ -49,7 +49,6 @@ def task_svg2pdf():
                        'targets': [pdfpath]}
 
 
-
 def main():
     doit.run(globals())
 

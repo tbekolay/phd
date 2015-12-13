@@ -16,7 +16,7 @@ from sklearn.svm import LinearSVC
 from scipy.interpolate import interp1d
 from scipy import stats
 
-from . import analysis, cache, config, ges_path, parallel, vtl
+from . import analysis, cache, config, parallel, vtl
 from .timit import TIMIT
 from .utils import derivative, rescale
 
@@ -433,16 +433,6 @@ def ideal_traj(model, sequence):
     return np.vstack(traj)
 
 
-def get_syllables(n_syllables, minfreq, maxfreq, rng=np.random):
-    allpaths = []
-    for gdir in ['ges-de-ccv', 'ges-de-cv', 'ges-de-cvc', 'ges-de-v']:
-        allpaths.extend([ges_path(gdir, gfile)
-                         for gfile in os.listdir(ges_path(gdir))])
-    indices = rng.permutation(len(allpaths))
-    return ([allpaths[indices[i]] for i in range(n_syllables)],
-            [rng.uniform(minfreq, maxfreq) for i in range(n_syllables)])
-
-
 def path2label(ges_path):
     return os.path.basename(ges_path)[:-4].upper()
 
@@ -460,8 +450,9 @@ class ProductionExperiment(object):
     def run_model(self):
         res = ProductionResult()
         rng = np.random.RandomState(self.seed)
+        dt = self.model.trial.dt
 
-        paths, freqs = get_syllables(
+        paths, freqs = analysis.get_syllables(
             self.n_syllables, self.minfreq, self.maxfreq, rng)
 
         t = 0.2
@@ -469,9 +460,9 @@ class ProductionExperiment(object):
         for path, freq in zip(paths, freqs):
             gs = vtl.parse_ges(path)
             gs_targets.append(gs)
-            traj = gs.trajectory(self.model.trial.dt)
-            label = path2label(path)
-            self.model.add_syllable(label=label, freq=freq, trajectory=traj)
+            self.model.add_syllable(label=path2label(path),
+                                    freq=freq,
+                                    trajectory=gs.trajectory(dt))
             t += 1. / freq
 
         # Determine and save syllable sequence
@@ -496,7 +487,7 @@ class ProductionExperiment(object):
         sim.run(t)
 
         # Get ideal trajectory; compare RMSE
-        delay_frames = int(self.model.trial.t_release / self.model.trial.dt)
+        delay_frames = int(self.model.trial.t_release / dt)
         traj = ideal_traj(self.model, seq)
         res.traj = traj
 
@@ -507,18 +498,18 @@ class ProductionExperiment(object):
         res.simrmse = npext.rmse(traj, simtraj)
 
         # Reconstruct gesture score; compare to originals
-        gs = gesture_score(simtraj, self.model.trial.dt)
+        gs = gesture_score(simtraj, dt)
         res.accuracy = analysis.gs_accuracy(gs, gs_targets)
         res.timing_mean, res.timing_var = analysis.gs_timing(gs, gs_targets)
         res.cooccur, res.co_chance = analysis.gs_cooccur(gs, gs_targets)
         log("Accuracy: %.3f" % res.accuracy)
 
         # Get the reconstructed trajectory and audio
-        reconstructed = gs.trajectory(dt=self.model.trial.dt)
+        reconstructed = gs.trajectory(dt=dt)
         res.reconstructed = reconstructed
         minsize = min(reconstructed.shape[0], traj.shape[0])
         res.reconstructedrmse = npext.rmse(traj[:minsize],
-                                              reconstructed[:minsize])
+                                           reconstructed[:minsize])
         audio, fs = gs.synthesize()
         res.audio = audio
         res.fs = fs
@@ -591,13 +582,14 @@ class RecognitionExperiment(object):
         res = RecognitionResult()
         rng = np.random.RandomState(self.seed)
 
-        paths, freqs = get_syllables(
+        paths, freqs = analysis.get_syllables(
             self.n_syllables, self.minfreq, self.maxfreq, rng)
 
         for path, freq in zip(paths, freqs):
             traj = vtl.parse_ges(path).trajectory(self.model.trial.dt)
-            label = path2label(path)
-            self.model.add_syllable(label=label, freq=freq, trajectory=traj)
+            self.model.add_syllable(label=path2label(path),
+                                    freq=freq,
+                                    trajectory=traj)
 
         # Determine and save syllable sequence
         if self.model.trial.repeat:
@@ -605,17 +597,15 @@ class RecognitionExperiment(object):
         else:
             seq_ix = rng.permutation(len(paths))[:self.sequence_len]
         seq = [path2label(paths[i]) for i in seq_ix]
-        seq_str = " + ".join(["%s*POS%d" % (label, i+1)
-                              for i, label in enumerate(seq)])
         res.seq = np.array(seq)
 
         # Determine how long to run
-        t = 0.0
+        simt = 0.0
         tgt_time = []
         for label in res.seq:
             syllable = self.model.syllable_dict[label]
-            t += 1. / syllable.freq
-            tgt_time.append(t)
+            simt += 1. / syllable.freq
+            tgt_time.append(simt)
 
         # Set that sequence in the model
         traj = ideal_traj(self.model, seq)
@@ -633,7 +623,7 @@ class RecognitionExperiment(object):
             p_mem = nengo.Probe(net.memory.output, synapse=0.01)
 
         sim = nengo.Simulator(net)
-        sim.run(t)
+        sim.run(simt)
 
         # Save iDMP system states
         res.dmps = np.hstack([sim.data[p_d] for p_d in p_dmps])
@@ -659,7 +649,7 @@ class RecognitionExperiment(object):
         tgt_time = np.asarray(tgt_time)
         mem_times = (tgt_time[1:] + tgt_time[:-1]) * 0.5
         mem_ix = (mem_times / self.model.trial.dt).astype(int)
-        mem_class = np.argmax(res.memory[mem_ix])
+        mem_class = np.argmax(res.memory[mem_ix], axis=1)
         slabels = [s.label for s in self.model.syllables]
         actual = np.array([slabels.index(lbl) for lbl in res.seq[:-1]])
         res.memory_acc = np.mean(mem_class == actual)

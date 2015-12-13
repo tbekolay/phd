@@ -6,7 +6,7 @@ from nengo.dists import Choice, ClippedExpDist
 from nengo.networks import EnsembleArray
 from nengo.utils.compat import is_array, is_string, iteritems
 
-from . import filters, params
+from . import params
 from .filters import melspace
 from .mfcc import mfcc
 from .networks import (  # noqa: F401
@@ -228,7 +228,7 @@ class AuditoryFeatures(object):
 
 class SyllableSequenceParams(ParamsObject):
     n_per_d = params.IntParam(default=50)
-    syllable_d = params.IntParam(default=96)
+    syllable_d = params.IntParam(default=32)
     difference_gain = params.NumberParam(default=15)
     n_positions = params.NumberParam(default=7)
     threshold_memories = params.BoolParam(default=True)
@@ -236,7 +236,7 @@ class SyllableSequenceParams(ParamsObject):
 
 
 class SequencerParams(ParamsObject):
-    n_per_d = params.IntParam(default=120)
+    n_per_d = params.IntParam(default=150)
     timer_tau = params.NumberParam(default=0.05)
     timer_freq = params.NumberParam(default=1.)
     reset_time = params.NumberParam(default=0.7)
@@ -246,7 +246,7 @@ class SequencerParams(ParamsObject):
 
 
 class ProdSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=90)
+    n_per_d = params.IntParam(default=150)
     tau = params.NumberParam(default=0.025)
 
 

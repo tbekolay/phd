@@ -9,7 +9,7 @@ import nwalign as nw
 import pandas as pd
 from nengo.utils.compat import range
 
-from . import cache, vtl
+from . import cache, ges_path, vtl
 from .utils import rescale
 
 
@@ -50,6 +50,16 @@ def load_results(result_cls, keys):
 # ############################
 # Model 2: Syllable production
 # ############################
+
+def get_syllables(n_syllables, minfreq, maxfreq, rng=np.random):
+    allpaths = []
+    for gdir in ['ges-de-ccv', 'ges-de-cv', 'ges-de-cvc', 'ges-de-v']:
+        allpaths.extend([ges_path(gdir, gfile)
+                         for gfile in os.listdir(ges_path(gdir))])
+    indices = rng.permutation(len(allpaths))
+    return ([allpaths[indices[i]] for i in range(n_syllables)],
+            [rng.uniform(minfreq, maxfreq) for i in range(n_syllables)])
+
 
 def gs_combine(scores):
     """Combine a set of gesture scores into a single gesture score."""
@@ -185,7 +195,7 @@ def gs_accuracy(gs, targets):
     return float(n_gestures - n_sub - n_del - n_ins) / n_gestures
 
 
-def gs_accuracy_baseline():
+def _gs_accuracy_baseline():
     """Determine a baseline for gesture score accuracy.
 
     In the experiments, we generate a syllable sequence and compare the
@@ -196,6 +206,20 @@ def gs_accuracy_baseline():
     good job reconstructing, our measure will be significantly larger
     than this value.
     """
+    acc = []
+
+    # There are 417 syllables
+    paths, _ = get_syllables(n_syllables=417, minfreq=1, maxfreq=1)
+    gests = [vtl.parse_ges(path) for path in paths]
+    for i in range(len(paths)):
+        for j in range(i+1, len(paths)):
+            acc.append(gs_accuracy(gests[i], [gests[j]]))
+
+    return np.mean(acc)
+
+# Obtained by running the above function (it's expensive though)
+gs_accuracy_baseline = 0.51642353200356783
+
 
 def gs_timing(gs, targets):
     """Compare the timing of a gesture score to a collection of targets.
