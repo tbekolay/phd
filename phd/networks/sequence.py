@@ -93,8 +93,15 @@ def Sequencer(n_per_d, timer_tau=0.05, timer_freq=2.,
         net.reset = nengo.Ensemble(60, dimensions=1,
                                    encoders=Choice([[1]]),
                                    intercepts=r_intercepts)
-        nengo.Connection(net.timer, net.reset, function=radial_f(
-            lambda x: 1. if x > reset_time else 0.))
+
+        def reset_f(x):
+            if x > reset_time:
+                return 1.
+            elif x < 0.05:
+                return 0.8
+            else:
+                return 0
+        nengo.Connection(net.timer, net.reset, function=radial_f(reset_f))
 
         # There's a catch 22 here. The reset forces the DMPs to a specific
         # point in state space, but that space is also where the timer starts

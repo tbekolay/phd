@@ -314,7 +314,7 @@ def ix2seqlabel(ix, labels):
         return 'lung-pressure-gestures'
 
 
-def gesture_score(traj, dt, dspread=18, dthresh=0.012):
+def gesture_score(traj, dt, dspread=18, dthresh=0.011):
     """Construct a gesture score given a trajectory."""
     # --- Take derivative and find times with high derivative
     trajd = np.abs(derivative(traj, dspread))
@@ -455,7 +455,7 @@ class ProductionExperiment(object):
         paths, freqs = analysis.get_syllables(
             self.n_syllables, self.minfreq, self.maxfreq, rng)
 
-        t = 0.2
+        t = 0.3  # 0.2 for initial stuff, 0.1 fudge factor
         gs_targets = []
         for path, freq in zip(paths, freqs):
             gs = vtl.parse_ges(path)

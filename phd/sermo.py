@@ -227,8 +227,8 @@ class AuditoryFeatures(object):
 # ############################
 
 class SyllableSequenceParams(ParamsObject):
-    n_per_d = params.IntParam(default=50)
-    syllable_d = params.IntParam(default=32)
+    n_per_d = params.IntParam(default=30)
+    syllable_d = params.IntParam(default=48)
     difference_gain = params.NumberParam(default=15)
     n_positions = params.NumberParam(default=7)
     threshold_memories = params.BoolParam(default=True)
@@ -239,7 +239,7 @@ class SequencerParams(ParamsObject):
     n_per_d = params.IntParam(default=150)
     timer_tau = params.NumberParam(default=0.05)
     timer_freq = params.NumberParam(default=1.)
-    reset_time = params.NumberParam(default=0.7)
+    reset_time = params.NumberParam(default=0.85)
     reset_threshold = params.NumberParam(default=0.5)
     reset_to_gate = params.NumberParam(default=-0.65)
     gate_threshold = params.NumberParam(default=0.4)
