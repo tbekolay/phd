@@ -455,12 +455,12 @@ in the list; i.e.,
   \text{SEQ} = \text{SYLL1} \bind \text{POS1} \oplus
     \text{SYLL2} \bind \text{POS2} \ldots
 \end{equation}
-For example, the word ``family'' (??? /fam schwa lee/)
+For example, the word ``Sermo''
+(\ipa{/s3rmoU/})
 would be represented as
 \begin{equation}
-  \text{FAMILY} = \text{FAM} \bind \text{POS1} \oplus
-    \text{SCHWA} \bind \text{POS2} \oplus
-    \text{LEE} \bind \text{POS3}.
+  \text{SERMO} = \text{S3R} \bind \text{POS1} \oplus
+    \text{MOU} \bind \text{POS2}.
 \end{equation}
 Representing a syllable sequence
 by binding syllables to list positions
@@ -472,7 +472,7 @@ for the first syllable,
 we can bind the sequence semantic pointer
 with the inverse of the first position pointer.
 \begin{equation}
-  \text{FAM} \approx \text{FAMILY} \bind \text{POS1}^{-1}
+  \text{S3R} \approx \text{SERMO} \bind \text{POS1}^{-1}
 \end{equation}
 
 The semantic pointers representing syllable positions
@@ -1364,15 +1364,15 @@ in differentiating between
 another syllable with the same nucleus,
 but no onset.
 For example, if the input is a trajectory
-from the syllable ??? bar,
-the iDMP for ??? bar
+from the syllable \ipa{[bAr]},
+the iDMP for \ipa{[bAr]}
 will be further along in the state space
-than the iDMP for ??? ar.
+than the iDMP for \ipa{[Ar]}.
 However, an issue arises
 for codas,
-in that the iDMP for ??? ba
+in that the iDMP for \ipa{[bA]}
 will be farther along than
-??? bar when the ??? r
+\ipa{[bAr]} when the \ipa{[r]}
 is encountered.
 We will refer to this as the
 \textit{trajectory subpath} problem.
@@ -1528,7 +1528,7 @@ the \textit{trajectory subpath problem},
 which occurs when two syllables
 start with the same trajectory
 but diverge near the end
-(e.g., ??? /ba/ vs /bar/).
+(e.g., \ipa{[bA]} versus \ipa{[bAr]}).
 In order to handle this problem,
 we introduce an additional connection
 in the model that explicitly punishes
@@ -1583,11 +1583,11 @@ As an added benefit,
 punishing gestures not in the sylalble helps
 differentiate between syllables with
 similar trajectory suffixes;
-e.g., ??? /bar/ vs /dar/.
+e.g., \ipa{[bAr]} versus \ipa{[dAr]}.
 Without punishing extra gestures,
 it is more likely that the iDMP
-associated with ??? /dar/ will catch up
-to the ??? /bar/ iDMP
+associated with \ipa{[dAr]} will catch up
+to the \ipa{[bAr]} iDMP
 and result in a misclassification
 if the parameters in the model
 are not well-tuned.

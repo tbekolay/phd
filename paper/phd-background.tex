@@ -880,8 +880,8 @@ resulting in low-frequency breathy sounds.
 When the glottis narrows,
 air passes through more turbulently,
 resulting in higher frequency breathy sounds,
-as in the /h???/ phoneme
-in the English word /had???/.
+as in the phone \ipa{[h]}
+in the English word \ipa{/h \ae d/}.
 In all voiced phonemes (e.g., all vowels),
 the vocal folds vibrate,
 resulting in a ``buzzing'' quality;
@@ -923,7 +923,7 @@ as follows.
   It carries air from the larynx to the oral and nasal cavities.
 \item The \textbf{velum} or soft palate permits or restricts
   access to the nasal cavity. It is also a constriction target
-  for the tongue, as in the phonemes /k???/ and /g???/.
+  for the tongue, as in the phones \ipa{[k]} and \ipa{[g]}.
 \item The \textbf{hard palate} is the hard surface
   at the roof of the mouth. It cannot move, but serves
   as a constriction target for the tongue.
@@ -1236,9 +1236,9 @@ Openness and backness are partially coupled,
 such that when the vocal tract is open,
 it must be mostly (but not completely) back.
 The three possible extremes, then,
-are /a???ipa/ (open, back),
-/i???/ (closed, front),
-and /u???/ (closed, back).
+are \ipa{A} (open, back),
+\ipa{i} (closed, front),
+and \ipa{u} (closed, back).
 Most of the remaining vowel sounds
 can be expressed as being
 a blend of one of these three vowel sounds
@@ -1254,19 +1254,67 @@ transitions or ``glides''
 from one vocal tract position
 to a second vocal tract position
 during phonation;
-e.g., the English ???
-in ??? is a diphthong.
+e.g., the English \ipa{[aU]} ???
+in ``loud'' (\ipa{[laUd]})
+is a diphthong.
 Triphthong phonemes,
 in which three vocal tract positions
 are visited in sequence,
 also occur in some languages;
 e.g., in RP English
-the word ???
-is often voiced with the
-triphthong ???.
+the word ``hour''
+is sometimes voiced with the
+triphthong \ipa{[aU@]}.
 
-% \fig{vowels}{0.8}{???}{???}
-% should be able to make with TIPA
+\begin{figure}[ht!]
+  \centering
+  \begin{tikzpicture}[scale=3]
+    \large
+    \tikzset{
+      vowel/.style={fill=white, anchor=mid, text depth=0ex, text height=1ex},
+      dot/.style={circle,fill=black,minimum size=0.4ex,inner sep=0pt,outer sep=-1pt},
+    }
+    \coordinate (hf) at (0,2); % high front
+    \coordinate (hb) at (2,2); % high back
+    \coordinate (lf) at (1,0); % low front
+    \coordinate (lb) at (2,0); % low back
+    \def\V(#1,#2){barycentric cs:hf={(3-#1)*(2-#2)},hb={(3-#1)*#2},lf={#1*(2-#2)},lb={#1*#2}}
+
+    % Draw the horizontal lines first.
+    \draw (\V(0,0)) -- (\V(0,2));
+    \draw (\V(1,0)) -- (\V(1,2));
+    \draw (\V(2,0)) -- (\V(2,2));
+    \draw (\V(3,0)) -- (\V(3,2));
+
+    % Place all the unrounded-rounded pairs next, on top of the horizontal lines.
+    \path (\V(0,0))     node[vowel, left] {\ipa{i}} node[vowel, right] {\ipa{y}} node[dot] {};
+    \path (\V(0,1))     node[vowel, left] {\ipa{1}} node[vowel, right] {\ipa{0}} node[dot] {};
+    \path (\V(0,2))     node[vowel, left] {\ipa{W}} node[vowel, right] {\ipa{u}} node[dot] {};
+    \path (\V(0.5,0.4)) node[vowel, left] {\ipa{I}} node[vowel, right] {\ipa{Y}} node[dot] {};
+    \path (\V(0.5,1.6)) node[vowel, left] {} node[vowel, right] {\ipa{U}} node[dot] {};
+    \path (\V(1,0))     node[vowel, left] {\ipa{e}} node[vowel, right] {\ipa{\o}} node[dot] {};
+    \path (\V(1,1))     node[vowel, left] {\ipa{9}} node[vowel, right] {\ipa{8}} node[dot] {};
+    \path (\V(1,2))     node[vowel, left] {\ipa{7}} node[vowel, right] {\ipa{o}} node[dot] {};
+    \path (\V(2,0))     node[vowel, left] {\ipa{E}} node[vowel, right] {\ipa{\oe}} node[dot] {};
+    \path (\V(2,1))     node[vowel, left] {\ipa{3}} node[vowel, right] {\ipa{\textcloseepsilon}} node[dot] {};
+    \path (\V(2,2))     node[vowel, left] {\ipa{2}} node[vowel, right] {\ipa{O}} node[dot] {};
+    \path (\V(2.5,0))   node[vowel, left] {\ipa{\ae}} node[vowel, right] {} node[   ] {};
+    \path (\V(3,0))     node[vowel, left] {\ipa{a}} node[vowel, right] {\ipa{\OE}} node[dot] {};
+    \path (\V(3,2))     node[vowel, left] {\ipa{A}} node[vowel, right] {\ipa{6}} node[dot] {};
+
+    % Draw the vertical lines.
+    \draw (\V(0,0)) -- (\V(3,0));
+    \draw (\V(0,1)) -- (\V(3,1));
+    \draw (\V(0,2)) -- (\V(3,2));
+
+    % Place the unpaired symbols last, on top of the vertical lines.
+    \path (\V(1.5,1))   node[vowel]       {\ipa{@}};
+    \path (\V(2.5,1))   node[vowel]       {\ipa{5}};
+  \end{tikzpicture}
+
+  \caption[]{}
+  \label{fig:vowels}
+\end{figure}
 
 Consonant phonemes occur when some point
 of the vocal tract is constricted.
@@ -1276,11 +1324,11 @@ Place refers to the location in the vocal tract
 that becomes constricted.
 For example, in bilabial consonants,
 both lips come together,
-as in /m???/ and /b???/;
+as in \ipa{[m]} and \ipa{[b]};
 in velar consonants,
 the tongue moves toward the velum
 (i.e., soft palate),
-as in /k???/ and /g???/.
+as in \ipa{[k]} and \ipa{[g]}.
 Manner refers to how the vocal tract
 is constricted in that location.
 For example, in a plosive,
@@ -1289,30 +1337,177 @@ at the place of articulation;
 air compresses behind the place of constriction,
 and is then released,
 producing the sound recognized
-as a plosive, like /t???/ and /k???/.
+as a plosive, like \ipa{[t]} and \ipa{[k]}.
 In fricatives,
 the articulators move close together
 such that there is a narrow channel
 for air to pass through.
 The narrow channel causes
 the hissing sounds associated
-with phonemes like /s???/ and /f???/.
+with phonemes like \ipa{[s]} and \ipa{[f]}.
 Several other places and manners exist;
 those defined by the IPA are shown
 in Figure~\ref{fig:consonants}.
 
-% \fig{consonants}{0.8}{???}{???}
-% also from TIPA;
-% http://www.ling.ohio-state.edu/events/lcc/tutorials/tipachart/tipachart.pdf
+% from Tim Mahrt
+\begin{figure}[ht!]
+  \begin{small}
+    \hspace{4.6em}
+    \begin{tabular}{|l|cc|cc|cc|cc|cc|cc|}
+      \hline &
+        \multicolumn{2}{|c|}{\footnotesize{Bilabial}} &         % Bilabial
+        \multicolumn{2}{|c|}{\footnotesize{Lab. dent.}} &       % Labiodental
+        \multicolumn{2}{|c|}{\footnotesize{Dental}} &           % Dental
+        \multicolumn{2}{|c|}{\footnotesize{Alveolar}} &         % Alveolar
+        \multicolumn{2}{|c|}{\footnotesize{P-alveo.}} &     % Post-alveolar
+        \multicolumn{2}{|c|}{\footnotesize{Retroflex}} &        % Retroflex
+
+      \hline Plosive &                % Plosive
+        \ipa{p} & \ipa{b} &                     % Bilabial
+                &         &                     % Labiodental
+        \multicolumn{3}{|r}{\ipa{t}}&           % Dental
+        \multicolumn{3}{l|}{\ipa{d}}&           % Alveolar
+                                                % Post-alveolar
+        \ipa{\:t} & \ipa{\:d}  \\               % Retroflex
+
+      \hline Nasal &              % Nasal
+        & \ipa{m} &                         % Bilabial
+        & \ipa{M} &                     % Labiodental
+        \multicolumn{3}{|r}{}&                % Dental
+        \multicolumn{3}{l|}{\ipa{n}}&             % Alveolar
+                                      % Post-alveolar
+        & \ipa{\:n}  \\                           % Retroflex
+
+      \hline Trill &                  % Trill
+        & \ipa{\;B}&                      % Bilabial
+        & &                           % Labiodental
+        \multicolumn{3}{|r}{}&                % Dental
+        \multicolumn{3}{l|}{\ipa{r}}&               % Alveolar
+                                      % Post-alveolar
+        &   \\                         % Retroflex
+
+      \hline Tap/Flap &             % Tap /Flap
+        & &                         % Bilabial
+        & &                           % Labiodental
+        \multicolumn{3}{|r}{} &         % Dental
+        \multicolumn{3}{l|}{\ipa{R}} &          % Alveolar
+                                      % Post-alveolar
+        & \ipa{\:r}  \\                          % Retroflex
+
+      \hline Fricative &            % Fricative
+        \ipa{F} & \ipa{B} &                 % Bilabial
+        \ipa{f} & \ipa{v} &                         % Labiodental
+        \ipa{T} & \ipa{D} &                 % Dental
+        \ipa{s} & \ipa{z} &                         % Alveolar
+        \ipa{S} & \ipa{Z} &                 % Post-alveolar
+        \ipa{\:s} & \ipa{\:z}   \\             % Retroflex
+
+      \hline Lat. Fric. &           % Lat. Fricative
+        \BlankCell        & \BlankCell        &   % Bilabial
+        \BlankCell        & \BlankCell        &   % Labiodental
+        \multicolumn{3}{|r}{\ipa{\textbeltl}} &       % Dental
+        \multicolumn{3}{l|}{\ipa{\textlyoghlig}} &      % Alveolar
+                                      % Post-alveolar
+        &   \\                         % Retroflex
+
+      \hline Approx &               % Approx.
+        & &                           % Bilabial
+        & \ipa{V} &                     % Labiodental
+        \multicolumn{3}{|r}{}&                % Dental
+        \multicolumn{3}{l|}{\ipa{\*r}} &          % Alveolar
+                                      % Post-alveolar
+        & \ipa{\:R}   \\                   % Retroflex
+
+      \hline Lat. appr. &           % Lat. Approx
+        \BlankCell        & \BlankCell        &   % Bilabial
+        \BlankCell        & \BlankCell        &   % Labiodental
+        \multicolumn{3}{|r}{}&                % Dental
+        \multicolumn{3}{l|}{\ipa{l}}&               % Alveolar
+                                      % Post-alveolar
+        & \ipa{\:l}  \\                    % Retroflex
+      \hline
+    \end{tabular}
+
+    \vspace{0.3em}
+    \hspace{4.6em}
+    \begin{tabular}{|l|cc|cc|cc|cc|cc|}
+      \hline &
+        \multicolumn{2}{|c|}{\footnotesize{Palatal}} &          % Palatal
+        \multicolumn{2}{|c|}{\footnotesize{Velar}} &          % Velar
+        \multicolumn{2}{|c|}{\footnotesize{Uvular}} &           % Uvular
+        \multicolumn{2}{|c|}{\footnotesize{Pharyng.}} &       % Pharyngeal
+        \multicolumn{2}{|c|}{\footnotesize{Glottal}}  \\          % Glottal
+
+      \hline Plosive &                % Plosive
+      \ipa{c} & \ipa{\textbardotlessj} &                            % Palatal
+        \ipa{k} & \ipa{g} &                         % Velar
+        \ipa{q} & \ipa{\;G} &                   % Uvular
+        & \BlankCell        &               % Pharyngeal
+        \ipa{P}& \BlankCell         \\                % Glottal
+
+      \hline Nasal &              % Nasal
+       & \textltailn &                           % Palatal
+        & \ipa{N} &                           % Velar
+        & \ipa{\;N} &                           % Uvular
+        \BlankCell        & \BlankCell        &   % Pharyngeal
+        \BlankCell        & \BlankCell         \\   % Glottal
+
+      \hline Trill &                  % Trill
+        & &                           % Palatal
+        \BlankCell        & \BlankCell        &   % Velar
+        & \ipa{\;R}&                      % Uvular
+        & &                           % Pharyngeal
+        \BlankCell        & \BlankCell         \\   % Glottal
+
+      \hline Tap/Flap &             % Tap /Flap
+        & &                           % Palatal
+        \BlankCell        & \BlankCell        &   % Velar
+        & &                           % Uvular
+        & &                           % Pharyngeal
+        \BlankCell        & \BlankCell         \\   % Glottal
+
+      \hline Fricative &            % Fricative
+        \ipa{\c{c}} & \ipa{J} &               % Palatal
+        \ipa{x} & \ipa{G} &                     % Velar
+        \ipa{X} & \ipa{K} &                 % Uvular
+        \textcrh & \ipa{Q} &                % Pharyngeal
+        \ipa{h} & \texthth \\                   % Glottal
+
+      \hline Lat. Fric. &           % Lat. Fricative
+        & &                           % Palatal
+        & &                           % Velar
+        & &                           % Uvular
+        \BlankCell        & \BlankCell              % Pharyngeal
+        & \BlankCell        & \BlankCell         \\   % Glottal
+
+      \hline Approx &               % Approx.
+        & \ipa{j} &                           % Palatal
+        & \ipa{\textturnmrleg} &                  % Velar
+        & &                           % Uvular
+        & &                           % Pharyngeal
+        \BlankCell        & \BlankCell         \\   % Glottal
+
+      \hline Lat. appr. &           % Lat. Approx
+        & \ipa{L} &                       % Palatal
+        & \ipa{\;L} &                     % Velar
+        & &                           % Uvular
+        \BlankCell        & \BlankCell        &   % Pharyngeal
+        \BlankCell        & \BlankCell         \\   % Glottal
+        \hline
+    \end{tabular}
+ \end{small}
+  \caption[]{}
+  \label{fig:consonants}
+\end{figure}
 
 While no phoneme's pronunciation is consistent,
 consonant pronunciations can vary more than vowels
 because consonant sounds are produced in the context
 of the vocal tract position for
 the prior or upcoming vowel sound.
-In the word /bat???/ for example,
-the /b???/ and /t???/ sounds
-occur in the context of /a???/.
+In the word ``bat'' for example,
+the \ipa{[b]} and \ipa{[t]} phones
+occur in the context of \ipa{[\ae]}.
 \cite{kroger1993} theorizes that
 each consonant sound is composed
 of speech gestures which force some
@@ -1328,7 +1523,7 @@ However, as with most aspects
 of phonetics and phonology,
 there are many examples that do not
 match the convenient criteria listed above.
-For example, /w???/, as in ``weep''
+For example, \ipa{[w]}, as in ``weep''
 is a phoneme consonant that is articulated
 with a mostly open vocal tract,
 like a vowel;
@@ -1410,9 +1605,9 @@ and quieter.
 In English, most vowel phonemes
 can only appear in either
 heavy or light syllables;
-for example, the schwa, /e???/,
+for example, the schwa, \ipa{[@]},
 can only appear in light syllables,
-and diphthongs like /ae???/
+and diphthongs like \ipa{[aU]}
 can only appear in heavy syllables.
 The weight of a syllable determines
 whether or not it can be stressed
@@ -1431,8 +1626,8 @@ been typical VC syllables have morphed
 into ``syllabic consonants,'' in which
 the vowel is no longer present;
 for example, ``bottle'' is often
-pronounced /bottl???/,
-where /l???/ is a syllabic consonant.
+pronounced \ipa{[b6tl]},
+where \ipa{[l]} is a syllabic consonant.
 In terms of syllable recognition,
 agreement between native English speakers
 is surprisingly low when
@@ -2016,12 +2211,12 @@ to the cue syllable
 with a predetermined syllable
 \cite{fowler2003}.\footnote{
   For clarity, in the task, subjects
-  shadowed a recording voicing the ??? /a/ phoneme,
-  which switched to either /pa/ /ta/ or /ka/??? at an
+  shadowed a recording voicing the \ipa{[A]} phone,
+  which switched to either \ipa{[pA]}, \ipa{[tA]} or \ipa{[kA]} at an
   unspecified time.
   Subject either voiced the syllable that they heard,
-  or one of /pa/ /ta/ or /ka/??? which was
-  kept constant regardless of what was heard.}
+  or one of \ipa{[pA]}, \ipa{[tA]} or \ipa{[kA]},
+  which was kept constant regardless of what was heard.}
 Typically, reaction time experiments
 in which the subject produces the same reaction
 regardless of the cue (e.g., pressing a button)

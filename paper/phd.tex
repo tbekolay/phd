@@ -15,7 +15,9 @@
 
 \usepackage{amsmath,amssymb,amstext}
 \usepackage[pdftex]{graphicx}
+\usepackage[dvipsnames,hyperref]{xcolor}
 \usepackage{microtype}
+\usepackage{rotating}
 \usepackage{tipa}
 \let\ipa\textipa
 
@@ -97,14 +99,13 @@
     pdfstartview={FitH},
     pdftitle={Biologically inspired methods in speech recognition and synthesis: closing the loop},
     pdfauthor={Trevor Bekolay},
-    pdfsubject={FIXMEsubject},
-    pdfkeywords={FIXME} {FIXME} {FIXME},
+    pdfsubject={Biologically inspired speech models},
+    pdfkeywords={speech} {spiking neural networks},
     pdfnewwindow=true,
     colorlinks=true,
-    linkcolor=blue,
-    citecolor=green,
-    filecolor=magenta,
-    urlcolor=cyan
+    linkcolor=BrickRed,
+    citecolor=PineGreen
+    % urlcolor=cyan
 }
 \ifthenelse{\boolean{PrintVersion}}{
   \hypersetup{
