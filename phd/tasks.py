@@ -1,6 +1,6 @@
 import numpy as np
 
-from . import sermo
+from . import figures, sermo
 from .experiments import (
     AuditoryFeaturesExperiment, ProductionExperiment, RecognitionExperiment)
 from .timit import TIMIT
@@ -540,3 +540,19 @@ class RecogRepeatTask(ExperimentTask):
 
 task_recog_repeat = lambda: RecogRepeatTask(
     repeat=[False, True], n_iters=recog_n_iters)()
+
+
+# Combining scripts
+
+def task_combine():
+    """Compose multiple plots into a figure."""
+
+    def fig(func, fin, fout):
+        return {'name': func.__name__,
+                'actions': [func],
+                'file_dep': [figures.svgpath(f) for f in fin],
+                'targets': [figures.svgpath(fout, pdir="figures")]}
+
+    yield fig(figures.temp_scaling,
+              ['ncc-mfcc', 'ncc-ncc', 'ncc-mfcc-long', 'ncc-ncc-short'],
+              'temp-scaling')

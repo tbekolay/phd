@@ -45,5 +45,6 @@ paper/auto/
 cache/
 
 # Figure stuff
+plots/
 figures/**/*.pdf
 figures/**/*.ipynb

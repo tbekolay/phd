@@ -4,7 +4,7 @@ import os
 import doit
 from doit.action import CmdAction
 
-from .tasks import *  # noqa; Load experiment tasks
+from .tasks import *  # noqa; load experiment tasks
 
 DOIT_CONFIG = {
     'default_tasks': [],
@@ -44,9 +44,10 @@ def task_plots():
         nbin = os.path.join(modeld, nb)
         nbout = os.path.join(figd, nb)
 
-        yield {'name': nb,
+        yield {'name': nb[:-6],
                'file_dep': [nbin],  # phd forget if other things change
                'actions': ['jupyter nbconvert --to notebook --execute %s '
+                           '--ExecutePreprocessor.timeout=-1 '
                            '--output %s' % (nbin, nbout)],
                'targets': [nbout]}
 

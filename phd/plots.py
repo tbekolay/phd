@@ -79,7 +79,8 @@ def cochleogram(data, time, freqs, ax=None, cax=None, cbar=True):
     else:
         fig = ax.get_figure()
 
-    mesh = ax.pcolormesh(time, freqs, data.T, cmap=cmap)
+    mesh = ax.pcolormesh(time, freqs, data.T,
+                         linewidth=0, rasterized=True, cmap=cmap)
     if cbar and cax is None:
         fig.colorbar(mesh, pad=0.015, use_gridspec=True)
     elif cbar:
@@ -164,19 +165,22 @@ root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 def savefig(fig, subdir, name, ext='svg'):
-    path = os.path.join(root, 'figures', subdir, '%s.%s' % (name, ext))
+    path = os.path.join(root, 'plots', subdir, '%s.%s' % (name, ext))
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
     fig.savefig(path)
+
+
+def setup(figsize=None):
+    if figsize is not None:
+        plt.rc('figure', figsize=figsize)
+    sns.set_style('white')
+    sns.set_style('ticks')
 
 
 # #####################################
 # Model 1: Neural cepstral coefficients
 # #####################################
-
-def setup_ncc():
-    plt.rc('figure', figsize=(10, 6))
-    sns.set_style('white')
-    sns.set_style('ticks')
-
 
 def plot_traj(traj, zscore=False, ax=None):
     if zscore:
@@ -186,7 +190,7 @@ def plot_traj(traj, zscore=False, ax=None):
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
-    mesh = ax.pcolormesh(traj.T)
+    mesh = ax.pcolormesh(traj.T, linewidth=0, rasterized=True)
     fig.colorbar(mesh, pad=0.015, use_gridspec=True)
     ax.set_ylim(top=traj.shape[1])
     ax.set_xlim(right=traj.shape[0])
@@ -198,7 +202,7 @@ def plot_traj(traj, zscore=False, ax=None):
 
 
 def plot_trajs(traj1, traj2, zscore=(False, False)):
-    fig = plt.figure(figsize=(8, 6))
+    fig = plt.figure(figsize=(6, 4))
     ax1 = plt.subplot(2, 1, 1)
     plot_traj(traj1, zscore[0], ax=ax1)
     ax1.set_xticks(())

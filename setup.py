@@ -49,6 +49,7 @@ setup(
         "scikit-learn",
         "scipy",
         "seaborn",
+        "svgutils",
         "sympy",
     ],
 )
