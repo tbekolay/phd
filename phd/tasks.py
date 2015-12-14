@@ -304,9 +304,8 @@ class ProdSyllableTauTask(ExperimentTask):
         return "tau:%.3f" % (experiment.model.syllable.tau)
 
 task_prod_sylltau = lambda: ProdSyllableTauTask(
-    tau=[0.01, 0.018, 0.025, 0.038, 0.05, 0.1],
+    tau=[0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05],
     n_iters=prod_n_iters)()
-
 
 
 class ProdSequencerNeuronsTask(ExperimentTask):

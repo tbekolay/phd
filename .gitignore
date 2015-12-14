@@ -46,3 +46,4 @@ cache/
 
 # Figure stuff
 figures/**/*.pdf
+figures/**/*.ipynb

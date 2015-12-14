@@ -15,6 +15,7 @@ root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 def task_paper():
+    """Compile thesis with LaTeX."""
     d = os.path.join(root, 'paper')
 
     def forsurecompile(fname, bibtex=True):
@@ -31,7 +32,27 @@ def task_paper():
     yield forsurecompile('phd')
 
 
+def task_plots():
+    """Run notebooks to generate plots."""
+    figd = os.path.join(root, 'figures')
+    modeld = os.path.join(root, 'models')
+
+    for nb in os.listdir(modeld):
+        if not nb.endswith('.ipynb'):
+            continue
+
+        nbin = os.path.join(modeld, nb)
+        nbout = os.path.join(figd, nb)
+
+        yield {'name': nb,
+               'file_dep': [nbin],  # phd forget if other things change
+               'actions': ['jupyter nbconvert --to notebook --execute %s '
+                           '--output %s' % (nbin, nbout)],
+               'targets': [nbout]}
+
+
 def task_svg2pdf():
+    """Convert SVGs to PDFs."""
 
     def svg2pdf(svgpath, pdfpath):
         return 'inkscape --export-pdf=%s %s' % (pdfpath, svgpath)
