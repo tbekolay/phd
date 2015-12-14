@@ -247,7 +247,7 @@ class SequencerParams(ParamsObject):
 
 class ProdSyllableParams(ParamsObject):
     n_per_d = params.IntParam(default=400)
-    tau = params.NumberParam(default=0.03)
+    tau = params.NumberParam(default=0.02)
 
 
 class ProdSyllable(ParamsObject):
