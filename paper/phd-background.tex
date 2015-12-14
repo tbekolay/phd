@@ -244,7 +244,7 @@ are perceived as louder for higher frequencies.
 The exact relationship between
 sound pressure level and
 loudness was originally proposed
-by \cite{fletcher1933},
+by \citet{fletcher1933},
 and further standardized
 by the international standards organization
 (ISO-226:2003);
@@ -284,14 +284,14 @@ suggests that a better model
 of the ear (instead of a spectrum analyzer)
 is as a bank of narrowband filters.
 Support for this model was provided
-in \cite{zwicker1957},
+in \citet{zwicker1957},
 who showed that when two tones
 have frequencies that are close enough,
 their perceived loudness sums,
 suggesting that the two tones
 are within the bandwidth of one of the
 auditory system's filters.
-\cite{moore1983}
+\citet{moore1983}
 summarized other attempts to
 determine the bandwidth
 of auditory filters
@@ -323,7 +323,7 @@ the frequency of incoming sounds
 in subjective ways.
 The subjective perception of frequency
 is referred to as pitch.
-\cite{stevens1937} quantified
+\citet{stevens1937} quantified
 the relationship between
 frequency and pitch
 with a simple equation,
@@ -366,7 +366,7 @@ consonant sounds more difficult
 to recognize in situations with background noise
 than vowel sounds,
 as consonants are shorter than vowels
-\cite[Chapter~3]{everest2001}.
+\citep[Chapter~3]{everest2001}.
 There is evidence that sounds with constant volume
 are perceived as being monotonically louder
 up to approximately 200 ms;
@@ -375,7 +375,7 @@ at some point in the auditory system,
 the power for a given characteristic frequency
 is integrated over a time window
 of approximately 200 ms
-\cite[p.64]{kollmeier2008}.
+\citep[p.64]{kollmeier2008}.
 
 \fig{short-sounds}{0.4}{???}{???}
 
@@ -407,7 +407,7 @@ and shortly thereafter when it is reflected
 back to us off of the walls.
 Yet, we perceive this as a single utterance,
 a phenomenon known as auditory fusion.
-\citeauthor{haas1972} found that auditory fusion occurs
+\citet{haas1972} found that auditory fusion occurs
 best when similar sounds are separated by roughly
 20 to 30 milliseconds.
 When similar sounds are separated by 50 to 80 milliseconds,
@@ -536,7 +536,7 @@ based on the
 Spectral-Temporal Receptive Field (STRF).
 STRFs summarize how a neuron responds
 to incoming stimuli both spatially
-and temporally \cite{aertsen1981}.
+and temporally \citep{aertsen1981}.
 Unfortunately, despite many decades
 of determining STRFs in
 primate ??? cite and
@@ -545,8 +545,8 @@ the exact temporal properties of
 each area are not known.
 In general, STRFs have been found that
 show delays of 5--250 ms
-(see, e.g., \cite[Supplementary material]{mesgarani2014}).
-See \cite{kaas1999,kaas2000,scott2003,semple2003}
+(see, e.g., \citealt[Supplementary material]{mesgarani2014}).
+See \citet{kaas1999,kaas2000,scott2003,semple2003}
 for reviews.
 
 It should be noted
@@ -555,20 +555,20 @@ spectro-temporal tuning curves
 still describes a linear relationship
 between the incoming frequency spectrum
 and how a particular neuron responds.
-\citeauthor{tian2004}
+\citet{tian2004}
 suggest that belt neurons
 in rhesus monkeys respond nonlinearly
 to frequency-modulated sweep stimuli,
-but \cite{kowalski1995}
+but \citet{kowalski1995}
 found that cat A1 responses were linear.
 It is difficult to evaluate
 the responses of cells
 as traditionally the STRF
 is determined using simple stimuli
 like white noise;
-however, see \cite{theunissen2000},
+however, see \citet{theunissen2000},
 for a method using complex sounds.
-\cite{escabi2002}
+\citet{escabi2002}
 found nonlinear responses
 in approximately 40\%
 of the midbrain inferior colliculus
@@ -611,7 +611,7 @@ important information.
 Automatic speech recognition (ASR) has been
 an active field of research
 in artificial intelligence since 1952,
-when \citeauthor{davis1952}
+when \citet{davis1952}
 presented a system for recognizing
 spoken digits by a single individual
 with accuracy above 97\%.
@@ -668,19 +668,19 @@ HMM-based systems
 were among the first systems
 successful enough to be
 used commercially
-(see \cite{huang2014}).
-In 1989, \citeauthor{lee1989}
+(see \citealt{huang2014}).
+In 1989, \citet{lee1989}
 achieved a phone accuracy rate of % ??? look up: phone or word accuracy?
 66.08\% on a subset of the
 TIMIT speech corpus.
 Four years later,
-\citeauthor{lamel1993}
+\citet{lamel1993}
 used a more sophisticated HMM-based system
 to achieve 72.9\% phone accuracy on
 all of the TIMIT speech corpus.
 Improvements from then until
 the mid-2000s were modest
-(see \cite{lopes2011}).
+(see \citealt{lopes2011}).
 
 Since 2006, a series of learning algorithms
 and network structures in artificial neural networks (ANNs)
@@ -690,7 +690,7 @@ the domain of automatic speech recognition
 with considerable success
 both in academic research
 and in commercial application.
-In 2013, \cite{graves2013}
+In 2013, \citet{graves2013}
 achieved
 phone classification accuracy on TIMIT
 of 82.3\%,
@@ -701,7 +701,7 @@ HMM-based model's error rate of 72.9\%.  % ??? check!
 The architecture of DNN-based systems
 is simpler than that of HMM-based systems
 (see Figure~\ref{fig:dnn}
-and \cite{hinton2012}).
+and \citealt{hinton2012}).
 Instead of distinct steps in which
 an explicit statistical acoustic model
 is evaluated and then combined with language models,
@@ -746,7 +746,7 @@ under certain biological constraints,
 mappings between DNNs
 and biologically plausible spiking neural networks
 are currently being developed
-\cite{hunsberger2015}.
+\citep{hunsberger2015}.
 
 \subsection{Auditory periphery modeling}
 
@@ -785,7 +785,7 @@ for speech recognition.
 Several approaches to auditory periphery modeling
 have progress in parallel over the past century.
 Detailed mechanical models
-like those reviewed in \cite{ni2014}
+like those reviewed in \citet{ni2014}
 aim to model ear physiology
 as accurately as possible.
 Unfortunately, efficient implementations
@@ -797,7 +797,7 @@ as closely as possible
 using simplified mathematical models;
 efficient implementations of these
 models are freely available
-\cite{fontaine2011}.
+\citep{fontaine2011}.
 We will focus only on phenomenological
 models of the auditory periphery.
 
@@ -818,8 +818,8 @@ For reviews of prominent
 auditory periphery models and
 the auditory-nerve response characteristic
 reproduced by those models,
-see \cite{lopez2005}
-and \cite{lyon2010}.
+see \citet{lopez2005}
+and \citet{lyon2010}.
 The auditory periphery models used
 in this thesis will be discussed
 in further detail in
@@ -1005,7 +1005,7 @@ quality differs across languages.\footnote{
   that would be covered in an
   introductory undergraduate level
   class or textbook
-  (I used \cite{roach2010} as a general reference).
+  (I used \citet{roach2010} as a general reference).
 }\footnote{The International Phonetic Alphabet (IPA)
   will be used this and subsequent sections.
   See Section~\ref{typography} for more details.}
@@ -1020,7 +1020,7 @@ the fundamental unit of speech production
 is the ``gesture,''
 which describes some movement
 of the articulators in the vocal tract
-\cite{browman1989}.
+\citep{browman1989}.
 Gestures are pre-linguistic,
 in that a vocal tract gesture
 does not necessarily produce
@@ -1037,7 +1037,7 @@ indicating that gestures develop
 before language,
 and are leveraged when
 developing language
-\cite{browman1989}.
+\citep{browman1989}.
 
 Gestures are stereotyped movements
 of sets of articulators in the vocal tract.
@@ -1214,7 +1214,7 @@ General American English has been transcribed
 as having 16 vowel phonemes,
 while Received Pronunciation English
 has been transcribed as having 25 vowel phonemes
-\cite{wells1982}.
+\citep{wells1982}.
 
 Vowel phonemes occur when air is freely
 moving through the open vocal tract.
@@ -1508,7 +1508,7 @@ the prior or upcoming vowel sound.
 In the word ``bat'' for example,
 the \ipa{[b]} and \ipa{[t]} phones
 occur in the context of \ipa{[\ae]}.
-\cite{kroger1993} theorizes that
+\citet{kroger1993} theorizes that
 each consonant sound is composed
 of speech gestures which force some
 articulators to change in a particular way,
@@ -1567,7 +1567,7 @@ though this is not true in all languages.
 Figure~\ref{fig:syllables} summarizes this grouping.
 Note that other ways to describe
 syllables exist
-(e.g. the \textit{mora}; \cite{otake1993}),
+(e.g. the \textit{mora}; \citealt{otake1993}),
 but we adopt this method
 as it is the most common
 for Germanic languages like English.
@@ -1845,7 +1845,7 @@ of both brain hemispheres
 that temporally controls a series
 of tightly timed activations
 of motor cortex.
-\cite{flinker2015}
+\citep{flinker2015}
 showed through Granger causality analysis
 that Broca's area is activated
 before motor cortex,
@@ -1894,9 +1894,9 @@ and neurobiological support
 for these variants
 can be found if certain
 analysis techniques are used
-(see \cite{tresch2009}
+(see \citet{tresch2009}
 for a review in general
-and \cite{smith2004,smith2006}
+and \citet{smith2004,smith2006}
 for evidence of speech synergies).
 We limit our discussion
 of motor synergies to the abstract concept,
@@ -1911,13 +1911,13 @@ can be thought of as the highest level
 of the human speech motor hierarchy.
 There is evidence that these motor synergies
 exist in the ventral sensorimotor cortex (vSMC).
-\cite{bouchard2013} found that activations
+\citet{bouchard2013} found that activations
 of vSMC during the voicing of a syllable
 represent activation of vocal tract articulators,
 and that the vSMC is organized somatotopically
 (i.e., distinct regions of the vSMC
 influence different vocal tract articulators).
-\cite{breshears2015} built on this work
+\citet{breshears2015} built on this work
 by directly stimulating vSMC in humans
 who were undergoing brain surgery.
 vSMC stimulation in different subsections
@@ -1927,7 +1927,7 @@ of vSMC varied for each subject,
 but all subjects' vSMCs were organized
 in dorsal-ventral articulator order.
 
-\cite{dewolf2010} integrated neurobiological research
+\citet{dewolf2010} integrated neurobiological research
 into a model of the motor hierarchy
 that involves the interaction of
 supplementary motor areas,
@@ -1940,10 +1940,10 @@ use the same hierarchy,
 with vSMC as the top level of that hierarchy
 (i.e., it is the supplementary motor area
 for the vocal tract).
-\cite{wildgruber2001} provides support
+\citet{wildgruber2001} provides support
 for the role of basal ganglia
 and cerebellum in speech,
-and \cite{brown2009}
+and \citet{brown2009}
 provides support for
 the role of primary motor cortex
 in speech.
@@ -1965,12 +1965,12 @@ implemented by the anterior insula,
 which is located in the lateral sulcus
 separating the temporal lobe from
 the parietal and frontal lobes.
-As reviewed in \cite{ackermann2004},
+As reviewed in \citet{ackermann2004},
 the insula seems to be responsible
 for the coordination of the up to 100 muscles
 that shape the vocal tract during speech
 and non-speech vocalizations.
-They (and others like \cite{ivry1998})
+They (and others like \citealt{ivry1998})
 hypothesize that the mapping from
 from vocal tract gestures to articulator movements
 is lateralized such that
@@ -2016,12 +2016,12 @@ they become increasingly sensitive
 to the phonemes that they hear regularly,
 and increasingly less sensitive
 to phonemes that they hear rarely or never
-\cite{kuhl2008}.\footnote{
+\citep{kuhl2008}.\footnote{
   Interestingly, it has been shown that
   remaining sensitive to phoneme
   that are not regularly encountered
   is predictive of poor language performance
-  at two years of age \cite{kuhl2008}.}
+  at two years of age \citep{kuhl2008}.}
 Up until puberty,
 children have a sensitivity for
 acquiring language in general;
@@ -2029,7 +2029,7 @@ after puberty, formal instruction
 is less effective,
 and speaking foreign languages
 without an accent is more difficult
-\cite{hurford1991}.
+\citep{hurford1991}.
 This finding suggests that
 parts of our model
 that include learning
@@ -2048,7 +2048,7 @@ the vocal babbling of children
 may be directed toward the goal of
 matching speech templates learned
 through auditory input
-\cite{bolhuis2010}.
+\citep{bolhuis2010}.
 This finding suggests that
 we develop a repository of speech templates
 that we attempt to match when
@@ -2058,7 +2058,7 @@ Despite the prominent role of sensorimotor integration
 in development,
 it is not the case that this system
 plays no role in the adult speech system.
-One influential study by \citeauthor{houde1998)
+One influential study by \citet{houde1998)
 investigated sensorimotor learning
 by manipulating adult speech
 through a device that recorded
@@ -2092,7 +2092,7 @@ a fruitful framework for many studies.
 
 The first theory
 is the dual-stream model of speech processing
-proposed by \cite{hickok2007}.
+proposed by \citet{hickok2007}.
 This model is conceptually similar
 to the dual-stream model of visual processing,
 in which the ventral stream
@@ -2104,11 +2104,11 @@ in guiding actions.\footnote{The dual-stream
   and the dorsal ``where'' pathway,
   assigning the dorsal stream
   the role of determining object locations
-  \cite{ungerleider1982}.
+  \citep{ungerleider1982}.
   However, more recent studies have made
   strong links between dorsal stream
   activity and motor actions
-  \cite{andersen1997,rizzolatti1997,rizzolatti2003}.}
+  \citep{andersen1997,rizzolatti1997,rizzolatti2003}.}
 In the speech processing case,
 the ventral stream
 is involved in lexical processing
@@ -2121,7 +2121,7 @@ but developing an
 interacting ventral pathway
 would be a logical extension.
 
-\cite{hickok2007}
+\citet{hickok2007}
 suggest that the dorsal stream
 is strongly involved in
 speech development,
@@ -2131,7 +2131,7 @@ of motor pathways to effect speech;
 the role of the dorsal pathway may
 be reduced over time as motor pathways
 reliably produce recognizable speech
-\cite{schmidt1975,doyon2003}.
+\citep{schmidt1975,doyon2003}.
 Anatomically, the dorsal stream begins with
 the dorsal superior temporal gyrus (STG; i.e., Wernicke's area)
 and the superior temporal sulcus (STS),
@@ -2152,12 +2152,12 @@ motor processing;
 area Spt, therefore, is a strong candidate
 for where sensorimotor integration might occur.
 
-\cite{hickok2009}
+\citet{hickok2009}
 provide human fMRI evidence that
 area Spt is significantly active
 during both sensory and motor aspects
 of a speech task.
-However, \cite{cogan2014}
+However, \citet{cogan2014}
 performed electrocorticography
 in human epilepsy patients
 and found electrodes that activated
@@ -2177,7 +2177,7 @@ motor theory of speech perception.
 The central tenet of this theory
 is that perceiving speech
 is perceiving vocal tract gestures
-\cite{liberman1985,galantucci2006}.\footnote{
+\citep{liberman1985,galantucci2006}.\footnote{
   The motor theory of speech perception has a long history
   and has made some claims that are not supported by evidence.
   We will ignore these claims, and focus only on
@@ -2194,7 +2194,7 @@ the direct perception of gestures
 influences how we perceive the sound.
 A well-known demonstration of
 this phenomenon is the McGurk effect
-\cite{mcgurk1976},
+\citep{mcgurk1976},
 in which the same audio waveform
 in perceived as representing a different syllable
 when accompanied by a video
@@ -2209,7 +2209,7 @@ when imitating a cue syllable
 compared to when reacting
 to the cue syllable
 with a predetermined syllable
-\cite{fowler2003}.\footnote{
+\citep{fowler2003}.\footnote{
   For clarity, in the task, subjects
   shadowed a recording voicing the \ipa{[A]} phone,
   which switched to either \ipa{[pA]}, \ipa{[tA]} or \ipa{[kA]} at an
@@ -2265,7 +2265,7 @@ vocal tract gestures are responsible
 for effecting movements that produce
 those phonemes.
 While they do not make this link directly,
-\cite{mesgarani2014}
+\citet{mesgarani2014}
 showed support for the motor theory of speech recognition
 by showing that in the STG,
 which is typically thought of
@@ -2316,7 +2316,7 @@ Several labs have investigated
 using measurements
 related to speech production
 as part of a speech recognition system
-(see \cite{king2007} for a review).
+(see \citealt{king2007} for a review).
 The primary advantage of this approach
 is that speech production information
 is not locked to each phoneme,
@@ -2326,17 +2326,17 @@ of the same phoneme.
 The existence of large datasets
 with continuous acoustic
 and articulator position recordings
-(e.g., \cite{westbury1990,wrench2000,steiner2012})
+(e.g., \citealt{westbury1990,wrench2000,steiner2012})
 has spurred development of
 systems that use both
 acoustic and articulatory information
 as input to an ASR system.
-\cite{zlokarnik1995}
+\citet{zlokarnik1995}
 used continuous acoustic and articulatory
 information with an HMM-based system
 and reduced word error rates
 by more 60\% (relative).
-\cite{eide2001}
+\citet{eide2001}
 augmented the feature vector
 in a standard HMM system
 articulatory features and
@@ -2344,9 +2344,9 @@ reduced word error rates
 by 34\% (relative).
 Similar studies have been done
 with traditional artificial neural networks
-(e.g., \cite{kirchhoff2002})
+(e.g., \citealt{kirchhoff2002})
 and dynamic Bayesian networks
-(e.g., \cite{stephenson2000,stephenson2004}).
+(e.g., \citealt{stephenson2000,stephenson2004}).
 
 Deep neural networks have been used for
 a related task,
@@ -2357,12 +2357,12 @@ that is, the input of the network
 is still an acoustic feature vector,
 but the desired output
 is articulator positions.
-\cite{uria2011}
+\citet{uria2011}
 obtained a root mean square error
 of 0.95 mm on the MNGU0 dataset,
 which is 0.04 mm better than prior
 efforts using Guassian mixture models
-\cite{richmond2009}.
+\citep{richmond2009}.
 The extracted articulatory information
 could be used by another ASR system
 to lower phone or word error rates.
@@ -2373,14 +2373,14 @@ Some work has also been done
 relating this work to
 vocal tract gestures.
 For example,
-\cite{zhuang2008,zhuang2009}
+\citet{zhuang2008,zhuang2009}
 showed that the vocal tract gesture score
 can be estimated
 from the continuous articulator positions,
 which can then be used
 to do word classification with
 over 80\% accuracy on a synthesized dataset.
-\cite{nam2010,nam2012}
+\citet{nam2010,nam2012}
 showed that a gesture score
 can be estimated from natural speech
 through a landmark-based time alignment procedure;
@@ -2428,7 +2428,7 @@ The most well known integrated system
 is called DIVA
 (Direction Into Velocities of Articulators;
 see Figure~\ref{fig:diva};
-\cite{guenther1995,guenther2004,guenther2006,guenther2006a}).
+\citealp{guenther1995,guenther2004,guenther2006,guenther2006a}).
 DIVA consists of an articulator synthesizer,
 and several interconnected artificial neural networks
 that drive the articulatory synthesizer
@@ -2446,7 +2446,7 @@ DIVA has been used to explain
 speech production phenomena
 like motor equivalence, contextual variability,
 and anticipatory and carryover coarticulation
-\cite{guenther1995,guenther2003,nieto2005}.
+\citep{guenther1995,guenther2003,nieto2005}.
 Additionally, all of the neural networks
 in the model have been mapped
 to brain regions that are hypothesized
@@ -2472,7 +2472,7 @@ stored speech plans with one artificial
 neuron per speech plan,
 where a speech plan can correspond to
 a single phoneme, a syllable, or one or more words.
-In \cite{guenther2006a},
+In \citet{guenther2006a},
 they note that ``it is expected that
 premotor cortex sound maps in the brain
 involve distributed representations
@@ -2506,7 +2506,7 @@ much easier than a learning procedure
 that must deal with delayed feedback,
 as happens in the real world.
 
-\cite{kroger2009} proposed
+\citet{kroger2009} proposed
 a large integrated model
 similar to DIVA in that
 it is composed of
@@ -2555,7 +2555,7 @@ In Kr\"{o}ger's neurocomputational model,
 phonetic information is extracted
 in an unsupervised manner
 using self-organizing maps
-\cite{kohonen1982,kohonen2007},
+\citep{kohonen1982,kohonen2007},
 which cause
 local clusters of neurons
 in the phonetic map to become active

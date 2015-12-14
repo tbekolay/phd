@@ -71,7 +71,7 @@ and tested on trajectories
 corresponding to phones
 in the TIMIT testing corpus.
 
-TIMIT \cite{garofolo1993} is a corpus of read speech
+TIMIT \citep{garofolo1993} is a corpus of read speech
 with time-aligned phone and word transcriptions.
 The corpus contains ten speech samples
 from 630 speakers across eight dialects
@@ -137,7 +137,7 @@ using simple linear interpolation.
 An alternative method
 for stretching the trajectory
 would be to use dynamic time warping
-\cite{ratanamahatana2004}.
+\citep{ratanamahatana2004}.
 However, dynamic time warping
 involves aligning each speech sample
 to a representative example,
@@ -169,7 +169,7 @@ by further categorizing
 the phones with similar properties;
 e.g., grouping together all
 plosives, fricatives, etc.
-\cite{lopes2011}.
+\citep{lopes2011}.
 We will use the reduced set of 39 phones.\footnote{
   The set of 39 phones includes a ``silence'' phone,
   which we include when using all phones,
@@ -214,10 +214,10 @@ support vector machine classifier
 that does not use the kernel trick
 (i.e., a linear SVM).
 We use LibLinear's fast implementation
-of linear SVMs \cite{fan2008},
+of linear SVMs \citep{fan2008},
 exposed to Python through
 the scikit-learn package
-\cite{pedregosa2011}.
+\citep{pedregosa2011}.
 
 The metric that we collect
 in the experiments below
@@ -249,7 +249,7 @@ Since we use correctness
 rather than accuracy,
 we can only compare our approach
 to some reported results
-\cite{lopes2011},
+\citep{lopes2011},
 but even then the comparison is flawed.
 Hence, we generate both MFCCs
 and NCCs for the same speech samples
@@ -789,7 +789,7 @@ in the majority of the experiments above,
 $N=1036$ neurons.
 According to the BioNumbers database,
 the human cochlea has 3500 inner hair cells
-\cite[BNID~100697]{milo2010}.
+\citep[BNID~100697]{milo2010}.
 Assuming that each inner hair cell
 represents a separate auditory filter
 (which is not necessarily true,
@@ -804,7 +804,7 @@ If we are somewhat more generous
 and use 40 cepstral coefficients,
 2 derivatives, and 200 neurons per feature,
 we get $N=1.8 \times 10^5$ neurons.
-\cite{smiley2013} estimated
+\citet{smiley2013} estimated
 that human A1 alone contains
 2$\times 10^7$--3$\times 10^7$ neurons,
 meaning that the NCC model
@@ -839,7 +839,7 @@ While the syllable sequencing and production model
 can be used to control any articulatory synthesizer,
 we use the VocalTractLab synthesizer
 because of its high quality speech
-and available API \cite{birkholz2013}.
+and available API \citep{birkholz2013}.
 The vocal tract gestures representation
 in VocalTractLab is based on a set of
 predefined articular positions.
@@ -982,7 +982,7 @@ a digit from \texttt{0} to \texttt{9}
 depending on the relative value
 in the gesture's range.
 We then do a global pairwise alignment\footnote{
-  Using the Needleman-Wunsch algorithm \cite{needleman1970},
+  Using the Needleman-Wunsch algorithm \citep{needleman1970},
   implemented by the \texttt{nwalign} Python package
   \url{https://pypi.python.org/pypi/nwalign/}.}
 of the string determined
@@ -1192,7 +1192,7 @@ In a similar vein,
 we investigated whether model behavior
 depends on the length of the syllable sequence,
 with the size of the syllabary fixed.
-In this case, we know from \cite{choo2010}
+In this case, we know from \citet{choo2010}
 that sequences of length five or greater
 tend to have difficulty with elements
 in the middle of the sequence.
@@ -1300,7 +1300,7 @@ then the model uses
 $N=2.67 \times 10^6$ neurons.
 Given that there are approximately
 2.7 \times 10^4 neurons per mm$^3$ (on average)
-in human cortex \cite[BNID 112050]{milo2010},
+in human cortex \citep[BNID 112050]{milo2010},
 a human scale syllabary would take up
 approximately 102.7 mm$^3$ of cortex
 (0.1027 cm$3$)

@@ -31,7 +31,7 @@ Section~\ref{sec:ncc}.
 \subsection{Gammatone filter}
 
 The Gammatone filter was proposed
-in the 1970 (see \cite{johannesma1972,deboer1975,patterson1976}
+in the 1970 (see \citealt{johannesma1972,deboer1975,patterson1976}
 and has become
 the most widely used auditory filter
 as it emulates the basic function
@@ -48,7 +48,7 @@ it can process audio online
 and in continuous time,
 making it applicable to Sermo.
 
-As described in \cite{patterson1976},
+As described in \citet{patterson1976},
 the Gammatone filter has
 an impulse response of the form
 \begin{equation}
@@ -66,12 +66,12 @@ and an envelope
 (a Gamma function, hence the name Gammatone).
 Fourth order Gammatone filters
 are the most common
-\cite{patterson1992}.
+\citep{patterson1992}.
 See Figure~\ref{fig:gammatone} for ???.
 
 \fig{gammatone}{0.8}{???}{???}
 
-\cite{slaney1993} proposed an efficient
+\citet{slaney1993} proposed an efficient
 digital filter implementation
 of the Gammatone filter.
 The filter is an eighth order
@@ -112,7 +112,7 @@ where $T$ is is the sampling interval,
 $f$ is the characteristic frequency of the filter,
 and $B$ controls the bandwidth of the filter
 ($B = 2 \pi b \text{ERB}(f)$).
-See \cite{slaney1993} for the derivation
+See \citet{slaney1993} for the derivation
 of the Z-transforms.
 
 \subsection{Log Gammachirp filter}
@@ -141,12 +141,12 @@ along ``notched'' white noise,
 in which the power spectrum of the noise
 at frequencies just above and just below
 the frequency of the sinusoid
-are set to zero \cite{patterson1976}.
+are set to zero \citep{patterson1976}.
 The Log Gammachirp filter,
-proposed by \cite{unoki2001}
+proposed by \citet{unoki2001}
 is an improvement over
 the original Gammachirp filter
-\cite{irion1997}
+\citep{irino1997}
 in that it is more numerically stable.
 
 The impulse response
@@ -184,7 +184,7 @@ is designed by determining
 an asymmetric filter $H_C(f)$
 that simulated the
 asymmetric function $H_A(f)$
-(see \cite{unoki2001} for details).
+(see \citealt{unoki2001} for details).
 The Log Gammachirp improves upon
 the original Gammachirp filter
 by identifying parameter values
@@ -206,8 +206,8 @@ in the human auditory system,
 including at the level of the auditory periphery.
 
 The Dual Resonance Nonlinear (DRNL) filter,
-proposed in \cite{lopez2001}
-based on earlier work by \cite{meddis2001},
+proposed in \citet{lopez2001}
+based on earlier work by \citet{meddis2001},
 consists of two parallel pathways
 that are summed together
 (see Figure~\ref{fig:drnl-structure}).
@@ -250,7 +250,7 @@ Like the parameters of the linear path's filters,
 these parameters are fit to human data.
 Detail on the fitting procedure
 and the digital filter implementation
-of the filter can be found in \cite{lopez2001}
+of the filter can be found in \citet{lopez2001}
 
 \fig{drnl}{0.8}{???}{???}
 
@@ -265,7 +265,7 @@ see Figure~\ref{fig:drnl}?.
 Just as the DRNL filter can be thought of
 as an nonlinear extension of Gammatone filters,
 the Dynamic Compressive Gammachirp model (DCGC)
-\cite{irino2006}
+\citep{irino2006}
 is a nonlinear extension of Gammachirp filters.
 It also consists of two pathways,
 which, unlike the DRNL,
@@ -294,7 +294,7 @@ and can be inverted in order to
 synthesize audio
 from transformed versions
 of filter output
-\cite{irino2006}.
+\citep{irino2006}.
 Like the DRNL filter, it is too complicated
 to express the impulse response
 in a simple closed form,
@@ -362,7 +362,7 @@ see Section~\ref{sec:nengo} for details.
 
 Finally, we also test
 an auditory periphery model
-presented in \cite{tan2003}
+presented in \citet{tan2003}
 which takes into account
 the full auditory periphery pathway
 in Figure~\ref{fig:periphmodel}.
@@ -426,12 +426,12 @@ In the full model, the output of the signal path
 is used to simulate an inner hair cell,
 and the synapse between an inner hair cell
 and a spiral ganglion cell
-\cite{{zhang2001}.
+\citep{{zhang2001}.
 The IHC model
 consists of a log-sigmoid transfer function
 and a seventh-order lowpass filter.
 The synapse model is a three-store
-diffusion model \cite{carney1993},
+diffusion model \citep{carney1993},
 which generates the instantaneous
 rate of a spiral ganglion cell.
 However, in this thesis,
@@ -444,7 +444,7 @@ and make the five models more consistent.
 \label{sec:brian-hears}
 
 The \textit{Brian hears} software
-\cite{fontaine2011}
+\citep{fontaine2011}
 provides implementations
 of the five models described above.
 \textit{Brian hears} is part of the
@@ -454,7 +454,7 @@ neural simulator capable
 of simulating spiking neural networks
 with relatively high precision
 but slow speed
-(see \cite{bekolay2013} for benchmark results).
+(see \citealt{bekolay2013} for benchmark results).
 Due in part to its slow speed,
 we use \textit{Brian} only for
 the auditory periphery model implementations
@@ -471,15 +471,15 @@ that requires little parameter tuning
 and is stable for trajectories
 with many degrees of freedom.
 DMPs were originally proposed
-by \cite{schaal2005,schaal2006},
-reformulated and refined by \cite{ijspeert2007},
+by \citet{schaal2005,schaal2006},
+reformulated and refined by \citet{ijspeert2007},
 and simplified for use in spiking neural networks
-by \cite{dewolf2014}.
+by \citet{dewolf2015}.
 Here, we summarize the essential aspects
-of the DMP framework as described by \cite{dewolf2014},
+of the DMP framework as described by \citet{dewolf2015},
 but invite interested readers to
 the previously cited works
-and \cite{vijayakumar2005,ijspeert2013}
+and \citet{vijayakumar2005,ijspeert2013}
 for further details and extensions.
 
 DMPs use dynamical systems
@@ -571,7 +571,7 @@ tiling the range of $x$ with some overlap
 are used as the basis functions
 for the forcing function
 (as are used in Figure~\ref{fig:dewolf}).
-\cite{dewolf2014} dewolf showed that
+\citet{dewolf2015} dewolf showed that
 the response curves of spiking neurons
 could be used as the
 basis functions instead
@@ -583,7 +583,7 @@ see Section~\ref{sec:nef}).
 \label{sec:nef}
 
 The Neural Engineering Framework
-(NEF; \cite{eliasmith2004})
+(NEF; \citealp{eliasmith2004})
 provides a unified method of
 representing and transforming information
 in spiking neural networks
@@ -606,12 +606,12 @@ using any spiking or non-spiking neuron model.
 The representation scheme in the NEF
 is based on \textit{population coding},
 which was first proposed by
-\cite{georgopoulos1986}
+\citet{georgopoulos1986}
 based on experiments in monkey cortex.
 Population coding is a type of distributed representation,
 theorizing that an ensemble of neurons
 collectively represents information.
-In the original \cite{georgopoulos1986|} experiment,
+In the original \citet{georgopoulos1986} experiment,
 the ensemble of neurons coded
 for the direction of a reach;
 in other words,
@@ -769,7 +769,7 @@ i.e.,
 This equation is in the form
 of a linear least squares problem,
 which can be solved with standard methods
-\cite{lawson1974}.
+\citep{lawson1974}.
 See Figure~\ref{fig:dec-scalar} for an illustration
 of how the decoding vectors
 result in an estimate of the encoded vector.
@@ -1021,7 +1021,7 @@ The Laplace transform of $h(t)$ is
 $H'(s) = \frac{1}{1 + s\tau}$.
 By accounting for the difference
 between these two filters
-(see \cite{eliasmith2004,eliasmith2013}
+(see \citealt{eliasmith2004,eliasmith2013}
 for a full derivation),
 we get
 \begin{align}
@@ -1065,7 +1065,7 @@ to linguistic and cognitive systems
 that have traditionally been described
 with static symbols
 and rule-based algorithms.
-The Semantic Pointer Architecture (SPA; \cite{eliasmith2013})
+The Semantic Pointer Architecture (SPA; \citealp{eliasmith2013})
 provides a method to implement
 symbol-like representations
 and transformations in spiking neural networks,
@@ -1078,7 +1078,7 @@ using the NEF.
 While many vector symbolic architectures exist,
 the SPA specifically uses
 Holographic Reduced Representations (HER),
-developed by \cite{plate1994},
+developed by \citet{plate1994},
 as it scales well to high dimensional spaces,
 and can be implemented naturally
 with the NEF.
@@ -1126,7 +1126,7 @@ no longer of unit length.
 To limit the number of situations
 in which this occurs,
 we can use random \textit{unitary} vectors
-\cite{plate1994}.
+\citep{plate1994}.
 
 A unitary vector is a vector with
 the same exact inverse
@@ -1272,7 +1272,7 @@ It is important to note that
 the HRR definitions for merging and binding
 do not change the dimensionality
 of the vector space, unlike other VSAs
-(e.g., \cite{smolensky1990}).
+(e.g., \citealt{smolensky1990}).
 One can therefore think of the
 merging and binding operators
 as compressing the information
@@ -1303,8 +1303,8 @@ as semantic pointers.
 
 The SPA has been used to implement
 models of large-scale knowledge representation
-using WordNet \cite{crawford2015},
-serial working memory \cite{choo2010},
+using WordNet \citep{crawford2014},
+serial working memory \citep{choo2010},
 and other cognitive tasks.
 An integrated model called Spaun
 combined several previous models
@@ -1316,7 +1316,7 @@ through a simulated visual system,
 and output was produced
 as motor commands driving
 a three link arm model
-\cite{eliasmith2012,eliasmith2013}.
+\citep{eliasmith2012,eliasmith2013}.
 
 \section{Nengo software}
 \label{sec:nengo}
@@ -1326,7 +1326,7 @@ for designing and simulating
 models using the representations,
 transformations, and dynamics
 of the NEF and SPA
-\cite{bekolay2013}.
+\citep{bekolay2013}.
 The NEF provides a level of abstraction
 that allows modelers to generate
 spiking neural networks
@@ -1405,11 +1405,11 @@ impose any constraints on how
 that data is used;
 for the models in this thesis,
 the data was analyzed with
-NumPy \cite{vanderwalt2011}
-and SciPy \cite{jones2014}
+NumPy \citep{vanderwalt2011}
+and SciPy \citep{jones2015}
 and visualized with
-Matplotlib \cite{hunter2007}
-and Seaborn \cite{waskom2014}.
+Matplotlib \citep{hunter2007}
+and Seaborn \citep{waskom2014}.
 However, other analysis and plotting packages
 could be used.
 

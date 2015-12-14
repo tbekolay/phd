@@ -129,7 +129,7 @@ The NCC pipeline is implemented
 in a Nengo network that uses
 the Brian hears library
 of auditory filter models
-\cite{fontaine2011},
+\citep{fontaine2011},
 and two layers of
 leaky integrate-and-fire (LIF) neurons ensembles
 connected in a feed-forward manner
@@ -273,7 +273,7 @@ called Double Delta-Cepstral Coefficients [DDCC])
 further improves recognition,
 though by a smaller margin than
 the improvement from the first derivative
-\cite{furui1986,kumar2011}.
+\citep{furui1986,kumar2011}.
 
 Temporal derivatives in these systems
 are typically computed through straightforward
@@ -307,7 +307,7 @@ to build networks that maintain
 information from the past
 and can therefore implement temporal differentiation.
 
-\cite{tripp2010} describes six such models,
+\citet{tripp2010} describes six such models,
 two of which use feedforward connections,
 two use adaptive neuron models,
 and two implement linear time-invariant (LTI) filters
@@ -363,14 +363,14 @@ with a relatively long time constant
 as the synaptic filter model.\footnote{
   Synaptic filter time constants of around 100 ms
   are consistent with NMDA glutamate receptors,
-  which \cite{young2003} have suggested
+  which \citet{young2003} have suggested
   are part of differentiator circuits
   underlying respiratory rhythm.
   Additionally, in terms of
   the biological plausibility of the network as a whole,
-  \cite{trip2010} notes that this form of network
+  \citet{tripp2010} notes that this form of network
   has been observed in \textit{C. elegans}
-  \cite{dunn2004} and may underlie chemotaxis.}
+  \citep{dunn2004} and may underlie chemotaxis.}
 
 In the second feedforward differentiation model,
 two connections are made between
@@ -383,7 +383,7 @@ uses a synaptic filter with a slow time constant
 ($\tau_s=0.1 \text{ s}$).\footnote{
   Synaptic filter time constants of 5 ms
   are consistent with some types of
-  AMPA receptors \cite{jonas1993}5.}
+  AMPA receptors \citep{jonas1993}5.}
 Like the first model,
 this approach exploits the delays introduced
 by synaptic filtering,
@@ -399,9 +399,9 @@ contain both fast and slow
 neurotransmitter receptors.\footnote{
   Since AMPA and NMDA are both glutamate receptors,
   no constraint is placed on the \textit{input} population.
-  \cite{tripp2001} notes that a derivative circuit
+  \citet{tripp2010} notes that a derivative circuit
   in the vestibular system of oyster toadfish
-  \cite{holstein2004}
+  \citep{holstein2004}
   is likely to match the form of the second
   feedforward differentiation model.}
 
@@ -436,7 +436,7 @@ that control an articulatory synthesizer.\footnote{
   The model described in this section was created
   in collaboration with Bernd Kr\"{o}ger.
   A preliminary version of the model was presented
-  in \cite{kroger2014}.}
+  in \citet{kroger2014}.}
 We employ several modules in the semantic pointer architecture
 to iterate though the syllable sequence,
 and use DMPs to generate production information trajectories.
@@ -466,7 +466,7 @@ Representing a syllable sequence
 by binding syllables to list positions
 allows us to query the sequence
 for its constituent syllables,
-as was done in \cite{choo2010,eliasmith2012}.
+as was done in \citet{choo2010,eliasmith2012}.
 For example, to query the model
 for the first syllable,
 we can bind the sequence semantic pointer
@@ -521,7 +521,7 @@ It should be noted that
 this choice of representation
 sets a soft upper bound
 on the number of syllables in a sequence.
-In \cite{eliasmith2012},
+In \citet{eliasmith2012},
 it was shown that a similar network
 could represent lists with six elements accurately;
 elements in the middle of
@@ -533,7 +533,7 @@ syllable sequences to be voiced
 are organized at the level of words,
 meaning that most syllable sequences
 will be between one and three syllables
-on average (see \cite{pellegrino2007}).
+on average (see \citealt{pellegrino2007}).
 Linguistic subsystems would themselves
 use hierarchical representations
 of higher level linguistic structures,
@@ -548,7 +548,7 @@ Each syllable semantic pointer
 is associated with a
 trajectory generation subsystem
 based on dynamic movement primitives (DMP)
-\cite{schaal2006,dewolf2014}.
+\citep{schaal2006,dewolf2015}.
 DMPs allow for reliable trajectory generation
 that can be temporally scaled,
 allowing for syllables to be voiced
@@ -632,7 +632,7 @@ which does not modify the sequence.
 The current and next position pointers
 is tracked by two interconnected
 \textit{working memory} modules,
-as was done in \cite{eliasmith2012}.
+as was done in \citet{eliasmith2012}.
 The current syllable is computed
 by binding the \textit{state}
 with the inverse of the
@@ -669,7 +669,7 @@ manipulations on those pointers
 have been previously created
 for Spaun.
 This model uses those networks
-as described in \cite{eliasmith2013}.
+as described in \citet{eliasmith2013}.
 
 The binding module computes
 circular convolution,
@@ -677,7 +677,7 @@ implemented as multiplication
 in the Fourier domain.
 The design of this network
 is described in more detail in
-\cite{choo2010}.
+\citet{choo2010}.
 
 The working memory module
 maintains a memory trace
@@ -685,7 +685,7 @@ through recurrent connections
 implementing an integrator.
 While the general design of the working memory
 is described in more detail elsewhere
-(\cite{choo2010}),
+\citep{choo2010},
 how the two working memory modules
 interact warrants further explanation.
 In order to calculate the next position,
@@ -823,7 +823,7 @@ generate repetitive
 production information trajectories.
 The networks are based on
 the general design
-presented in \cite{dewolf2014},
+presented in \citet{dewolf2015},
 with some modifications
 to enable interactions between
 the DMP networks
@@ -853,7 +853,7 @@ vocal tract gesture score over time.
 The gesture scores are
 designed to be used with the VocalTractLab
 articulatory synthesizer
-\cite{birkholz2006,birkholz2013}.
+\citep{birkholz2006,birkholz2013}.
 While a full speech production system
 would also include a mapping from
 the gesture score to
@@ -869,7 +869,7 @@ by VocalTractLab.
 
 We have made two modifications
 to the DMP network design
-in \cite{dewolf2014}
+in \citet{dewolf2015}
 to allow multiple DMPs
 to operate in quick succession.
 The first modification
@@ -1736,13 +1736,13 @@ from the associative memory to the classifier,
 and from the classifier to the iDMPs;
 specifically, the time constant is 100 ms,
 which is consistent with some NMDA receptors
-\cite{sah1990}.
+\citep{sah1990}.
 Second, we use a different neuron model.
 All other ensembles mentioned in this thesis
 are composed of leaky integrate-and-fire neurons.
 In the classifier ensemble,
 we use an adaptive leaky integrate-and-fire neuron model
-\cite{koch1998}.
+\citep{koch1998}.
 While a true bursting neuron model
 would be better,
 the adaptive LIF at least will produce
@@ -1776,7 +1776,7 @@ passes a threshold.\footnote{
   of the well known drift diffusion model
   that has been used to model
   human behavior in two-alternative forced choice tasks
-  \cite{bogacz2006}.}
+  \citep{bogacz2006}.}
 While this classification method
 is straightforward to implement,
 it may make arbitrary choices

@@ -159,7 +159,7 @@ Neuromorphic systems that are designed
 to simulate millions of spiking neuron models
 in real time
 are currently under development
-(e.g., \cite{furber2013,benjamin2014}),
+(e.g., \citealt{furber2013,benjamin2014}),
 and may make a full Sermo instance
 possible in the next few decades.
 
@@ -308,7 +308,7 @@ of the model.
 Decorrelation techniques like
 linear filters and the discrete cosine transform
 are widely used in digital computing
-for compression \cite{khayam2003}.
+for compression \citep{khayam2003}.
 In compression, a signal is projected
 onto a set of basis functions;
 only the coefficients are stored,
@@ -384,7 +384,7 @@ However, a great deal of engineering
 went into the application of HMMs
 to speech, primarily because of
 its temporal nature
-(see e.g., \cite{rabiner1989} ??? more).
+(see e.g., \citealt{rabiner1989} ??? more).
 One such improvement for HMM-based ASR systems
 is to include the first and second temporal derivatives
 in the state representation.
@@ -411,7 +411,7 @@ linear time-invariant (LTI) filter
 would be of particular interest,
 as LTI filters can be efficiently implemented
 with spiking neural networks
-(see \cite{eliasmith2004}).
+(see \citealt{eliasmith2004}).
 Alternatively, LTI filters
 commonly used in engineering applications
 can be experimented with
@@ -498,7 +498,7 @@ Were the sensory and motor representations static,
 the associations in the sensorimotor system
 could be accomplished
 with simple associative memories
-(see \cite{eliasmith2012,eliasmith2013}).
+(see \citealt{eliasmith2012,eliasmith2013}).
 Instead, we are effectively associating
 sensory trajectories with motor trajectories.
 The key insight
@@ -779,7 +779,7 @@ would lead to a production trajectory
 being learned and consolidated.
 % ??? mention the model if I make it
 
-\cite{uria2011} has shown that it is possible to
+\citet{uria2011} has shown that it is possible to
 do this decoding,
 which some call auditory-articulatory inversion
 (see Section~\ref{sec:asr-prod}).
@@ -823,12 +823,12 @@ can be implemented in a mechanistic model
 suitable for incorporation with Sermo,
 as has been done for similar
 visual classification systems
-(e.g., \cite{hunsberger2013}).
+(e.g., \citealt{hunsberger2013}).
 Once classified, lexical and sublexical items
 will be used in higher level linguistic
 systems that will associate
-semantics (as in \cite{blouw2013,blouw2015})
-and syntax (as in \cite{stewart2014,stewart2015})
+semantics (as in \citealt{blouw2013,blouw2015})
+and syntax (as in \citealt{stewart2014,stewart2015})
 to these representations.
 As these higher level systems
 have been developed with
@@ -937,7 +937,7 @@ ideal choice for representing production information.
 However, we have not yet determined
 if vocal tract gestures can be decoded
 from acoustic information
-(\cite{uria2011} has done this for vocal tract parameters),
+(\citealt{uria2011} has done this for vocal tract parameters),
 nor do we have empirical evidence
 that vocal tract gesture trajectories
 can be generated and classified robustly.
@@ -949,7 +949,7 @@ the task dynamics framework,
 and the ??? CASY synthesizer
 use a particular set of ??? vocal tract gestures..
 % ??? more ??? cite.
-\cite{kroger2014} and \cite{birkholz2006,birkholz2013},
+\citet{kroger2014} and \citet{birkholz2006,birkholz2013},
 on the other hand,
 use 11 gestures in their 2D synthesizer,
 and 49 gestures in the VocalTractLab synthesizer,
@@ -980,7 +980,7 @@ in compensating for vocal tract perturbations.
 When our vocal tracts are modified in some way,
 perhaps by illness or injury,
 or by a deliberate manipulation
-as in \cite{houde1998}
+as in \citet{houde1998}
 we can adapt our speech
 such that changes in how we voice a phoneme
 transfer to other syllables containing that phoneme.
@@ -1083,9 +1083,9 @@ There are several existing data sets
 with full training and testing
 input-output pairs,
 such as TIMIT for linguistic decoding
-\cite{garofolo1993},
-and the X-ray microbeam database \cite{westbury1990}
-and mngu0 \cite{steiner2012}
+\citep{garofolo1993},
+and the X-ray microbeam database \citep{westbury1990}
+and mngu0 \citep{steiner2012}
 for continuous sensorimotor decoding.
 Currently, there are no data sets
 for discrete sensorimotor decoding
@@ -1155,7 +1155,7 @@ measure how much the generated trajectory
 deviates from the target trajectory
 (comparing, for example,
 the squared jerk of the trajectories;
-see \cite{hogan2009}).
+see \citealt{hogan2009}).
 However, a stronger evaluation
 is to use the generated trajectories
 to drive the speech motor control system,
@@ -1197,7 +1197,7 @@ from the expected sound.
 We believe that Sermo can be adapted
 to learn trajectories online in a similar way,
 using biologically plausible learning rules
-(e.g., \cite{macneil2011,bekolay2013}).
+(e.g., \citealt{macneil2011,bekolay2013a}).
 
 There are several critical differences
 between how Sermo and DIVA view
@@ -1212,7 +1212,7 @@ or even short phrases.
 Additionally, in DIVA
 the motor trajectory is initiated
 by activating a speech sound cell,
-(\cite{guenther2006a} notes that a fully realized
+(\citealt{guenther2006a} notes that a fully realized
 model would use a distributed representation),
 and it is not clear how sequences
 of sound cells would be temporally coordinated.
@@ -1239,7 +1239,7 @@ the first three formant frequencies
 at each moment in time,
 though they have used log formant ratios
 and wavelet-based transformations
-with similar results \cite{guenther2006a}.
+with similar results \citep{guenther2006a}.
 Regardless, this ideal offline auditory processing
 gives DIVA a significant advantage
 in terms of being able to
@@ -1251,7 +1251,7 @@ Finally, despite positioning itself as
 a biologically plausible neural network model
 of speech production
 (the ``most thoroughly defined and tested''
-as of 2006; \cite{guenther2006a})
+as of 2006; \citealp{guenther2006a})
 it performs many operations
 that are not easily implementable
 in a biological system.
@@ -1273,7 +1273,7 @@ and with no degradation or noise.
 In order to represent temporal effects,
 signals are perfectly delayed
 by arbitrary amounts of time
-\cite{nieto-castanon2011}.
+\citep{nieto-castanon2011}.
 While it may be possible to approximate
 the computations that
 DIVA assumes are possible
@@ -1333,7 +1333,7 @@ and syllables in the phonetic map
 are also represented with one neuron;
 this representation scheme is unrealistic
 and  does not scale to adult vocabularies
-\cite{crawford2014}.
+\citep{crawford2014}.
 % ??? transition
 % there is still no guarantee
 % that a spiking neural approximation
