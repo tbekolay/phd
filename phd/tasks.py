@@ -270,25 +270,6 @@ task_af_periphery = lambda: AFPeripheryTask(
 prod_n_iters = 15
 
 
-class ProdSyllableNeuronsTask(ExperimentTask):
-
-    params = ['n_neurons']
-
-    def __iter__(self):
-        for n_neurons in self.n_neurons:
-            model = sermo.Production()
-            model.syllable.n_per_d = n_neurons
-            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
-            yield expt
-
-    def name(self, experiment):
-        return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
-
-task_prod_syllneurons = lambda: ProdSyllableNeuronsTask(
-    n_neurons=[30, 40, 50, 70, 90, 120, 150, 180, 250, 400, 600],
-    n_iters=prod_n_iters)()
-
-
 class ProdSyllableTauTask(ExperimentTask):
 
     params = ['tau']
@@ -305,6 +286,25 @@ class ProdSyllableTauTask(ExperimentTask):
 
 task_prod_sylltau = lambda: ProdSyllableTauTask(
     tau=[0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05],
+    n_iters=prod_n_iters)()
+
+
+class ProdSyllableNeuronsTask(ExperimentTask):
+
+    params = ['n_neurons']
+
+    def __iter__(self):
+        for n_neurons in self.n_neurons:
+            model = sermo.Production()
+            model.syllable.n_per_d = n_neurons
+            expt = ProductionExperiment(model, n_syllables=2, sequence_len=3)
+            yield expt
+
+    def name(self, experiment):
+        return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
+
+task_prod_syllneurons = lambda: ProdSyllableNeuronsTask(
+    n_neurons=[50, 90, 120, 150, 250, 400, 600],
     n_iters=prod_n_iters)()
 
 
