@@ -455,7 +455,7 @@ class ProductionExperiment(object):
         paths, freqs = analysis.get_syllables(
             self.n_syllables, self.minfreq, self.maxfreq, rng)
 
-        t = 0.3  # 0.2 for initial stuff, 0.1 fudge factor
+        t = 0.8  # 0.2 for initial stuff, 0.6 fudge factor
         gs_targets = []
         for path, freq in zip(paths, freqs):
             gs = vtl.parse_ges(path)
