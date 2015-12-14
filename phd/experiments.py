@@ -476,6 +476,9 @@ class ProductionExperiment(object):
         self.model.trial.sequence = seq_str
         res.seq = np.array(seq)
 
+        # Use a minimum number of syllables
+        self.model.sequence.n_positions = self.n_syllables
+
         # Save frequencies for that sequence
         res.freqs = np.array([self.model.syllables[i].freq for i in seq_ix])
 
