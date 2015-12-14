@@ -443,7 +443,9 @@ class RecogScaleTask(ExperimentTask):
         return "scale:%.3f" % (experiment.model.syllable.scale)
 
 task_recog_scale = lambda: RecogScaleTask(
-    scale=np.arange(0.64, 0.91, 0.02), n_iters=recog_n_iters)()
+    scale=[0.5, 0.6, 0.64, 0.66, 0.68, 0.69, 0.7, 0.71, 0.72, 0.73,
+           0.74, 0.75, 0.76, 0.78, 0.8, 0.84, 0.9, 1.0],
+    n_iters=recog_n_iters)()
 
 
 class RecogSyllableNeuronsTask(ExperimentTask):
