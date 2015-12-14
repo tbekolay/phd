@@ -83,9 +83,9 @@ def ncc(model, sample, zscore, seed, upsample=False):
         fs_scale = 50000. / TIMIT.fs
         resample_len = int(sample.shape[0] * fs_scale)
         sample = lengthen(sample, resample_len)
-        model.audio = sample
         model.fs = 50000
 
+    model.audio = sample
     net = model.build(nengo.Network(seed=seed))
     with net:
         pr = nengo.Probe(net.output, synapse=0.01)
@@ -110,7 +110,7 @@ def nccs(model, audio, zscore, seed, upsample):
         for label in audio:
             for sample in audio[label]:
                 jobs[label].append(parallel.get_pool().apply_async(
-                    ncc, [model, sample, zscore, seed]))
+                    ncc, [model, sample, zscore, seed, upsample]))
         for label in jobs:
             for result in jobs[label]:
                 out[label].append(result.get())
