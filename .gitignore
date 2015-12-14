@@ -23,6 +23,9 @@
 *.out
 *.synctex.gz
 
+# For Mac OS X
+.DS_Store
+
 # For Python
 __pycache__/
 *.py[cod]

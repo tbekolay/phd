@@ -9,4 +9,5 @@ import brian
 
 from .gestures import ges_path
 from . import (
-    analysis, experiments, filters, plots, processes, sermo, tasks, timit, vtl)
+    analysis, experiments, filters, plots, processes, sermo, tasks, timit)
+    #, vtl)

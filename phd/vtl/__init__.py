@@ -66,7 +66,10 @@ def repair_wavheader(path):
 
 class VTL(object):
     dll = vtl_path('VocalTractLabApi.so')
-    lib = ctypes.cdll.LoadLibrary(dll)
+    try:
+        lib = ctypes.cdll.LoadLibrary(dll)
+    except OSError:
+        lib = None
     default_speaker = vtl_path('JD2.speaker')
     glottis_model = "Triangular glottis"
     numerical_gestures = ['velic', 'f0', 'lung-pressure']
@@ -83,6 +86,10 @@ class VTL(object):
 
     @speaker.setter
     def speaker(self, _speaker):
+        if self.lib is None:
+            self._speaker = _speaker
+            return
+
         # Get VTL info
         self.lib.vtlInitialize(_speaker)
         c_int_ptr = ctypes.c_int * 1  # int*
@@ -126,6 +133,9 @@ class VTL(object):
         self._speaker = _speaker
 
     def tract_params(self, shape):
+        if self.lib is None:
+            return
+
         c_ntractparam_ptr = ctypes.c_double * self.n_vocaltract_params
         params = c_ntractparam_ptr(0)
         self.lib.vtlInitialize(self.speaker)
@@ -135,6 +145,9 @@ class VTL(object):
         return params
 
     def synthesize(self, gesfile, wavfile=None, areafile=None):
+        if self.lib is None:
+            raise RuntimeError("VTL can't run on this OS currently.")
+
         self.lib.vtlInitialize(self.speaker)
         loadwav = wavfile is None
         if wavfile is None:
