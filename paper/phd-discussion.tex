@@ -613,3 +613,166 @@ e.g. the syllable repeating one
 
 % ??? Mental syllabary (1-s2.0-S009394X...pdf)
 % supports our architecture
+
+\subsection{Prosody}
+
+\subsubsection{Tone-units}
+
+??? move to discussion
+
+The final level of organization
+that we will examine is the tone-unit.
+The tone-unit allows us to examine
+suprasegmental aspects of speech.
+A tone-unit is made up of a serially ordered
+sequence of syllables.\footnote{Many
+  phoneticians consider a tone-unit to be
+  composed of ``feet,'' where a foot is
+  a single unit of rhythm.
+  However, feet are mostly used when describing
+  non-conversational utterances,
+  such as those found in music and poetry.
+  In this thesis we focus on speech
+  as a means of conveying linguistic information,
+  and therefore ignore the concept of feet.}
+
+The structure of a tone-unit is similar
+to a syllable, except its component parts
+are syllables instead of phonemes,
+and its components are serially ordered.
+A tone-unit must contain a tonic syllable
+(sometimes also called the nucleus),
+and can optionally contain one or more syllables
+in a pre-head, head, or tail section.
+The pre-head consists of all syllables
+before the first stressed syllable
+in a tone-unit.
+The head consists of all syllables from
+the first stressed syllable
+to the tonic syllable.
+The tonic syllable is the most significant
+syllable in the tone-unit because
+pitch changes in the tonic syllable
+will occur relative to the tonic syllable;
+the tonic syllable is not necessarily
+the loudest or most prominently stressed
+syllable in the tone-unit,
+though it does always contain
+a stressed (and therefore heavy) syllable.
+The tail consists of all syllables
+following the tonic syllable.
+
+% ??? tone-unit structure figure
+% maybe don't worry for now
+
+Not all heavy syllables are necessarily stressed;
+stress is hypothesized to occur when
+more muscle activation is used
+to voice a particular heavy syllable
+???cite?.
+Stress is perceived as a heavy syllable
+that is louder, longer, and with
+a different pitch or quality compared
+to other syllables.
+In some languages, rules govern
+which syllables receive stress;
+for example, in French,
+the last syllable in a word is
+always stressed.
+In English, each word defines
+its own stress pattern,
+and each utterance can add
+additional stresses
+that emphasize some words over others.
+Additionally, stress is not a binary quantity;
+English is typically thought to contain
+three stress levels
+(primary stress, secondary stress, and unstressed).
+
+Intonation, on the other hand,
+is a more straightforward phenomenon to model.
+Intonation is the use of pitch changes
+to 1) express emotions and attitudes,
+2) impart prominence on stressed syllables,
+3) exaggerate grammar and syntactic structure,
+and 4) clue listeners into what information
+is novel and what is thought to be already known.
+While intonation can be thought to also include
+body language and other prosodic characteristics,
+we will focus only on pitch changes.
+The tone of a tone-unit
+is the overall trajectory of pitch
+during the tone-unit.
+
+There are a limited set of possible pitch trajectories
+(i.e., tones) in English.
+While different sources identify different trajectories,
+we will adopt the conventions of ???below
+which note six possible pitch trajectories:
+high fall, low fall, high rise,
+low rise, fall-rise, and rise-fall
+(see Figure~???).
+The same sequence of syllables
+can change its meaning dramatically
+by using a different pitch trajectory,
+or by changing the position of the
+tonic syllable within that pitch trajectory.
+The meaning of each pitch trajectory
+changes depending on the utterance in question;
+we will not investigate meanings further
+in this work, as we focus on
+sound reproduction rather than on
+linguistic meaning.
+
+??? Quick plot of pitch trajectories
+% again, deal with later
+
+% cite https://notendur.hi.is/peturk/KENNSLA/25/IPBE/SHELL/25/nucleus.html
+% or Cruttenden
+
+It is important to note that when talking about
+the pitch trajectory of an utterance,
+pitch is always relative to the
+upper and lower range of a particular speaker.
+In the pitch trajectory plot in Figure~???,
+horizontal lines show the upper and lower ranges.
+
+These six trajectories in Figure~???
+interact with the pre-head and tail
+in predictable ways.
+The pre-head is usually low,
+but can be high in front of a low stressed syllable.
+The tail trajectory can be predicted
+by the trajectory of the tonic syllable;
+for example, if the tonic syllable falls,
+the tail remains low;
+if the tonic syllable rises,
+the tail continues to rise.
+The head, on the other hand,
+is independent of the tonic syllable;
+it may remain at a high or low level,
+or it can rise or fall like
+the trajectories associated with the tonic syllable.
+The combinations of head and tonic syllable
+pitch trajectories also contributes
+to the varying meanings conveyed
+by the pitch trajectory of a tone-unit.
+
+Finally, one note about
+the absence of ``words'' in our treatment
+of phonetics and phonology.
+While words are clearly an important concept
+that we will use colloquially in this thesis,
+they are a linguistic construct
+rather than a phonological one.
+However, as directly applied
+to speech recognition and synthesis,
+words are more readily perceived
+than sequences of syllables with no meaning.
+Fortunately, the pioneering work
+of ???allen94 which summarizes ???
+gives a direct relationship between
+the classification rates of nonsense syllables and words,
+which can be used to adjust
+recognition rates for
+non-linguistic speech.
