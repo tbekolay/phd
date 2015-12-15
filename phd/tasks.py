@@ -267,7 +267,7 @@ task_af_periphery = lambda: AFPeripheryTask(
 # Model 2: Syllable production
 # ############################
 
-prod_n_iters = 15
+prod_n_iters = 20
 
 
 class ProdSyllableTauTask(ExperimentTask):
@@ -304,7 +304,7 @@ class ProdSyllableNeuronsTask(ExperimentTask):
         return "syllneurons:%d" % (experiment.model.syllable.n_per_d)
 
 task_prod_syllneurons = lambda: ProdSyllableNeuronsTask(
-    n_neurons=[50, 90, 120, 150, 250, 400, 600],
+    n_neurons=[50, 90, 120, 150, 250, 400, 600, 800, 1000],
     n_iters=prod_n_iters)()
 
 
