@@ -236,7 +236,7 @@ class SyllableSequenceParams(ParamsObject):
 
 
 class SequencerParams(ParamsObject):
-    n_per_d = params.IntParam(default=250)
+    n_per_d = params.IntParam(default=400)
     timer_tau = params.NumberParam(default=0.05)
     timer_freq = params.NumberParam(default=1.)
     reset_time = params.NumberParam(default=0.85)

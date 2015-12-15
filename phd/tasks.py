@@ -342,7 +342,7 @@ class ProdFreqTask(ExperimentTask):
         return "freq:%.2f" % (experiment.minfreq)
 
 task_prod_freqs = lambda: ProdFreqTask(
-    freqs=np.arange(1.6, 6.1, 0.4), n_iters=prod_n_iters)()
+    freqs=np.arange(0.6, 10.1, 0.4), n_iters=prod_n_iters)()
 
 
 class ProdNSyllablesTask(ExperimentTask):
@@ -361,7 +361,7 @@ class ProdNSyllablesTask(ExperimentTask):
         return "n_syllables:%d" % (experiment.n_syllables)
 
 task_prod_n_syllables = lambda: ProdNSyllablesTask(
-    n_syllables=list(range(9)), n_iters=prod_n_iters)()
+    n_syllables=np.arange(1, 9), n_iters=prod_n_iters)()
 
 
 class ProdSequenceLenTask(ExperimentTask):
@@ -379,7 +379,7 @@ class ProdSequenceLenTask(ExperimentTask):
         return "sequence_len:%d" % (experiment.sequence_len)
 
 task_prod_sequence_len = lambda: ProdSequenceLenTask(
-    sequence_len=np.arange(3, 10), n_iters=prod_n_iters)()
+    sequence_len=np.arange(1, 9), n_iters=prod_n_iters)()
 
 
 class ProdRepeatTask(ExperimentTask):
@@ -486,7 +486,7 @@ class RecogFreqTask(ExperimentTask):
         return "freq:%.2f" % (experiment.minfreq)
 
 task_recog_freqs = lambda: RecogFreqTask(
-    freqs=np.arange(0.6, 5.1, 0.4), n_iters=recog_n_iters)()
+    freqs=np.arange(0.6, 10.1, 0.4), n_iters=recog_n_iters)()
 
 
 class RecogNSyllablesTask(ExperimentTask):
@@ -504,7 +504,7 @@ class RecogNSyllablesTask(ExperimentTask):
         return "n_syllables:%d" % (experiment.n_syllables)
 
 task_recog_n_syllables = lambda: RecogNSyllablesTask(
-    n_syllables=np.arange(5, 25, 5), n_iters=recog_n_iters)()
+    n_syllables=np.arange(1, 9), n_iters=recog_n_iters)()
 
 
 class RecogSequenceLenTask(ExperimentTask):
@@ -522,7 +522,7 @@ class RecogSequenceLenTask(ExperimentTask):
         return "sequence_len:%d" % (experiment.sequence_len)
 
 task_recog_sequence_len = lambda: RecogSequenceLenTask(
-    sequence_len=np.arange(3, 10), n_iters=recog_n_iters)()
+    sequence_len=np.arange(1, 9), n_iters=recog_n_iters)()
 
 
 class RecogRepeatTask(ExperimentTask):
