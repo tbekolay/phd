@@ -323,7 +323,8 @@ class ProdSequencerNeuronsTask(ExperimentTask):
         return "seqneurons:%d" % (experiment.model.sequencer.n_per_d)
 
 task_prod_seqneurons = lambda: ProdSequencerNeuronsTask(
-    n_neurons=[10, 20, 30, 50, 90, 180, 250, 400], n_iters=prod_n_iters)()
+    n_neurons=[10, 20, 30, 50, 90, 180, 250, 400, 600, 1000],
+    n_iters=prod_n_iters)()
 
 
 class ProdFreqTask(ExperimentTask):
@@ -341,7 +342,7 @@ class ProdFreqTask(ExperimentTask):
         return "freq:%.2f" % (experiment.minfreq)
 
 task_prod_freqs = lambda: ProdFreqTask(
-    freqs=np.arange(1.6, 4.1, 0.4), n_iters=prod_n_iters)()
+    freqs=np.arange(1.6, 6.1, 0.4), n_iters=prod_n_iters)()
 
 
 class ProdNSyllablesTask(ExperimentTask):

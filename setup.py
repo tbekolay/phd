@@ -45,7 +45,7 @@ setup(
         "nengo",
         "nwalign",
         "pandas",
-        "pysoundfile",
+        "pysoundfile<0.8",
         "scikit-learn",
         "scipy",
         "seaborn",

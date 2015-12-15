@@ -178,11 +178,7 @@ def setup(figsize=None):
     sns.set_style('ticks')
 
 
-# #####################################
-# Model 1: Neural cepstral coefficients
-# #####################################
-
-def plot_traj(traj, zscore=False, ax=None):
+def plot_traj(traj, zscore=False, ax=None, cbar=True):
     if zscore:
         traj = stats.zscore(traj, axis=0)
 
@@ -191,7 +187,8 @@ def plot_traj(traj, zscore=False, ax=None):
     else:
         fig = ax.get_figure()
     mesh = ax.pcolormesh(traj.T, linewidth=0, rasterized=True)
-    fig.colorbar(mesh, pad=0.015, use_gridspec=True)
+    if cbar:
+        fig.colorbar(mesh, pad=0.015, use_gridspec=True)
     ax.set_ylim(top=traj.shape[1])
     ax.set_xlim(right=traj.shape[0])
     ax.set_yticks(())
@@ -201,17 +198,21 @@ def plot_traj(traj, zscore=False, ax=None):
     return fig, ax
 
 
-def plot_trajs(traj1, traj2, zscore=(False, False)):
+def plot_trajs(traj1, traj2, zscore=(False, False), cbar=True):
     fig = plt.figure(figsize=(6, 4))
     ax1 = plt.subplot(2, 1, 1)
-    plot_traj(traj1, zscore[0], ax=ax1)
+    plot_traj(traj1, zscore[0], ax=ax1, cbar=cbar)
     ax1.set_xticks(())
     sns.despine(bottom=True, left=True, ax=ax1)
     ax2 = plt.subplot(2, 1, 2)
-    plot_traj(traj2, zscore[1], ax=ax2)
+    plot_traj(traj2, zscore[1], ax=ax2, cbar=cbar)
     fig.tight_layout()
     return fig, ax1, ax2
 
+
+# #####################################
+# Model 1: Neural cepstral coefficients
+# #####################################
 
 def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
     df = analysis.load_results(AuditoryFeaturesResult, columns + ['phones'])
