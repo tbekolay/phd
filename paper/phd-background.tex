@@ -411,6 +411,7 @@ are further temporally filtered
 by auditory regions of the brain.
 
 \subsection{Linguistics}
+\label{sec:perc-linguistics}
 
 Following psychoacoustics,
 linguistics provides
@@ -423,7 +424,21 @@ key concepts in phonology,
 phonetics, morphology, and semantics
 in order to
 explain the speech perception hierarchy
-summarized in Figure~\ref{fig:perception}.
+summarized in Figure~\ref{fig:perception}.\footnote{
+  When not explicitly cited,
+  the information in Sections~\ref{sec:perc-linguistics}
+  and \ref{sec:prod-linguistics}
+  should be considered
+  basic linguistics
+  that would be covered in an
+  introductory undergraduate level
+  class or textbook
+  (I used \citet{roach2010} as a general reference).
+}\footnote{The International Phonetic Alphabet (IPA)
+  will be used this and subsequent sections.
+  See Section~\ref{typography} and
+  Figures~\ref{fig:vowels} and \ref{fig:consonants}
+  for more details.}
 
 %% \fig{perception}{0.8}{???}{???}
 
@@ -431,7 +446,9 @@ summarized in Figure~\ref{fig:perception}.
 
 The smallest linguistically relevant unit
 is the phoneme, which conceptually
-summarizes a short sound
+summarizes the linguistically relevant
+aspects of a phone,
+which is a short speech sound
 on the order of tens of milliseconds.
 Phonemes are noted by their ability
 to change the meaning of some word
@@ -469,14 +486,14 @@ is not used in English.\footnote{
   and will not be mentioned again.}
 
 Even though different individuals
-voice each phone
-(and therefore phoneme) differently,
+voice each phone differently,
 the important quality is that
-the particular sound is classified
+the particular sound is perceived
 as a particular phoneme
+by a listener
 in the context of an utterance.
 A helpful analogy can be made between
-phonemes in speech
+phones in speech
 and alphabetical letters in writing.
 With no knowledge of English,
 seeing the sentence,
@@ -494,7 +511,7 @@ Therefore, ``A'' and ``a'' represent
 the same underlying ``letter.''
 Similarly, despite individual differences
 in the pitch, speed, volume, and quality
-of how one voices a particular phoneme,
+of how one realizes a particular phoneme,
 that phoneme is still considered the same
 if it plays the same role
 in a linguistically relevant sequence of phonemes.
@@ -609,7 +626,7 @@ a blend of one of these three vowel sounds
   \label{fig:vowels}
 \end{figure}
 
-Consonant phonemes occur when some point
+Consonant phones occur when some point
 of the vocal tract is constricted.
 The place and manner of constriction
 determines the consonant that will be uttered.
@@ -794,7 +811,7 @@ in Figure~\ref{fig:consonants}.
   \label{fig:consonants}
 \end{figure}
 
-While no phoneme's pronunciation is consistent,
+While no phone's pronunciation is consistent,
 consonant pronunciations can vary more than vowels
 because consonant sounds are produced in the context
 of the vocal tract position for
@@ -1110,16 +1127,39 @@ is related to accessing the mental lexicon.\footnote{
 
 Finally,
 while little concrete is known
-about how words are represented,
+about how words and semantics
+are represented,
 it is clear that word representations
 are distributed among a network
 of neurons distributed
 across cortical areas
 ??? cite pulvermuller2001.
-Therefore, the mental lexicon
-is a convenient theoretical construct,
-but is not an area of the brain
-that can be pointed to and studied.
+The semantic information associated
+with a word is represented
+in brain regions associated with
+the perception or action associated
+with that words
+??? cite 4--6 in patterson2007.
+??? patterson2007 studied
+cases of semantic dementia
+and noted that the semantics
+associated with a word can be damaged
+even when modality-specific
+information was retained.
+??? citeauthor therefore
+argued that,
+in addition to the information
+represented across brain regions,
+the anterior temporal lobes
+act as amodal semantic ``hubs''
+that can activate modality-specific
+representations in other parts of cortex.
+The mental lexicon, therefore,
+may have some similiarities
+with the semantic hubs in
+the anterior temporal lobes,
+but in general
+is just a convenient theoretical construct.
 
 \subsection{Automatic speech recognition}
 
@@ -1256,11 +1296,11 @@ weighted connections.
 While the computations done by these neurons
 and the learning algorithms that adjust
 the connection weights
-may not be directly implementable
-under certain biological constraints,
+are not directly implementable
+with biologically pluasible components,
 mappings between DNNs
 and biologically plausible spiking neural networks
-are currently being developed
+are currently under development
 \citep{hunsberger2015}.
 
 \subsection{Auditory periphery modeling}
@@ -1397,7 +1437,7 @@ air passes through more turbulently,
 resulting in higher frequency breathy sounds,
 as in the phone \ipa{[h]}
 in the English word \ipa{/h \ae d/}.
-In all voiced phonemes (e.g., all vowels),
+In all voiced phones (e.g., all vowels),
 the vocal folds vibrate,
 resulting in a ``buzzing'' quality;
 compare voicing ``ah'' to
@@ -1436,8 +1476,11 @@ as follows.
 \begin{enumerate}
 \item The \textbf{pharynx} is a tube at the back of the throat.
   It carries air from the larynx to the oral and nasal cavities.
-\item The \textbf{velum} or soft palate permits or restricts
-  access to the nasal cavity. It is also a constriction target
+\item The \textbf{velum} or soft palate opens or closes
+  the velopharyngeal port to the nasal cavity,
+  which is important for distinguishing
+  nasal and oral sounds.
+  It is also a constriction target
   for the tongue, as in the phones \ipa{[k]} and \ipa{[g]}.
 \item The \textbf{hard palate} is the hard surface
   at the roof of the mouth. It cannot move, but serves
@@ -1446,13 +1489,11 @@ as follows.
   the hard palate and the top front teeth. Like the hard palate,
   it serves as a constriction target for the tongue.
 \item The upper and lower \textbf{teeth} are at the front of the mouth.
-  While they primarily serve as a constriction target,
-  the lower teeth are under muscular control,
-  though few sounds utilize the motion of the lower teeth.
+  They primarily serve as an obstacle (???) in fricative production.
 \item The \textbf{tongue} is a large, flexible, muscular structure
   that can reach several different constriction targets.
   The tongue is often divided into the tip, blade, dorsum, and root,
-  though there are no clear dividing lines between these areas.
+  though this is not a strict anatomical separation.
 \item The \textbf{lips} are another important flexible, muscular
   articulator that is involved in many speech sounds.
   The lips can move toward other articulators to constrict airflow,
@@ -1460,12 +1501,12 @@ as follows.
 \end{enumerate}
 
 Other parts of the vocal tract are important to speech;
-for example, some sounds require air
+for example, nasals require air
 to pass through the nasal cavity.
 However, air is routed to the nasal cavity
 through constrictions of the seven articulators above;
-there are few little linguistically relevant
-movements that can be done with the nose.
+the nose does not move and therefore is not
+considered an articulator.
 Exact definitions of the articulators
 do vary between phoneticians,
 and play an important role
@@ -1473,14 +1514,18 @@ in the design of a speech production system.
 We will discuss this in further detail
 in Section~\ref{sec:results-production}.
 
-\subsection{Phonetics and phonology}
-\label{sec:phonology}
+\subsection{Linguistics}
+\label{sec:prod-linguistics}
 
-Our treatment of phonetics and phonology
-focuses on the hierarchical levels in speech,
-paying particular attention to two
-sets of characteristics in each level
-and in each mapping between two levels:
+Our treatment of linguistics
+in the context of speech production
+aims to explain the hierarchy
+presented in Figure~\ref{fig:production}
+(which contrasts with the speech perception
+hierarchy in Figure~\ref{fig:perception}.
+We pay particular attention to two
+sets of characteristics in the hierarchical levell
+and in the mapping between levels:
 temporal patterns and constraints,
 and the existence of rule-like regularities.
 For example,
@@ -1497,52 +1542,29 @@ follow any other sentence,
 though there may be semantic issues.
 Similar constraints exist at
 the lower levels of language that
-phonetics and phonology examine,
+we will examine in this section,
 and these constraints will
 inform the structure of the model
 we present in Chapter~\ref{chapt:model}.
 
-The specific hierarchy that we will
-present in this section is pictured
-in Figure~\ref{fig:prod-hierarchy}.
-We will arbitrarily begin at
-the lowest (rightmost???) level and work upwards
-(though a presentation starting at
-the highest level would be equally valid).
-For clarity, we will use English for examples,
-except when demonstrating that a particular
-quality differs across languages.\footnote{
-  When not explicitly cited,
-  the information in Section~\ref{sec:phonology}
-  should be considered
-  basic phonetics and phonology
-  that would be covered in an
-  introductory undergraduate level
-  class or textbook
-  (I used \citet{roach2010} as a general reference).
-}\footnote{The International Phonetic Alphabet (IPA)
-  will be used this and subsequent sections.
-  See Section~\ref{typography} for more details.}
-
-% \fig{prod-hierarchy}{0.5}{???}{???}
-% box-arrow diagram with the stuff from this sect
+\fig{production}{0.7}{???}{???}
 
 \subsubsection{Vocal tract gestures}
 \label{sec:gestures}
 
-According to many articulatory phoneticians,
+%% Or actions; note that some call them actions.
+%% Also, cite goldstein2006
+
+According to many phoneticians,
 the fundamental unit of speech production
 is the ``gesture,''
 which describes some movement
 of the articulators in the vocal tract
 \citep{browman1989}.
-Gestures are pre-linguistic,
-in that a vocal tract gesture
-does not necessarily produce
-a linguistically interesting sound;
-a set of possibly overlapping
-vocal tract gesture can produce a phoneme,
-which is smallest linguistically relevant unit.
+Gestures are the basic unit of
+the speech production hierarchy
+(playing a similar role to phonemes
+in the speech perception hierarchy).
 There is evidence that children
 learning to say their first words
 often use the correct gestures,
@@ -1554,7 +1576,7 @@ and are leveraged when
 developing language
 \citep{browman1989}.
 
-Gestures are stereotyped movements
+Gestures are learned movements
 of sets of articulators in the vocal tract.
 Each gesture has its own temporal dynamics;
 that is, a gesture is a function defined
@@ -1599,19 +1621,22 @@ Gestures are rarely discussed in isolation
 as phonemes only occur when certain
 sets of gestures overlap
 or occur in tight succession.
-Therefore, gestures are often
+Therefore, gestures are always
 grouped into gestural scores
 (see Figure~\ref{fig:gs})
 which embody the spatiotemporal
 coordination of several gestures
 to produce a linguistically
-relevant sound.
+relevant sound or series of sounds
+(e.g., a syllable or word).
 The vertical axis of a gestural score
-is the articulator set,
-as although each set
-can be used for multiple gestures,
-it can only produce one gesture
-at a time.
+is the articulator set.
+Each articulator set
+can be used for multiple gestures;
+these gestures can even overlap in time
+for an articular set,
+resulting in a combination
+of the effects of both gestures.
 The horizontal axis of
 a gestural score represents time,
 though the time axis may be
@@ -1891,6 +1916,27 @@ They also found that the somatotopic organization
 of vSMC varied for each subject,
 but all subjects' vSMCs were organized
 in dorsal-ventral articulator order.
+
+% Note: Bernd worries about using this for speech.
+% Perhaps add in a sentence or two justifying.
+
+%% a severe difference between modeling speech movements
+%% (i.e. gestures) and arm movements First: arm movements are
+%% sequential (like phonemes) but speech gestures overlap in time for
+%% different articulators. May be we can argue, that for each
+%% articulator (each articulatory tier), there is a phonemic sequence
+%% of gestures, but these gestures need to be timed with respect to
+%% other gestures occurring on other articulatory tiers . And this
+%% "between tiers" temporal coordination (within phoneme coordination)
+%% may be more important than the temporal seqencing of phonemes.
+%% Second: gestures are simple point attractor movemetns towards ONE
+%% SINGLE target while the arm movement for writing a digit comprizes
+%% a sequence of around 10 target points in order to draw a
+%% digit. thus, the definition of "target" is totally different for
+%% digit drawing and for a gesture in speech articulation.  Third:
+%% Intrinsic timing and the notion of brain oscillators may be very
+%% important for speech, because there is an intrinsic timining in
+%% speech (which may be not thus important for digit drawing).
 
 \citet{dewolf2010} integrated neurobiological research
 into a model of the motor hierarchy

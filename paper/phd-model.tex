@@ -599,6 +599,12 @@ Syllable representations are clearly the most tractable
 given these assumptions.
 % ??? reminder: make sure we use this to argue
 % that this scales in the results section.
+Indeed, the influential WEAVER speech production model
+also theorizes that syllables
+are the basic organizational units
+in speech production ???cite,
+and has received empirical support
+???cite cholin2003.pdf.
 
 So far, we have not been explicit
 about our representation of production information.
@@ -722,7 +728,8 @@ we assume that the trajectories we are classifying
 are trajectories of production information.
 It may also be possible to directly classify
 sensory information into syllables;
-however, we follow the motor theory of speech recognition
+however, we follow the motor theory of speech perception
+\citep{liberman1985}
 which theorizes that production information
 is directly inferred from auditory information.
 One theoretical reason
@@ -777,7 +784,16 @@ speech motor control system unchanged.
 Repeated repetitions of the syllable
 would lead to a production trajectory
 being learned and consolidated.
-% ??? mention the model if I make it
+Both the trajectory decoding and
+the learning procedure are likely
+to use existing elements
+in the mental syllabary
+that closely resemble the
+infrequent syllable to be learned
+(e.g., a similar CV syllable could
+be used to learn a different CV syllable,
+following the frame/content theory
+of ???macneilage2001).
 
 \citet{uria2011} has shown that it is possible to
 do this decoding,
@@ -807,14 +823,14 @@ represents high-level linguistic features of speech.
 In Sermo, we hypothesize that
 the linguistic processing system
 decodes linguistically relevant information
-like phonemes and words
+like words or morphemes
 from sensory and production information,
 and provides syllable targets
 to be voiced to the sensorimotor integration system.
 
-Decoding phonemes and words from speech
+Decoding words from speech
 (or, more accurately,
-classifying phonemes and words from speech)
+classifying words from speech)
 has been the primary topic of research
 in ASR systems for decades.
 As such, we are confident that
@@ -824,7 +840,7 @@ suitable for incorporation with Sermo,
 as has been done for similar
 visual classification systems
 (e.g., \citealt{hunsberger2013}).
-Once classified, lexical and sublexical items
+Once classified, lexical items
 will be used in higher level linguistic
 systems that will associate
 semantics (as in \citealt{blouw2013,blouw2015})
@@ -885,14 +901,12 @@ production information abstractly,
 either as vocal tract gestures
 or vocal tract articulator positions.
 In the neurobiological case,
-there is only one possible
-configuration for the vocal tract,
-and so the production information
-should be as close as possible to the
-form required by the motor system.
-While all vocal tracts are differently shaped,
-the muscle groups controlling various articulators
-should be identical in healthy humans.
+the vocal tract model used
+by each individual corresponds to
+their own physical vocal tract,
+an internal model of which
+would be learned through
+sensorimotor associations.
 
 In Sermo, however,
 there is no perfect choice
@@ -1161,7 +1175,9 @@ is to use the generated trajectories
 to drive the speech motor control system,
 and perceptually evaluate generated audio.
 
-\section{Relation to the DIVA and Kr\"{o}ger models}
+\section{Relation to other models}
+
+??? Talk about the WEAVER model in indefrey2004.pdf too
 
 As discussed in Section~\ref{sec:bg-diva-kroger},
 the models most similar to Sermo
@@ -1230,7 +1246,8 @@ the model, and therefore uses
 a biologically inspired auditory filter
 and statistical methods that can be
 performed by spiking neurons.
-DIVA processes audio waveforms offline,
+DIVA does not constrain
+how it processes audio waveforms,
 and provides the model with
 representations that are well suited
 for the operations performed by the model;
@@ -1240,7 +1257,7 @@ at each moment in time,
 though they have used log formant ratios
 and wavelet-based transformations
 with similar results \citep{guenther2006a}.
-Regardless, this ideal offline auditory processing
+Regardless, this ideal auditory processing
 gives DIVA a significant advantage
 in terms of being able to
 associate auditory feedback
@@ -1328,18 +1345,23 @@ is an improvement over DIVA,
 it still uses an overly simplistic
 representation scheme.
 Words in the phonemic map
-are represented with one neuron each,
-and syllables in the phonetic map
-are also represented with one neuron;
-this representation scheme is unrealistic
-and  does not scale to adult vocabularies
+are represented with one neuron each;
+this localist representation scheme is unrealistic,
+and when considering the number of possible
+interactions between words,
+does not scale to adult vocabularies
 \citep{crawford2014}.
+
+%% just one model neuron in the phonemic map,. not at the phoentic
+%% level, see: figure 8
+
 % ??? transition
 % there is still no guarantee
 % that a spiking neural approximation
 % of GSOMs will be accurate enough
 % to reproduce the results
 % of the model.
+%% not spiking, of course
 
 \section{Subsystems modeled in this thesis}
 

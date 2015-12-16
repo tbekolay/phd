@@ -21,8 +21,9 @@ non-neural speech recognition and synthesis systems.
 \probbox{A raw audio waveform has high temporal resolution,
   but low spatial resolution, as it is a one-dimensional signal.
   Audio must therefore be preprocessed such that
-  all the temporal information necessary to recognize speech
-  is available at the current moment in time.
+  temporal information in the recent past
+  is projected into some feature space
+  at the current moment in time.
   Automatic speech recognition systems preprocess speech by
   extracting feature vectors containing cepstral coefficients.
   How can a neural model like Sermo preprocess speech?}
@@ -417,12 +418,12 @@ to compute the desired derivative.
 
 \probbox{Once the intention to voice a syllable sequence
   has been formed, the motor system must translate
-  a sequence of static conceptual syllable representations
+  a sequence of conceptual syllable representations
   to a continuous trajectory of motor commands
   that will cause muscle activations in the vocal tract.
   How can a neural model like Sermo generate
   a motor command trajectory from
-  a sequence of static syllable representation?}
+  a symbolic syllable sequence representation?}
 
 We theorize that the speech motor system
 is organized at the level of syllables,
