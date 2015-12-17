@@ -352,7 +352,7 @@ class ProdNSyllablesTask(ExperimentTask):
     def __iter__(self):
         for n_syllables in self.n_syllables:
             model = sermo.Production()
-            # Also up syllable_d
+            model.sequence.syllable_d = 16 * n_syllables
             expt = ProductionExperiment(
                 model, n_syllables=n_syllables, sequence_len=3)
             yield expt
