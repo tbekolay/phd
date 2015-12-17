@@ -486,7 +486,7 @@ class RecogFreqTask(ExperimentTask):
         return "freq:%.2f" % (experiment.minfreq)
 
 task_recog_freqs = lambda: RecogFreqTask(
-    freqs=np.arange(0.6, 10.1, 0.4), n_iters=recog_n_iters)()
+    freqs=np.arange(0.6, 7.1, 0.4), n_iters=recog_n_iters)()
 
 
 class RecogNSyllablesTask(ExperimentTask):
