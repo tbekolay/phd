@@ -28,9 +28,9 @@ The Semantic Pointer Architecture (SPA; \cite{eliasmith2013})
 provides a method to connect these dynamical systems
 to symbol-like representations.
 In terms of speech,
-dynamical systems allow
-the processing of
-temporally varying sensory inputs and motor output.
+dynamical systems enable processing of
+temporally varying sensory inputs
+to effect motor outputs.
 The symbol-like representations in SPA
 allow us to interpret the states
 of these dynamical systems
@@ -47,9 +47,10 @@ which are currently dominated
 by computational statistics.
 
 In addition to the application of biological methods,
-another motivation for this thesis
-is the long-term goal of a closed-loop
-speech system.
+we aim to provide a framework for
+closed-loop speech systems
+which perform both recognition and synthesis
+with common representations.
 Currently, state-of-the-art approaches
 to speech recognition and synthesis
 are independent;
@@ -60,9 +61,9 @@ In humans, however,
 speech perception and production
 overlaps and interacts in a closed-loop manner.
 When learning to speak,
-we use our perception of our own voice
+we use the perception of our own voice
 to improve future vocalizations.
-While to role of such a closed loop system
+While the role of such a closed-loop system
 diminishes over time,
 we still regularly monitor
 our own speech and can adapt
@@ -86,8 +87,8 @@ The long-term goal of the line of research
 described in this thesis
 is a closed-loop speech system
 that uses biological methods
-to recognize and synthesize speech
-with computers.
+implemented in computers
+to recognize and synthesize speech.
 Such a system could produce its own training data,
 and therefore would require
 far less hand-labeled real-world data than
@@ -96,12 +97,14 @@ It would also enable interrogation
 of how the system recognizes
 and synthesizes speech,
 and enable synergistic interactions
-between researchers in linguistics
-and neuroscience.
+between theoretical model developers
+and experimental researchers
+in linguistics and neuroscience.
 As the model develops and makes predictions
 about the computations required for speech
 and how they might be implemented,
-neuroscientists can test those predictions
+linguists and neuroscientists
+can test those predictions
 and update the model accordingly.
 
 In order to achieve the long-term goal
@@ -123,7 +126,7 @@ and constructing neural implementations
 of three subsystems of Sermo.
 In the conceptual Sermo model,
 I have synthesized literature
-in linguistics, neuroscience,
+in linguistics, psychoacoustics, neuroscience,
 automatic speech recognition,
 and articulatory synthesis
 to present a closed-loop system
@@ -160,14 +163,13 @@ In Chapter~\ref{chapt:results},
 I propose metrics through which
 to evaluate those models,
 and present the results of collecting those metrics
-while varying parameters on the neural models.
+while varying parameters of the neural models.
 In Chapter~\ref{chapt:discussion}
 I discuss the results,
 summarize the contributions and predictions
 of the models,
-and discuss avenues for future work,
-and finally,
-conclude in Chapter~\ref{chapt:conclusion}.\footnote{
+and discuss avenues for future work.
+Finally, I conclude in Chapter~\ref{chapt:conclusion}.\footnote{
   Note that this chapter organization differs
   from a prototypical thesis
   because we make both

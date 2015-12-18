@@ -9,14 +9,13 @@ It is currently unknown how these methods
 relate to the methods that the human brain
 uses to perceive and produce speech.
 In this thesis,
-I present a conceptual model,
-Sermo,
-which describes the computations that
+I present a conceptual model, Sermo,
+which describes some of the computations that
 the human brain uses to
 perceive and produce speech.
 I then implement three large-scale brain models
 that accomplish tasks
-hypothesized to be required by Sermo,
+theorized to be required by Sermo,
 drawing upon techniques
 in automatic speech recognition,
 articulatory speech synthesis,
@@ -52,7 +51,7 @@ an articulatory synthesizer.
 I show that the model
 can produce trajectories
 up to several seconds in length
-from a single static syllable sequence
+from a static syllable sequence representation
 that result in
 intelligible synthesized speech.
 The trajectories reflect the
@@ -67,22 +66,20 @@ classifies syllables
 from a trajectory of premotor commands.
 I show that the model is able to
 classify syllables online
-using only the information available
-at the current timestep
-for syllables with a certain range
-of temporal variability,
+despite high temporal variability,
 and can produce the same
 syllable representations
-used by the second model
-in order to implement
+used by the second model.
+These two models can be connected
+in future work in order to implement
 a closed-loop sensorimotor speech system.
 
 Unlike current computational approaches,
 all three of these models are implemented
 with biologically plausible spiking neurons,
 which can be simulated with neuromorphic hardware,
-and can interface naturally with silicon cochleas.
-All models are also shown to scale
+and can interface naturally with artificial cochleas.
+All models are shown to scale
 to the level of adult human vocabularies
 in terms of the neural resources required,
 though limitations on their performance

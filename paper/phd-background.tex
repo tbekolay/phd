@@ -1,31 +1,29 @@
 \chapter{Background}
 \label{chapt:bg}
 
-This thesis draws upon and makes contributions
-to what would traditionally be thought of a disparate fields:
+This thesis draws upon
+what would traditionally be thought of a disparate fields:
 phonetics and phonology from linguistics,
 psychoacoustics from psychology,
 knowledge representation
 and artificial neural networks from computer science,
-spiking neural networks and
-synaptic plasticity rules from computational neuroscience,
-dynamical systems and control theory
-from systems design engineering,
-concretely implemented in software
-using principles from software engineering.
+spiking neural networks
+from computational neuroscience,
+and dynamical systems and control theory
+from systems design engineering.
 For clarity, the background presented
 in this chapter is limited
 to subjects specifically related to speech.
 I assume basic knowledge in
 computer science or engineering,
-but will present specific techniques
+but will review the specific techniques
 used in this thesis
-in Chapter~\ref{chapt:previouswork}.
+in Chapter~\ref{chapt:methods}.
 
 \section{Speech perception \& recognition}
 
-Our goal in this thesis is to
-apply aspects of speech perception
+On the sensory side of speech,
+we aim to apply aspects of speech perception
 to automatic speech recognition (ASR)
 in order to
 improve the performance of ASR systems,
@@ -33,58 +31,13 @@ and make progress toward
 the long-term goal of a closed-loop
 computational speech system
 that recognizes and synthesizes speech
-in a single interconnected network,
-as humans perceive and produce speech.
-Toward this goal,
-we review literature in
-basic ear physiology,
+in a single interconnected network.
+In this section,
+we review fundamental concepts and literature
+in basic ear physiology,
 psychoacoustics,
 auditory neurobiology,
-and automatic speech recognition
-in this section.
-
-Basic ear physiology is necessary
-foundation for understanding
-how humans process speech.
-Psychoacoustics provides a quantitative account
-of how the human auditory system
-responds to incoming air pressure levels.
-A primary assumption behind this work
-is that the human auditory system
-has evolved to be adept at processing speech;
-psychoacoustics describes many of the ways
-in which the human auditory system
-manipulates sound,
-which we aim to reproduce.
-
-Auditory neurobiology describes both
-the physical substrate and organization
-of the system that we aim to emulate.
-We do not aim to fully replicate
-all aspects of biological neurons;
-instead, we will use an approximation
-of biological neurons,
-but review auditory neurobiology
-in order to constrain our algorithmic choices
-to those that could be implemented
-in a biological system.
-Similarly, by examining the organization
-of the auditory brain structures,
-we constrain the space of possible
-network topologies
-to those that match
-a network that we know
-to be successful.\footnote{One notable omission
-  from our discussion
-  of the human auditory system
-  is the integration of information
-  coming from both ears.
-  There are binaural effects at many levels,
-  and while a full human auditory model
-  would incorporate these effects,
-  at this stage of research
-  we only aim to build
-  a monaural speech system.}
+and automatic speech recognition.
 
 \subsection{Ear physiology}
 
@@ -97,21 +50,32 @@ into instantaneous frequency components,
 which is the basic representation
 that the brain receives.
 Figure~\ref{fig:an-overview} illustrates
-the major structures that will be discussed.
+the major structures involved
+in sound transduction.
 
-\fig{an-overview}{0.8}{??? caption}{??? shortcap}
+\fig{an-overview}{0.8}{Overview of the human ear.}{
+  Overview of the human ear. Fluctuations in air pressure
+  travel down the auditory canal
+  and cuase the tympanic membrane to vibrate.
+  These vibrations cause a tiny bone
+  called the stapes to rapidly move
+  in and out of the oval window of the cochlea.
+  The disturbances of the liquid in the cochlea
+  deflect the basilar membrane inside,
+  with high frequency disturbances
+  causing deflections at the base of the cochlea,
+  and low frequency disturbances causing deflections
+  at the apex of the cochlea.
+  Electrical activity in the form of action potentials
+  are produced in the cochlea,
+  and enter the brain through the cochlear nerve.
+  Adapted from \citet{chittka2005}.}
 
 The outer ear (pinna) funnels air
-into the ear canal.
-Functionally, it selectively boosts
-air pressure fluctuations at
-around 3 kHz (see Figure~\ref{fig:ear-tf}),
+into the ear canal,
 and modifies the air pressure wave
 such that the directionality
 of sound can be determined.
-
-% \fig{ear-tf}{0.7}{??? caption}{??? shortcap}
-
 In the middle ear,
 air pressure fluctuations
 cause the eardrum (tympanic membrane)
@@ -126,8 +90,35 @@ the stapes moves in and out of the oval window,
 causing disturbances in the liquid
 in the cochlea
 (see Figure~\ref{fig:cochlea}).
+Importantly for modeling,
+the external and middle ear
+also attenuate low frequency sounds
+and amplify mid frequency sounds
+(2--7 kHz)
+\citep{rosowski1996,ballachanda1997}.
 
-\fig{cochlea}{0.5}{??? caption}{??? shortcap}
+\fig{cochlea}{0.55}{Cochlea cross-section.}{
+  Cross-section of the cochlea.
+  As the basilar membrane deflects
+  due to the motion of the stapes
+  in and out of the oval window of the cochlea,
+  inner hair cells are pushed against
+  the tectorial membrane.
+  When deflected,
+  the stereocilia on the top of the hair cells
+  allow positive charged ions to enter
+  the cell.
+  The change in inner hair cell voltage
+  causes action potentials to fire in
+  spiral ganglion cells,
+  which travel down
+  the cochlear (auditory) nerve.
+  Outer hair cells are attached to
+  the tectorial membrane,
+  and act as a dynamic amplifier
+  (see text for more details).
+  Adapted from
+  \url{https://commons.wikimedia.org/wiki/File:Organ_of_corti.svg}.}
 
 The inner ear transduces vibrations
 of the liquid in the cochlea
@@ -159,9 +150,9 @@ The basilar membrane's surface is covered
 with hair cells that transduce
 the deflections of the membrane
 to electric current.
-Stereocilia on the top of the hair cell
+Stereocilia on the top of inner hair cells
 rests on or near the tectorial membrane
-on the outside of the cochlea.
+(see Figure~\ref{fig:cochlea}).
 When the basilar membrane deflects,
 the stereocilia's orientation
 relative to the tectorial membrane changes,
@@ -173,7 +164,7 @@ to enter the hair cell.
 Inner hair cells synapse with
 spiral ganglion cells,
 which accumulate the continuously
-changing voltage in the inner hair cells
+changing voltage of the inner hair cells
 and send action potentials
 down the auditory nerve
 conveying how much power
@@ -184,9 +175,10 @@ Outer hair cells play a more nuanced
 role in transduction.
 Their activity is tuned
 more broadly in both space and time,
-and seems to act as a dynamic amplifier,
+and seem to act as a dynamic amplifier,
 amplifying quiet sounds and
-attenuating loud sounds.
+attenuating loud sounds
+\citep{dallos1992}.
 This dynamic amplification allows
 the human ear to have a wide dynamic range,
 able to safely hear sounds from 0--130 dB,
@@ -196,6 +188,13 @@ of absolute air pressure.
 \subsection{Psychoacoustics}
 \label{sec:psychoacoustics}
 
+Psychoacoustics provides a quantitative account
+of how the human auditory system
+responds to incoming air pressure levels.
+In this thesis, we review psychoacoustics
+under the assumption that
+the human auditory system
+has evolved to be adept at processing speech.
 While the human ear can be thought of
 as a spectrum analyzer for air pressure waves,
 there are important differences between
@@ -207,17 +206,12 @@ auditory system has evolved to be
 well-suited for speech,
 it stands to reason that
 capturing these differences
-is important for building
-a frontend for speech recognition.
+is important for speech recognition.
 Therefore, the psychoacoustical findings
 discussed in this chapter
 are presented as motivation for the
 auditory periphery models described
 in Section~\ref{sec:periphery-models}.
-
-% ??? Either here or in previous section,
-% introduce the idea of formants
-% and format frequencies...
 
 \subsubsection{Spatial psychoacoustical effects}
 
@@ -245,7 +239,16 @@ as expressed in the phon scale,
 increases for higher frequency sounds
 up to around 7000 Hz.
 
-% \fig{el-curves}{0.8}{??? caption}{??? caption}
+\fig{el-curves}{0.65}{Equal loudness curves.}{
+  Equal loudness curves.
+  Each line denotes a contour
+  of equal subjective loudness
+  for a loudness level given in units of phon
+  (determined empirically through many studies,
+  beginning with \citealt{fletcher1933}).
+  Generally, low frequency sounds must have higher
+  sound pressure levels to reach the same loudness
+  as sounds with lower pressure at higher frequencies.}
 
 Another scale, the sone,
 quantifies the relative differences
@@ -256,23 +259,17 @@ is linear with perceived loudness;
 a sound played with twice the sone value
 should be perceived as twice as loud.
 The sone for a particular frequency is
-\begin{equation}
+\begin{equation*}
   \text{sone} \approx 2^{\frac{\text{phon} - 40}{10}},
-\end{equation}
+\end{equation*}
 above signals of 40 phon or louder.
-% However, while it is easy to compare
-% the relative volumes of two sound presented
-% in close succession,
-% absolute loudness is difficult to perceive.
-% Kollmeier suggests we perceive only
-% seven levels of loudness?
 
 The difference in perceived loudness
 across the frequency spectrum,
 along with the organization
 of the inner ear,
 suggests that a better model
-of the ear (instead of a spectrum analyzer)
+of the ear (instead of as a spectrum analyzer)
 is as a bank of narrowband filters.
 Support for this model was provided
 in \citet{zwicker1957},
@@ -295,7 +292,7 @@ of auditory filters:
 \end{equation}
 where $f$ is the center frequency
 of the auditory filter of interest.
-See Figure~\ref{fig:erb} for a visualization of
+See Figure~\ref{fig:erb-mel} for a visualization of
 this measure for frequencies of relevance
 for the human auditory system.
 Auditory filters are not rectangular,
@@ -306,7 +303,18 @@ the ERB measure has been productive and is still used
 to determine the bandwidths
 of filters in auditory periphery models.
 
-% \fig{erb}{0.8}{???}{???}
+\fig{erb-mel}{0.65}{Equivalent rectangular bandwidth (ERB) and Mel scales.}{
+  Two scales based on psychoacoustic experiments
+  quantifying perception of sounds of different frequencies.
+  The equivalent rectangular bandwidth scale
+  (ERB; \citealp{moore1983}),
+  plotted in blue,
+  summarizes the bandwidth of auditory filters
+  at different frequencies.
+  The Mel scale \citep{stevens1937},
+  plotted in green,
+  summarizes the perceived pitch
+  for the given frequency.}
 
 Like volume,
 humans perceive
@@ -319,10 +327,10 @@ the relationship between
 frequency and pitch
 with a simple equation,
 \begin{equation}
-  \text{mel} = 2595 \log_{10} \left(1 + \frac{f}{700}\right),
+  \text{Mel} = 2595 \log_{10} \left(1 + \frac{f}{700}\right),
 \end{equation}
-resulting in the mel scale
-(see Figure~\ref{fig:mel}).
+resulting in the Mel scale
+(see Figure~\ref{fig:erb-mel}).
 As with volume, humans are adept at
 noticing when two tones differ in pitch;
 however, absolute perceptions of pitch
@@ -330,23 +338,15 @@ have far less granularity
 (musical notation, for example,
 uses seven degrees of pitch per octave
 and seven degrees of loudness).
-Octaves are spaced from one frequency
-to double that frequency;
-harmonic tones are perceptually similar,
-so pitches can only
-be easily differentiated
-relative to their position in an octave.
-
-% \fig{mel}{0.8}{???}{???}
 
 \subsubsection{Temporal psychoacoustical effects}
 
 To this point, we have discussed
 spatial psychoacoustical effects,
-as they depend on the content of
+which depend on
 the sound pressure level
 at a moment in time.
-There are also several temporal effects,
+There are also several temporal effects
 which are important for speech.
 The first is that the length
 of a sound affects its perceived volume.
@@ -368,7 +368,17 @@ is integrated over a time window
 of approximately 200 ms
 \citep[p.64]{kollmeier2008}.
 
-\fig{short-sounds}{0.4}{???}{???}
+\fig{short-sounds}{0.65}{Short sounds are less audible than longer ones.}{
+  When audio samples are played for shorter durations,
+  they are perceived as quieter,
+  for both random noise and pure tone samples.
+  Perceived loudness can be equalized
+  by raising the sound pressure level of the audio pulse;
+  the relationship between
+  how much the sound pressure level must be raised
+  and the duration of the audio sample
+  is plotted.
+  Adapted from \citet[p.60]{everest2001}.}
 
 Another temporal effect is forward and backward masking.
 When two sounds are made in quick succession,
@@ -418,7 +428,7 @@ linguistics provides
 the next level of insight into
 how we perceive speech.
 While a full treatment of linguistics
-is impossible in a short space,
+is impossible in this short space,
 we will briefly introduce
 key concepts in phonology,
 phonetics, morphology, and semantics
@@ -436,11 +446,21 @@ summarized in Figure~\ref{fig:perception}.\footnote{
   (I used \citet{roach2010} as a general reference).
 }\footnote{The International Phonetic Alphabet (IPA)
   will be used this and subsequent sections.
-  See Section~\ref{typography} and
-  Figures~\ref{fig:vowels} and \ref{fig:consonants}
+  See Figure~\ref{fig:vowels} and Table~\ref{tab:consonants}
   for more details.}
 
-%% \fig{perception}{0.8}{???}{???}
+\fig{perception}{0.2}{Hierarchy of linguistic concepts in speech perception.}{
+  Hierarchy of linguistic concepts in speech perception.
+  A continuous audio signal contains
+  a string of discrete phones,
+  which are processed in a linguistic context
+  to yield a string of phonemes.
+  A morpheme is composed of one or more phonemes,
+  and a word is composed of one or more morphemes.
+  While there are further levels
+  in the speech perception hierarchy,
+  we limit our discussion to the levels
+  up to words.}
 
 \subsubsection{Phones \& phonemes}
 
@@ -467,23 +487,16 @@ used in a particular language.
 More than one phone can map
 to a phoneme;
 for example, the English word
-``???'' can be voiced as
-\ipa{[???]} or \ipa{[???]}
-and will be recognized to
-almost all English speakers
-as \ipa{/???/} because
-the \ipa{[???]} phone
-is not used in English.\footnote{
-  Additionally, some phonemes
-  (diphthongs and triphthongs)
-  can be made up of multiple phones;
-  for example, the English \ipa{[aU]}
-  in ``loud'' (\ipa{[laUd]})
-  can be thought of as a single
-  diphthong phoneme. ??? check
-  Diphthongs and triphongs, however,
-  are not relevant to the current model,
-  and will not be mentioned again.}
+``pin'' can be voiced as
+\ipa{[pIn]} or \ipa{[p\super{h}In]}
+and will be recognized by
+all English speakers
+as \ipa{/pIn/} because
+the \ipa{[p\super{h}]} phone
+is used interchangeably with
+\ipa{[p]} in English
+(i.e., \ipa{[p\super{h}]} and \ipa{[p]}
+are allophones).
 
 Even though different individuals
 voice each phone differently,
@@ -512,7 +525,7 @@ the same underlying ``letter.''
 Similarly, despite individual differences
 in the pitch, speed, volume, and quality
 of how one realizes a particular phoneme,
-that phoneme is still considered the same
+that realization is still considered the same
 if it plays the same role
 in a linguistically relevant sequence of phonemes.
 Accents come about, in part,
@@ -524,9 +537,9 @@ phones not encountered early in life.
 
 While there are many properties
 of phones and phonemes,
-in this thesis we are primarily concerned
+in this thesis we are only concerned
 with whether it
-is a consonant or a vowel.
+is a vowel or a consonant.
 Vowels are longer sounds
 made when the vocal tract is mostly open.
 Consonants are shorter sounds
@@ -534,19 +547,12 @@ made when some part of the vocal tract
 is constricted or transiently closed.
 In almost all languages,
 there are more consonant phonemes
-than there are vowel phonemes
-(though pronunciation varies significantly
-between dialects),
-though transcribing the full set of
+than there are vowel phonemes,
+though pronunciation varies significantly
+between dialects,
+and transcribing the full set of
 phonemes in a language is
 not a purely objective exercise.
-For example, while most dialects
-of English define 24 consonant phonemes,
-General American English has been transcribed
-as having 16 vowel phonemes,
-while Received Pronunciation English
-has been transcribed as having 25 vowel phonemes
-\citep{wells1982}.
 
 Vowel phones occur when air is freely
 moving through the open vocal tract.
@@ -568,13 +574,22 @@ Openness and backness are partially coupled,
 such that when the vocal tract is open,
 it must be mostly (but not completely) back.
 The three possible extremes, then,
-are \ipa{A} (open, back),
-\ipa{i} (closed, front),
-and \ipa{u} (closed, back).
+are \ipa{[A]} (open, back),
+\ipa{[i]} (closed, front),
+and \ipa{[u]} (closed, back).
 Most of the remaining vowel sounds
 can be expressed as being
 a blend of one of these three vowel sounds
 (see Figure~\ref{fig:vowels} for a visualization).
+
+The frequency spectrum of vowel sounds
+typically shows three frequencies
+of relatively high power,
+which are called formants.
+In most cases, the first two formants
+(i.e., the lower two frequencies)
+are sufficient to disambiguate
+between vowel phones.
 
 \begin{figure}[ht!]
   \centering
@@ -621,9 +636,16 @@ a blend of one of these three vowel sounds
     \path (\V(1.5,1))   node[vowel]       {\ipa{@}};
     \path (\V(2.5,1))   node[vowel]       {\ipa{5}};
   \end{tikzpicture}
-
-  \caption[]{}
-  \label{fig:vowels}
+  \caption[Vowels defined in the IPA.]{Vowels defined in the
+    International Phonetic Alphabet (IPA),
+    organized along three axes.
+    The vertical axis reflects whether the vocal tract
+    is open or closed.
+    The horizontal axis reflects wether the tongue
+    is near the front or back of the mouth.
+    The last axis, on either side of each dot ($\cdot$)
+    reflects whether the lips are rounded or unrounded.}
+\label{fig:vowels}
 \end{figure}
 
 Consonant phones occur when some point
@@ -657,19 +679,18 @@ the hissing sounds associated
 with phonemes like \ipa{[s]} and \ipa{[f]}.
 Several other places and manners exist;
 those defined by the IPA are shown
-in Figure~\ref{fig:consonants}.
+in Table~\ref{tab:consonants}.
 
-% from Tim Mahrt
-\begin{figure}[ht!]
+\begin{table}[ht!]
   \begin{small}
-    \hspace{4.6em}
+    \hspace{1.3em}
     \begin{tabular}{|l|cc|cc|cc|cc|cc|cc|}
       \hline &
         \multicolumn{2}{|c|}{\footnotesize{Bilabial}} &         % Bilabial
-        \multicolumn{2}{|c|}{\footnotesize{Lab. dent.}} &       % Labiodental
+        \multicolumn{2}{|c|}{\footnotesize{Labiodental}} &       % Labiodental
         \multicolumn{2}{|c|}{\footnotesize{Dental}} &           % Dental
         \multicolumn{2}{|c|}{\footnotesize{Alveolar}} &         % Alveolar
-        \multicolumn{2}{|c|}{\footnotesize{P-alveo.}} &     % Post-alveolar
+        \multicolumn{2}{|c|}{\footnotesize{Post-alveolar}} &     % Post-alveolar
         \multicolumn{2}{|c|}{\footnotesize{Retroflex}} &        % Retroflex
 
       \hline Plosive &                % Plosive
@@ -712,15 +733,15 @@ in Figure~\ref{fig:consonants}.
         \ipa{S} & \ipa{Z} &                 % Post-alveolar
         \ipa{\:s} & \ipa{\:z}   \\             % Retroflex
 
-      \hline Lat. Fric. &           % Lat. Fricative
-        \BlankCell        & \BlankCell        &   % Bilabial
-        \BlankCell        & \BlankCell        &   % Labiodental
+      \hline Lateral Fricative &           % Lat. Fricative
+                &         &   % Bilabial
+                &         &   % Labiodental
         \multicolumn{3}{|r}{\ipa{\textbeltl}} &       % Dental
         \multicolumn{3}{l|}{\ipa{\textlyoghlig}} &      % Alveolar
                                       % Post-alveolar
         &   \\                         % Retroflex
 
-      \hline Approx &               % Approx.
+      \hline Approximant &               % Approx.
         & &                           % Bilabial
         & \ipa{V} &                     % Labiodental
         \multicolumn{3}{|r}{}&                % Dental
@@ -728,9 +749,9 @@ in Figure~\ref{fig:consonants}.
                                       % Post-alveolar
         & \ipa{\:R}   \\                   % Retroflex
 
-      \hline Lat. appr. &           % Lat. Approx
-        \BlankCell        & \BlankCell        &   % Bilabial
-        \BlankCell        & \BlankCell        &   % Labiodental
+      \hline Lateral approximant &           % Lat. Approx
+                &         &   % Bilabial
+                &         &   % Labiodental
         \multicolumn{3}{|r}{}&                % Dental
         \multicolumn{3}{l|}{\ipa{l}}&               % Alveolar
                                       % Post-alveolar
@@ -738,43 +759,43 @@ in Figure~\ref{fig:consonants}.
       \hline
     \end{tabular}
 
-    \vspace{0.3em}
-    \hspace{4.6em}
+    \vspace{0.8em}
+    \hspace{1.3em}
     \begin{tabular}{|l|cc|cc|cc|cc|cc|}
       \hline &
         \multicolumn{2}{|c|}{\footnotesize{Palatal}} &          % Palatal
         \multicolumn{2}{|c|}{\footnotesize{Velar}} &          % Velar
         \multicolumn{2}{|c|}{\footnotesize{Uvular}} &           % Uvular
-        \multicolumn{2}{|c|}{\footnotesize{Pharyng.}} &       % Pharyngeal
+        \multicolumn{2}{|c|}{\footnotesize{Pharyngeal}} &       % Pharyngeal
         \multicolumn{2}{|c|}{\footnotesize{Glottal}}  \\          % Glottal
 
       \hline Plosive &                % Plosive
       \ipa{c} & \ipa{\textbardotlessj} &                            % Palatal
         \ipa{k} & \ipa{g} &                         % Velar
         \ipa{q} & \ipa{\;G} &                   % Uvular
-        & \BlankCell        &               % Pharyngeal
-        \ipa{P}& \BlankCell         \\                % Glottal
+        &         &               % Pharyngeal
+        \ipa{P}&          \\                % Glottal
 
       \hline Nasal &              % Nasal
        & \textltailn &                           % Palatal
         & \ipa{N} &                           % Velar
         & \ipa{\;N} &                           % Uvular
-        \BlankCell        & \BlankCell        &   % Pharyngeal
-        \BlankCell        & \BlankCell         \\   % Glottal
+                &         &   % Pharyngeal
+                &          \\   % Glottal
 
       \hline Trill &                  % Trill
         & &                           % Palatal
-        \BlankCell        & \BlankCell        &   % Velar
+                &         &   % Velar
         & \ipa{\;R}&                      % Uvular
         & &                           % Pharyngeal
-        \BlankCell        & \BlankCell         \\   % Glottal
+                &          \\   % Glottal
 
       \hline Tap/Flap &             % Tap /Flap
         & &                           % Palatal
-        \BlankCell        & \BlankCell        &   % Velar
+                &         &   % Velar
         & &                           % Uvular
         & &                           % Pharyngeal
-        \BlankCell        & \BlankCell         \\   % Glottal
+                &          \\   % Glottal
 
       \hline Fricative &            % Fricative
         \ipa{\c{c}} & \ipa{J} &               % Palatal
@@ -783,33 +804,37 @@ in Figure~\ref{fig:consonants}.
         \textcrh & \ipa{Q} &                % Pharyngeal
         \ipa{h} & \texthth \\                   % Glottal
 
-      \hline Lat. Fric. &           % Lat. Fricative
+      \hline Lateral Fricative &           % Lat. Fricative
         & &                           % Palatal
         & &                           % Velar
         & &                           % Uvular
-        \BlankCell        & \BlankCell              % Pharyngeal
-        & \BlankCell        & \BlankCell         \\   % Glottal
+                &               % Pharyngeal
+        &         &          \\   % Glottal
 
-      \hline Approx &               % Approx.
+      \hline Approximant &               % Approx.
         & \ipa{j} &                           % Palatal
         & \ipa{\textturnmrleg} &                  % Velar
         & &                           % Uvular
         & &                           % Pharyngeal
-        \BlankCell        & \BlankCell         \\   % Glottal
-
-      \hline Lat. appr. &           % Lat. Approx
+        & \\   % Glottal
+      \hline Lateral approximant &           % Lat. Approx
         & \ipa{L} &                       % Palatal
         & \ipa{\;L} &                     % Velar
         & &                           % Uvular
-        \BlankCell        & \BlankCell        &   % Pharyngeal
-        \BlankCell        & \BlankCell         \\   % Glottal
+        & &   % Pharyngeal
+        & \\   % Glottal
         \hline
     \end{tabular}
  \end{small}
-  \caption[Consonant phonemes defined in the International Phonetic Alphabet
-    (IPA)]{??? note that some phones that act like consonants are elsewhere}
-  \label{fig:consonants}
-\end{figure}
+  \caption[Pulmonic consonants defined in the IPA.]{
+    Consonant phonemes defined in the International Phonetic Alphabet (IPA).
+    Table headers denote the place of articulation;
+    the first column of each row denotes the manner of articulation.
+    Note that only the pulmonic consonants are listed here
+    as non-pulmonic consonants will not be considered
+    in this thesis.}
+\label{tab:consonants}
+\end{table}
 
 While no phone's pronunciation is consistent,
 consonant pronunciations can vary more than vowels
@@ -826,18 +851,18 @@ articulators to change in a particular way,
 but allow other articulators,
 like those involved in the vocalic sound,
 to change freely;
-see Section~\label{sec:gestures}
+see Section~\ref{sec:gestures}
 for more details.
 
 The vowels and consonants described so far
 represent the most common phonemes used
-in daily speech.
+in English.
 However, as with most aspects
 of phonetics and phonology,
 there are many examples that do not
 match the convenient criteria listed above.
 For example, \ipa{[w]}, as in ``weep''
-is a phoneme consonant that is articulated
+is a consonant that is articulated
 with a mostly open vocal tract,
 like a vowel;
 for this reason, it is sometimes called a semivowel.
@@ -845,7 +870,7 @@ Some languages use clicks,
 in which inward suction releases a complete constriction
 resulting in a loud consonantal sound.
 However, the general principles
-of vowels and consonants generally hold
+of vowels and consonants hold
 for these phones,
 and do not require further treatment
 in this thesis.
@@ -855,73 +880,150 @@ in this thesis.
 The next level of meaning in the
 speech perception hieararchy
 is the morpheme.
-
-??? look up, fill in
+Morphemes are the smallest unit
+of grammatical significance
+in a language,
+and is made up of a sequence
+of phonemes.
+A morpheme is distinct
+from a word in that
+a morpheme need not be freestanding.
+For example, in the word
+``walked'', both ``walk''
+and the suffix ``-ed''
+are morphemes,
+as they both contribute
+semantics to the word ``walked.''
 
 \subsubsection{Word}
 
 Finally, the last level
 of the speech perception hierarchy
 that we will consider is the word.
+A word is made up of
+one or more morphemes,
+and is the smallest freestanding unit
+with meaning.
 
-??? look up, fill in
+A speaker's repository of known words
+is called a lexicon,
+with the words in that lexicon
+called lexemes.
+It has been theorized that
+people also have a ``mental lexicon,''
+which contains additional information
+about words,
+such as their meaning, pronunciation,
+and grammatical properties.
+It is clear that people have access
+to this information,
+but whether the mental lexicon
+is a purely theoretical construct
+or has clear neural correlates
+is an open question.
+We will examine this question
+further in Section~\ref{sec:recog-neurobio}.
 
-??? mention the mental lexicon
-
-From here,
+From words,
 further subfields of linguistsics
-(semantics and syntax)
-discuss how words are composed
+(e.g., semantics and syntax)
+study how words are composed
 into higher order linguistic structures
 like phrases and sentences;
 however, we will only consider
-speech perception up to the word level.
+speech perception up to the word level
+in this thesis.
+The goal of the models described in this thesis
+is to map from sensory inputs
+to lexical items,
+and to map from lexical items to motor outputs,
+enabling a clear interface with
+higher order linguistic models.
 
 \subsection{Neurobiology}
 \label{sec:recog-neurobio}
+
+Auditory neurobiology describes both
+the physical substrate and organization
+of the system that we aim to emulate.
+We do not aim to fully replicate
+all aspects of biological neurons;
+instead, we will use an approximation
+of biological neurons,
+but review auditory neurobiology
+in order to constrain our algorithmic choices
+to those that could be implemented
+in a biological system.
+Similarly, by examining the organization
+of the auditory brain structures,
+we constrain the space of possible
+network topologies
+to those that match
+a network that we know
+to be successful.\footnote{One notable omission
+  from our discussion
+  of the human auditory system
+  is the integration of information
+  coming from both ears.
+  There are binaural effects at many levels,
+  and while a full human auditory model
+  would incorporate these effects,
+  at this stage of research
+  we only aim to build
+  a monaural speech system.}
 
 Brain structures in the primate auditory system
 are organized in several parallel
 hierarchical pathways.
 Information from the auditory periphery
-arrives at the brainstem. % ???more.
+arrives at the brainstem.
 That information is relayed to the cortex
-through the medial geniculate nucleus (MGn)
+through the medial geniculate nuclei
 in the thalamus.
-The MGn sends information to a part
+The medial geniculate sends information to a part
 of cortex in the temporal lobe
 called the core.
-In the context of auditory cortex,
-the core is a small portion of cortex
-in Heschl's gyrus (???)
-% (???size in mm2)
+The core is a small portion of auditory cortex
 that serves as the first stage
 in the mostly feedforward hierarchy
 of auditory cortical areas.
-The core appears to be made up of
-three subareas, ??? A1, R, and RT.
+The core is made up of
+three subareas, A1, R, and RT.
 The core is surrounded by a set of areas
 called the belt,
 which primarily receives input from
 the core.
-% As such, there are ???three
-% distinct areas in the belt,
-% ???.
 The belt provides input
-to the parabelt.
-% which is made up of ???.
-See Figure~\ref{fig:corebelt} for a summary of
-the neuroanatomical structures and connections
-in the auditory hierarchy.
+to the parabelt,
+which projects to higher cortical regions.
+See Figure~\ref{fig:auditory}
+for a comprehensive view
+of auditory cortical connections.
 
-\fig{corebelt}{0.9}{???}{???}
+\fig{auditory}{0.5}{Organization of primate auditory cortex.}{
+  Cortical and subcortical structures involved
+  in the primate auditory system.
+  Solid lines denote connections
+  seen empirically in primate auditory cortex;
+  dashed lines denote connections
+  theorized to exist based on findings
+  in other mammals.
+  The brain areas and specific connections
+  are not germane to this thesis,
+  but are presented here to illustrate
+  the scope of the problem in
+  attempting to model auditory cortex.
+  Adapted from \cite{kaas2000};
+  see that paper for explanations
+  of acronyms.}
 
 The parabelt provides input
 to several areas,
 including brain areas
 associated with language
-in the superior temporal gyrus,
-and frontal cortex which is associated
+in the superior temporal gyrus (STG)
+and frontal cortex,
+which is associated
 with working memory and executive function.
 Historically, the most
 salient linguistic area
@@ -930,7 +1032,8 @@ was Wernicke's area (Brodmann area 22),
 as lesions in this area result in
 a type of aphasia in which
 speech can be produced fluently,
-but lacks meaning.
+but lacks meaning
+\cite{ellis1983}.
 However, more recent hypotheses
 concerning how auditory information
 becomes discrete linguistic information
@@ -960,7 +1063,7 @@ and cells close to one another
 are likely to be sensitive
 to the same frequency band.
 In general, lower level regions
-like the MGn and core
+like the medial geniculate and core
 are more tightly tuned
 to a smaller part of the frequency spectrum
 (sometimes even more tightly tuned
@@ -969,15 +1072,9 @@ while higher level regions
 like the parabelt
 are more broadly tuned
 to larger parts of the frequency spectrum.
-% ???more, cites
-See Figure~\ref{fig:aud-tonotopy} for visualizations
-of the tonotopic organization
-of primary auditory cortical regions.
-
-\fig{aud-tonotopy}{0.6}{???}{???}
 
 Neurons at various levels in the auditory hierarchy
-respond to their selected frequency range
+respond to their characteristic frequency range
 with different temporal characteristics.
 In general, we can express the temporal
 relationship between the incoming
@@ -989,28 +1086,23 @@ of cells as a filter,
 many auditory researchers
 summarize the spatial and temporal
 tuning properties of auditory neurons
-using a single filter,
-based on the
+using a single filter
+called the
 Spectral-Temporal Receptive Field (STRF).
 STRFs summarize how a neuron responds
 to incoming stimuli both spatially
 and temporally \citep{aertsen1981}.
-Unfortunately, despite many decades
-of determining STRFs in
-primate ??? cite and
-human auditory cortex ???cite
-the exact temporal properties of
-each area are not known.
 In general, STRFs have been found that
-show delays of 5--250 ms
-(see, e.g., \citealt[Supplementary material]{mesgarani2014}).
-See \citet{kaas1999,kaas2000,scott2003,semple2003}
+show delays of 5--250 ms;
+see, \citet[Supplementary material]{mesgarani2014}
+for example STRFs,
+and \citet{kaas1999,kaas2000,scott2003,semple2003}
 for reviews.
 
 It should be noted
 that the information gleaned from
 spectro-temporal tuning curves
-still describes a linear relationship
+describes a linear relationship
 between the incoming frequency spectrum
 and how a particular neuron responds.
 \citet{tian2004}
@@ -1020,7 +1112,7 @@ to frequency-modulated sweep stimuli,
 but \citet{kowalski1995}
 found that cat A1 responses were linear.
 It is difficult to evaluate
-the responses of cells
+the responses of cells,
 as traditionally the STRF
 is determined using simple stimuli
 like white noise;
@@ -1035,26 +1127,14 @@ suggesting that nonlinearities
 are widespread
 throughout the auditory hierarchy.
 
-Auditory cortical areas project
-to areas involved in
-higher-order procesing,
-including areas specific to speech.
-The most notable areas
-specific to speech perception
-lie in left superior temporal cortex,
-including the superior temporal sulcus (STS)
-and superior temporal gyrus
-(STG; i.e., Werncike's area).
-??? more, wernicke's stuff?
-
 The nature of the nonlinear processing
 of speech in the human auditory cortex
-was explored in ???cite pasley2012
+was explored in \citet{pasley2012}
 through recordings of
 intracranial field potentials
 in superior temporal gyrus
 and middle temporal gyrus.
-\citeauthor{???} built
+\citeauthor{pasley2012} built
 two models that attempted to
 reconstruct the acoustic signal
 using the data recorded from
@@ -1089,38 +1169,37 @@ up to and including superior temporal cortex.
 While it is still unknown how
 these linear and nonlinear
 transformations of acoustic information
-map to items in the mental lexicon,
+map to lexical items
+or other information in the mental lexicon,
 we have some idea of the general
 timecourse of the
 acoustic-to-lexical mapping.
-??? cite
-Reading senseless sentences brain potentials reflect semantic incongruity
+\citet{kutas1980}
 recorded the electric potentials
 on human subjects' scalps
-(i.e., electro-encephalograpy [EEG])
+(i.e., electroencephalography [EEG])
 and found a significantly
 negative evoked potential
-400 ms after a semantically unexpected word
-(see ??? cite
-Electrophysiology reveals semantic memory use in language comprehension
-for a review).
+400~ms after a semantically unexpected word
+(see \citealt{kutas2000} for a review).
 Using magnetoencephalography (MEG),
-??? cite pyllkkanen
+\citet{pylkkanen2003}
 obtained better spatial resolution,
 theorizing that the negativity
-at 400 ms (the so-called N400)
+at 400~ms (the so-called N400)
 is a summation of three separate signals.
-At 150--200 ms, magnetic activity (??? potential? What call?)
-peaks, and is thought to be related to
+At 150--200 ms, electrical activity peaks,
+and is thought to be related to
 letter-string processing.
-At 250 ms, an activity peak
-is related to phonological factors,
+At 250 ms, there is an activity peak
+related to phonological factors,
 such as the frequency of the sounds in the word.
-At 350 ms, an activity peak
-is related to accessing the mental lexicon.\footnote{
+At 350 ms, there is an activity peak
+related to accessing
+lexical information.\footnote{
   It should be noted, however,
   that the studies described in
-  ??? cite used visual information
+  \citet{pylkkanen2003} used visual information
   (written words) rather than speech,
   so the timecourse of lexical access
   in speech may differ.}
@@ -1130,23 +1209,23 @@ while little concrete is known
 about how words and semantics
 are represented,
 it is clear that word representations
-are distributed among a network
+are distributed across networks
 of neurons distributed
 across cortical areas
-??? cite pulvermuller2001.
+\citep{pulvermuller2001}.
 The semantic information associated
 with a word is represented
 in brain regions associated with
 the perception or action associated
-with that words
-??? cite 4--6 in patterson2007.
-??? patterson2007 studied
+with those words
+\citep{martin2007}.
+\citet{patterson2007} studied
 cases of semantic dementia
 and noted that the semantics
 associated with a word can be damaged
 even when modality-specific
 information was retained.
-??? citeauthor therefore
+\citeauthor{patterson2007} therefore
 argued that,
 in addition to the information
 represented across brain regions,
@@ -1155,13 +1234,16 @@ act as amodal semantic ``hubs''
 that can activate modality-specific
 representations in other parts of cortex.
 The mental lexicon, therefore,
-may have some similiarities
-with the semantic hubs in
+may have close links to
+the semantic hubs in
 the anterior temporal lobes,
 but in general
-is just a convenient theoretical construct.
+the information contained in the mental lexicon
+is distributed across cortical areas,
+and therefore
+is most likely a theoretical construct.
 
-\subsection{Automatic speech recognition}
+\subsection{Automatic speech recognition (ASR)}
 
 Automatic speech recognition (ASR) has been
 an active field of research
@@ -1209,7 +1291,7 @@ which are then composed into words
 using large corpora of
 lexical and linguistic information
 (see Figure~\ref{fig:asr} and
-\ref{rabiner1989,gales2008} for reviews).
+\cite{rabiner1989,gales2008} for reviews).
 The first part of the pipeline
 that produces feature vectors
 is often called the ``frontend;''
@@ -1217,7 +1299,22 @@ the second part that uses
 statistical methods to infer labels
 is called the ``backend.''
 
-\fig{asr}{0.6}{???}{???}
+\fig{asr}{0.6}{Basic organization of an ASR system using HMMs.}{
+  Basic organization of an ASR system using HMMs.
+  In the frontend, feature vectors are extracted
+  from the speech signal.
+  Words are decoded from those feature vectors
+  using acoustic models,
+  which statistically model
+  the acoustic-to-phoneme mapping,
+  a pronunciation dictionary,
+  which uses domain knowledge to
+  determine likely phoneme strings,
+  and a language model,
+  which statistically models
+  which words are most likely
+  in the current context.
+  Adapted from \citet{gales2008}.}
 
 HMM-based systems
 were among the first systems
@@ -1225,7 +1322,7 @@ successful enough to be
 used commercially
 (see \citealt{huang2014}).
 In 1989, \citet{lee1989}
-achieved a phone accuracy rate of % ??? look up: phone or word accuracy?
+achieved a phone accuracy rate of
 66.08\% on a subset of the
 TIMIT speech corpus.
 Four years later,
@@ -1245,47 +1342,43 @@ the domain of automatic speech recognition
 with considerable success
 both in academic research
 and in commercial application.
-In 2013, \citet{graves2013}
-achieved
-phone classification accuracy on TIMIT
-of 82.3\%,
+Recently, \citet{graves2013}
+achieved phone classification accuracy
+on TIMIT of 82.3\%,
 significantly better than the most sophisticated
-HMM-based model's error rate of 72.9\%.  % ??? check!
-% look at zen2007 zen2009
+HMM-based model's error rate of 72.9\%.
 
 The architecture of DNN-based systems
-is simpler than that of HMM-based systems
-(see Figure~\ref{fig:dnn}
-and \citealt{hinton2012}).
-Instead of distinct steps in which
-an explicit statistical acoustic model
-is evaluated and then combined with language models,
-DNNs map directly from the
-feature vector input representation
-to the output representation of choice
-(typically phonemes or word vectors),
-which can be further refined with a language model.
+is typically simpler
+than that of HMM-based systems.
+The backends of DNN-based systems
+rarely incorporate explicit
+prior information,
+like the language model
+and pronunciation information.
+In some cases,
+the frontend of the system
+uses raw spectral information,
+as in \citet{mohamed2012}
+(see \citealt{hinton2012}
+for a review).
 This simpler architecture may be
 responsible for much of DNN's success,
 as its internal representations
 are not locked to specific representations
-like triphones.
+like triphones,
+as are used in some HMM-based systems.
 However, the simpler architecture
 does not necessarily mean that
 using DNNs is straightforward;
 the effort in developing ASR models
-with DNNs shifted from
+with DNNs shifts from
 developing complicated architectures
 to developing complicated learning algorithms
 that have many parameters
 which must be carefully tuned.
 
-% \fig{dnn}{0.5}{???}{???}
-% ??? DNN architecture
-% something like slide 8 of Vanhoucke2013
-% or check hinton2012
-
-One additional benefit of DNN-based approaches
+One potential benefit of DNN-based approaches
 is that they have analogies to
 how humans peceive speech.
 DNNs leverage simple computational units
@@ -1307,7 +1400,7 @@ are currently under development
 
 Most ASR frontends do an ideal
 power spectral analysis
-with variants of the Fourier transform,
+using Fourier and Fourier-like transforms,
 mimicking the function
 of the human auditory periphery.
 However, as discussed in Section~\ref{sec:psychoacoustics},
@@ -1322,8 +1415,8 @@ to maintain a perfect history
 of the past 50 milliseconds of sound.
 Some differences are due to
 the nature of biological computation,
-which is distributed, analog, and noise robust,
-but not easily emulated with digital computers.
+which is distributed, analog, and robust to noise,
+but is not easily emulated with digital computers.
 Finally, some differences
 occur because they are advantageous
 for some aspect of hearing
@@ -1338,7 +1431,7 @@ whether or not that difference is advantageous
 for speech recognition.
 
 Several approaches to auditory periphery modeling
-have progress in parallel over the past century.
+have progressed in parallel over the past century.
 Detailed mechanical models
 like those reviewed in \citet{ni2014}
 aim to model ear physiology
@@ -1389,27 +1482,25 @@ in the model that will be presented
 in Chapters~\ref{chapt:model}
 and \ref{chapt:implementation}:
 basic vocal tract physiology,
-phonetics and phonology,
-and neurobiology.
-Phonetics and phonology
-provide insight into the basic units of speech.
-While a full conversational system
-would draw upon all areas of linguistics,
-we believe that phonetics and phonology
-provides the most relevant insights
-when assessing speech from the level of
-incoming air pressure levels.
+linguistics, neurobiology,
+and articulatory speech synthesis.
 
 \subsection{Vocal tract physiology}
 
 The human vocal tract performs
-the opposite role,
-translating electrical brain activity
-into muscle activations
+the opposite role
+as the human ear:
+it translates electrical activity in the brain
+into muscle activations,
 which cause fluctuations in air pressure.
 
-% \fig{vt}{0.4}{???}{???}
-% % Generate from Kroger synth, label
+\fig{vt}{0.4}{Sagittal view of the human vocal tract.}{
+  Sagittal view of the human vocal tract,
+  showing the seven main articulators;
+  refer to the text for details
+  on how the articulators contribute
+  to speech production.
+  Adapted from \citet{macneilage2001}.}
 
 The vocal tract consists of
 the layrngeal cavity,
@@ -1436,7 +1527,7 @@ When the glottis narrows,
 air passes through more turbulently,
 resulting in higher frequency breathy sounds,
 as in the phone \ipa{[h]}
-in the English word \ipa{/h \ae d/}.
+in the English word \ipa{/h\ae d/}.
 In all voiced phones (e.g., all vowels),
 the vocal folds vibrate,
 resulting in a ``buzzing'' quality;
@@ -1450,13 +1541,13 @@ such as intensity (speaking versus shouting),
 frequency (low versus high pitch),
 and quality (e.g., harsh, breathy, murmured, creaky).
 
-The pharynx, oral cavity, and nasal cavity
+The pharynx and oral cavity
 can be moved into many different shapes
 by the muscles of the vocal tract.
 The shape of these remaining portions
 of the vocal tract cause further turbulence
 of the air passing through,
-resulting in specific patterns
+resulting in specific air pressure patterns
 that we interpret as phonemes.
 The areas of the vocal tract
 that can be moved in order to
@@ -1489,7 +1580,7 @@ as follows.
   the hard palate and the top front teeth. Like the hard palate,
   it serves as a constriction target for the tongue.
 \item The upper and lower \textbf{teeth} are at the front of the mouth.
-  They primarily serve as an obstacle (???) in fricative production.
+  They primarily serve as constriction target in fricative phones.
 \item The \textbf{tongue} is a large, flexible, muscular structure
   that can reach several different constriction targets.
   The tongue is often divided into the tip, blade, dorsum, and root,
@@ -1522,9 +1613,9 @@ in the context of speech production
 aims to explain the hierarchy
 presented in Figure~\ref{fig:production}
 (which contrasts with the speech perception
-hierarchy in Figure~\ref{fig:perception}.
+hierarchy in Figure~\ref{fig:perception}).
 We pay particular attention to two
-sets of characteristics in the hierarchical levell
+sets of characteristics in hierarchy levels
 and in the mapping between levels:
 temporal patterns and constraints,
 and the existence of rule-like regularities.
@@ -1547,25 +1638,46 @@ and these constraints will
 inform the structure of the model
 we present in Chapter~\ref{chapt:model}.
 
-\fig{production}{0.7}{???}{???}
+\fig{production}{0.2}{Hierarchy of linguistic concepts in speech production.}{
+  Hierarchy of linguistic concepts in speech production.
+  While there are many important linguistic processes
+  generating sequences of words,
+  we focus on the hierarchy levels below words.
+  Words are composed of one or more syllabes,
+  which are the last discrete units
+  in the speech production hierarchy.
+  Syllables are defined by
+  a coupled set of vocal tract gestures
+  (a gesture score),
+  which define target articular positions
+  over time.
+  Successful movement of vocal tract articulators
+  to those target positions
+  results in disturbances in air pressure
+  perceived as speech.}
 
 \subsubsection{Vocal tract gestures}
 \label{sec:gestures}
-
-%% Or actions; note that some call them actions.
-%% Also, cite goldstein2006
 
 According to many phoneticians,
 the fundamental unit of speech production
 is the ``gesture,''
 which describes some movement
 of the articulators in the vocal tract
-\citep{browman1989}.
+\citep{browman1989,goldstein2006}.\footnote{
+  Some authors refer to vocal tract gestures
+  as vocal tract actions or speech actions,
+  which may better match terminology used in
+  general motor control literature.
+  However, we will use
+  the terminology of vocal tract gestures
+  in this thesis.}
 Gestures are the basic unit of
 the speech production hierarchy
 (playing a similar role to phonemes
-in the speech perception hierarchy).
-There is evidence that children
+in the speech perception hierarchy),
+making them integral to language.
+Howver, there is evidence that children
 learning to say their first words
 often use the correct gestures,
 but take time to order them correctly
@@ -1646,20 +1758,29 @@ Gestural scores can also
 be visualized as a graph,
 as in Figure~\ref{fig:gs},
 which highlights that
-certain gestures must co-occur
+certain gestures must cooccur
 or have tight temporal couplings
 such that one gesture
-must start as another gesture ends.
+starts as another gesture ends.
 
-\fig{gs}{0.5}{???}{???}
+\fig{gs}{0.7}{Example gesture score.}{
+  Example gesture score for the word ``bad.''
+  The gesture score is composed of three gestures.
+  The coupling graph on the right denotes that
+  the labial closure and palatal wide gestures
+  should cooccur,
+  while the alveolar closure gesture's
+  onset is tied to the offset of
+  the palatal wide gesture.
+  Adapted from~\cite{goldstein2006}.}
 
-As will be discussed in detail
+As shown in Figure~\ref{fig:production}
+and as will be discussed in detail
 in Section~\ref{sec:model-motorcontrol},
 there is a mapping
-between gestures and vocal tract articulators;
-in speech, the mapping links
-gestures and vocal tract muscle activations.
-In models of speech,
+between gestures and
+vocal tract articulator positions.
+In articulatory speech synthesizers,
 the mapping depends on what articulators
 are available in the articulatory synthesizer,
 and how those articulators can be manipulated.
@@ -1670,28 +1791,12 @@ to articulator trajectories,
 resulting in there being
 no agreed upon set of vocal tract gestures
 in speech.
-Similarly, several approaches to
-temporal sequencing of gestures
-have resulted in different
-definitions of gesture sets,
-with different graph structures as
-the one shown in Figure~\ref{fig:gs}.
 We will discuss our interpretation
-of gestures and gesture sets
-in Section~\ref{sec:results-production}.
-% Development of better human vocal tract models
-% will help researchers
-% determine a complete set of
-% vocal tract gestures.
-
-% ??? In a sense, vocal tract gestures
-% can be thought of a subset of all
-% motor synergies ???cite
-
-% ??? this is where 'phonemes' used to be;
-% make sure this still flows
+of gestures in Section~\ref{sec:results-production}.
 
 \subsubsection{Syllables}
+
+%% START UP HERE %%
 
 Syllables are groups of one or more phonemes
 with a well-specified structure.
@@ -1994,6 +2099,10 @@ suggesting that these two timescales
 would be represented
 with separate neural resources
 in a neural model of the speech system.
+
+\subsection{Articulatory speech synthesis}
+
+
 
 \section{Sensorimotor integration}
 

@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 from . import figures, sermo
@@ -548,12 +550,22 @@ task_recog_repeat = lambda: RecogRepeatTask(
 def task_combine():
     """Compose multiple plots into a figure."""
 
+    def cp(name, subdir='results'):
+        pin = figures.svgpath(name, pdir="plots", subdir=subdir)
+        pout = figures.svgpath(name, pdir="figures", subdir=subdir)
+        return {'name': os.path.basename(pin)[:-4],
+                'actions': ['cp %s %s' % (pin, pout)],
+                'file_dep': [pin],
+                'targets': [pout]}
+
     def fig(func, fin, fout):
         return {'name': func.__name__,
                 'actions': [func],
                 'file_dep': [figures.svgpath(f) for f in fin],
                 'targets': [figures.svgpath(fout, pdir="figures")]}
 
+    yield cp('el-curves', subdir='background')
+    yield cp('erb-mel', subdir='background')
     yield fig(figures.temp_scaling,
               ['ncc-mfcc', 'ncc-ncc', 'ncc-mfcc-long', 'ncc-ncc-short'],
               'temp-scaling')
