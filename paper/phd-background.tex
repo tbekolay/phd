@@ -56,9 +56,9 @@ in sound transduction.
 \fig{an-overview}{0.8}{Overview of the human ear.}{
   Overview of the human ear. Fluctuations in air pressure
   travel down the auditory canal
-  and cuase the tympanic membrane to vibrate.
-  These vibrations cause a tiny bone
-  called the stapes to rapidly move
+  and cause the tympanic membrane to vibrate.
+  These vibrations result in a tiny bone
+  called the stapes rapidly moving
   in and out of the oval window of the cochlea.
   The disturbances of the liquid in the cochlea
   deflect the basilar membrane inside,
@@ -136,14 +136,14 @@ the base of the membrane
 is deflected when
 incoming vibrations have power
 at high frequencies,
-up to 20,000 Hz.
+up to 20,000~Hz.
 The membrane becomes sensitive
 to lower and lower frequencies
 going further down the membrane
 to the apex
 in the center of the cochlea,
 which is deflected when incoming vibrations
-have power as low as 20 Hz.
+have power as low as 20~Hz.
 
 The basilar membrane's surface is covered
 with hair cells that transduce
@@ -180,7 +180,7 @@ attenuating loud sounds
 \citep{dallos1992}.
 This dynamic amplification allows
 the human ear to have a wide dynamic range,
-able to safely hear sounds from 0--130 dB,
+able to safely hear sounds from 0--130~dB,
 which represents 13 orders of magnitude
 of absolute air pressure.
 
@@ -236,7 +236,7 @@ see Figure~\ref{fig:el-curves}.
 In general, perceived loudness,
 as expressed in the phon scale,
 increases for higher frequency sounds
-up to around 7000 Hz.
+up to around 7000~Hz.
 
 \fig{el-curves}{0.65}{Equal loudness curves.}{
   Equal loudness curves.
@@ -261,7 +261,7 @@ The sone for a particular frequency is
 \begin{equation*}
   \text{sone} \approx 2^{\frac{\text{phon} - 40}{10}},
 \end{equation*}
-above signals of 40 phon or louder.
+above signals of 40~phon or louder.
 
 The difference in perceived loudness
 across the frequency spectrum,
@@ -359,12 +359,12 @@ as consonants are shorter than vowels
 \citep[Chapter~3]{everest2001}.
 There is evidence that sounds with constant volume
 are perceived as being monotonically louder
-up to approximately 200 ms;
+up to approximately 200~ms;
 this finding suggests that
 at some point in the auditory system,
 the power for a given characteristic frequency
 is integrated over a time window
-of approximately 200 ms
+of approximately 200~ms
 \citep[p.64]{kollmeier2008}.
 
 \fig{short-sounds}{0.65}{Short sounds are less audible than longer ones.}{
@@ -409,8 +409,8 @@ Yet, we perceive this as a single utterance,
 a phenomenon known as auditory fusion.
 \citet{haas1972} found that auditory fusion occurs
 best when similar sounds are separated by roughly
-20 to 30 milliseconds.
-When similar sounds are separated by 50 to 80 milliseconds,
+20 to 30~milliseconds.
+When similar sounds are separated by 50 to 80~milliseconds,
 we perceive them as discrete echoes.
 
 Together, these temporal psychoacoustical effects
@@ -1079,9 +1079,8 @@ In general, we can express the temporal
 relationship between the incoming
 frequency spectrum and the resulting
 neural activity with a causal filter.
-Considering that we also
-have referred to the spatial tuning
-of cells as a filter,
+Since we can also consider
+the spatial tuning of cells as a filter,
 many auditory researchers
 summarize the spatial and temporal
 tuning properties of auditory neurons
@@ -1091,8 +1090,8 @@ Spectral-Temporal Receptive Field (STRF).
 STRFs summarize how a neuron responds
 to incoming stimuli both spatially
 and temporally \citep{aertsen1981}.
-In general, STRFs have been found that
-show delays of 5--250 ms;
+In general, STRFs
+show delays of 5--250~ms;
 see, \citet[Supplementary material]{mesgarani2014}
 for example STRFs,
 and \citet{kaas1999,kaas2000,scott2003,semple2003}
@@ -1149,7 +1148,7 @@ They found that
 words could be decoded from
 reconstructed acoustic signals
 with up to 50\% accuracy
-for the best subject;
+using data from the best subject;
 average accuracy was around 30\%,
 chance accuracy was 2.1\%.
 Notably, the linear reconstruction model
@@ -1187,13 +1186,13 @@ obtained better spatial resolution,
 theorizing that the negativity
 at 400~ms (the so-called N400)
 is a summation of three separate signals.
-At 150--200 ms, electrical activity peaks,
+At 150--200~ms, electrical activity peaks,
 and is thought to be related to
 letter-string processing.
-At 250 ms, there is an activity peak
+At 250~ms, there is an activity peak
 related to phonological factors,
 such as the frequency of the sounds in the word.
-At 350 ms, there is an activity peak
+At 350~ms, there is an activity peak
 related to accessing
 lexical information.\footnote{
   It should be noted, however,
@@ -1324,7 +1323,7 @@ used commercially
 In 1989, \citet{lee1989}
 achieved a phone accuracy rate of
 66.08\% on a subset of the
-TIMIT speech corpus.
+TIMIT speech corpus \citp{garofolo1993}.
 Four years later,
 \citet{lamel1993}
 used a more sophisticated HMM-based system
@@ -1357,18 +1356,17 @@ prior information,
 like the language model
 and pronunciation information.
 In some cases,
-the frontend of the system
-uses raw spectral information,
+frontends uses raw spectral information,
 as in \citet{mohamed2012}
 (see \citealt{hinton2012}
 for a review).
-This simpler architecture may be
+These simpler architectures may be
 responsible for much of DNN's success,
 as its internal representations
 are not locked to specific representations
 like triphones,
 as are used in some HMM-based systems.
-However, the simpler architecture
+However, using simpler architectures
 does not necessarily mean that
 using DNNs is straightforward;
 the effort in developing ASR models
@@ -1412,7 +1410,7 @@ are due to the continuous nature
 of the real world;
 it is not possible for the ear
 to maintain a perfect history
-of the past 50 milliseconds of sound.
+of the past 50~milliseconds of sound.
 Some differences are due to
 the nature of biological computation,
 which is distributed, analog, and robust to noise,
@@ -1917,12 +1915,12 @@ role in speech perception may be limited.
 Syllables, however, play a critical role
 in speech production.
 A series of theoretical and experimental studies
-by Levelt, Roelofs, and colleagues
+by Levelt, Roelofs, Indefrey and colleagues
 has proposed that speech production
 involves several stages,
 including phonological encoding,
 and phonetic encoding
-\citep{levelt1999,roelofs2000,cholin2004}.
+\citep{levelt1999,roelofs2000,cholin2004,indefrey2004,indefrey2011}.
 In phonological encoding,
 a sequence of phonemes is retrieved
 from the mental lexicon corresponding
@@ -2701,8 +2699,8 @@ but the desired output
 is articulator positions.
 \citet{uria2011}
 obtained a root mean square error
-of 0.95 mm on the MNGU0 dataset,
-which is 0.04 mm better than prior
+of 0.95~mm on the MNGU0 dataset,
+which is 0.04~mm better than prior
 efforts using Guassian mixture models
 \citep{richmond2009}.
 The extracted articulatory information
