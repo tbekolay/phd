@@ -19,11 +19,13 @@
 \usepackage{microtype}
 \usepackage[round]{natbib}
 \usepackage{rotating}
+\usepackage{multicol}
 \usepackage{tipa}
 \let\ipa\textipa
 
 % Set figure directories
 \graphicspath{{../figures/background/}
+              {../figures/model/}
               {../figures/previouswork/}
               {../figures/implementation/}
               {../figures/results/}}
@@ -70,13 +72,13 @@
 % For fancy boxes
 \usepackage{tikz}
 \usetikzlibrary{shapes,decorations}
-\tikzstyle{probbox}=[draw=black!80, very thick,
+\tikzstyle{roundbox}=[draw=black!80, very thick,
     rectangle, rounded corners, inner sep=10pt, inner ysep=20pt]
 \tikzstyle{fancytitle}=[fill=black!80, text=white]
 \newcommand{\probbox}[1]{%
   \begin{center}
     \begin{tikzpicture}
-      \node [probbox] (box){%
+      \node [roundbox] (box){%
         \begin{minipage}{0.8\textwidth}
           #1
         \end{minipage}
@@ -84,6 +86,31 @@
       \node[fancytitle, right=10pt, rounded corners] at (box.north west) {%
         \textbf{Problem statement}
       };
+    \end{tikzpicture}
+\end{center}}
+\newcommand{\inoutbox}[2]{%
+  \begin{center}
+    \begin{tikzpicture}
+      \node [roundbox] (box){%
+        \begin{minipage}{0.9\textwidth}
+          \begin{multicols}{2}
+            \begin{center}
+              #1
+              \vfill
+              \columnbreak
+
+              #2
+            \end{center}
+          \end{multicols}
+        \end{minipage}
+      };
+      \node[fancytitle, right=7.0em, rounded corners] at (box.north west) {%
+        \textbf{Inputs}
+      };
+      \node[fancytitle, left=7.1em, rounded corners] at (box.north east) {%
+        \textbf{Outputs}
+      };
+      \draw[very thick] (box.north) -- (box.south);
     \end{tikzpicture}
 \end{center}}
 

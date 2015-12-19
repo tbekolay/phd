@@ -37,7 +37,12 @@ in subsequent chapters.
 \section{Sermo description}
 \label{sec:sermo}
 
-% \fig{sermo}{0.8}{???}{???}
+\fig{sermo}{0.9}{Architecture of the Sermo model.}{
+  Architecture of the Sermo model.
+  The goal of the model is to explicitly define
+  computations needed
+  for speech recognition and synthesis.
+  See text for details.}
 
 Sermo is split into five interacting systems,
 as summarized in Figure~\ref{fig:sermo}.
@@ -62,17 +67,17 @@ as summarized in Figure~\ref{fig:sermo}.
     dorsal stream in the human speech system.
   \item \textbf{Linguistic processing}
     converts sensory and sensorimotor information
-    into sublexical and lexical representations
+    into lexical representations
     suitable for high level linguistic
     and cognitive reasoning.
     This system is anologous to
-    the language model in an ASR system,
+    the backend in an ASR system,
     and to the ventral stream
     in the human speech system.
   \item \textbf{Speech motor control}
-    uses lexical and sensorimotor information
+    uses sensorimotor information
     to generate motor commands
-    that drive a simulated vocal tract model,
+    that drive an articulatory synthesizer,
     which produces audio waveforms.
 \end{itemize}
 
@@ -100,11 +105,11 @@ is to emphasize that Sermo
 is a mechanistic model
 of the human speech system.
 We are not only concerned with
-classifying and generating speech
+recognizing and synthesizing speech
 with human-like accuracy,
 we also wish to gain insight
 into what information is required
-to classify and generate speech.
+to recognize and synthesize speech.
 
 Solutions to subproblems that do not
 meet these criteria
@@ -126,7 +131,7 @@ for the following reasons.
 
 \begin{itemize}
   \item Models meeting these criteria can be compared directly
-    to experimental data at all levels,
+    to experimental data at multiple levels,
     from single unit activity recordings to behavior.
   \item Models meeting these criteria can be implemented
     in neuromorphic hardware.
@@ -151,7 +156,7 @@ CPUs and GPUs,
 and reasonably efficient algorithms.
 While incremental advances
 in these technologies may
-bring subsystems closer to real time,
+bring subsystems closer to real time speeds,
 a fully integrated system
 with all subsystems interacting online
 is intractable for the foreseeable future.
@@ -166,16 +171,16 @@ possible in the next few decades.
 A final note about
 the general architecture of Sermo
 and its subsystems
-is that we will focus on a view
-of Sermo as it would be used
-in a conversational setting
+is that we will focus on an
+``adult'' version of Sermo
+that would be used in a conversational setting
 that does not require learning.
 We treat each subsystem as a separate
 module that is defined primarily
 by the input it expects,
 and the output it provides;
-however, in development and other forms
-of learning,
+however, in development
+and other forms of learning,
 there would be a proliferation of
 interconnections between modules
 providing error information.
@@ -188,21 +193,14 @@ a static endpoint for learning
 is important as a first step
 before considering
 how that endpoint might come about.
-% Regardless,
-% as learning is ubiquitous in speech,
-% we provide a model that learns
-% through synaptic plasticity
-% in Section~??? as
-% a proof of concept that
-% the subsystems in Sermo
-% can be learned if appropriate
-% error information is computed
-% as part of the model.
+Regardless, we will provide a sketch of
+how learning can be incorporated in Sermo
+in Section~\ref{sec:syllable-learning}.
 
 \subsection{Auditory feature extraction}
 \label{sec:model-ncc}
 
-% ??? Add input / output box, similar to Implementation probbox?
+\inoutbox{Audio waveform}{Auditory feature vector}
 
 The auditory feature extraction system
 preprocesses audio waveforms
@@ -211,14 +209,14 @@ linguistic and sensorimotor analysis.
 As has been shown through
 the gap between
 automatic speech recognition
-and human speech comprehension,
+and speech perception,
 the temporal characteristics
 of speech
-make these analysis problems
+make these problems
 difficult to solve
 with traditional computers.
 Digital computation is precise and discrete;
-human speech is variable and continuous.
+human speech is noisy and continuous.
 We hypothesize that the
 parallel and distributed nature
 of biological computation
@@ -244,19 +242,20 @@ make feature extraction more difficult,
 so the decorrelation step
 projects the spectral density
 onto a set of basis functions
-that are more orthogonal;
-typically, fewer basis functions
-are used than frequency components.
+that are more orthogonal.
+Typically, fewer basis functions
+are used than frequency components,
+making decorrelation also a form
+of dimensionality reduction.
 Finally, while the information
-in the spectral density
-and decorrelated vector
-contains information from
-a window of time defined by
-the spectral analysis step,
-the temporal characteristic of speech
-may require that information
-from further in the past is available
-at the current time.
+in the spectral densities
+and decorrelated vectors
+contain information from
+a certain time window,
+the temporal characteristics of speech
+may require that more
+temporal information is available
+at the current moment.
 Temporal transformations
 maintain past information
 to filter spectral
@@ -281,13 +280,13 @@ imposed by Sermo (see Section~\ref{sec:sermo}).
 Each auditory perhiphery model
 captures certain psychoacoustic phenomena
 at a particular computational cost.
-In general, these two quantities
-are often traded off;
+In general, these two characteristics
+are traded off;
 the more accurately the ear is modeled,
 the most costly the model is to simulate.
 
 It is difficult to assert \textit{a priori}
-which psychoacoustical phenomena
+which psychoacoustic phenomena
 are important for speech.
 It would be reasonable to assume that
 the majority of what the ear does
@@ -310,24 +309,25 @@ linear filters and the discrete cosine transform
 are widely used in digital computing
 for compression \citep{khayam2003}.
 In compression, a signal is projected
-onto a set of basis functions;
-only the coefficients are stored,
-as an approximation of the original signal
-can be recovered later by linearly combining
+onto a set of basis functions
+and only the coefficients are stored.
+An approximation of the original signal
+can later be recovered by linearly combining
 the basis functions weighted by those coefficients.
+The coefficients are much smaller
+to store than the original signal.
 A similar argument can be made
 to explain why automatic speech recognition systems
-often use a decorrelation technique
-at the frontend.
-By operating on the coefficients of a set
+decorrelate spectral information in their frontends:
+by operating on the coefficients of a set
 of basis functions,
 the set of parameters that must be optimized
 by the backend is reduced.
 
 While this line of reasoning
-does not guarantee that
+does not necessarily imply that
 the brain also explicitly decorrelates
-the frequency representation
+spectral information
 provided by the auditory periphery,
 it is clear that biological systems
 aim to minimize energy expenditure whenever possible.
@@ -339,30 +339,30 @@ is developed and refined
 through synaptic plasticity,
 using decorrelated representations
 as early in the speech system as possible
-may reduce the brain's energy expenditure
-over one's lifetime.
+reduces the brain's energy expenditure
+over its lifetime.
 Therefore, we hypothesize
 that a system implemented
 with a biologically plausible substrate,
-as Sermo is,
-decorrelates the frequency representation
+like Sermo,
+decorrelates spectral information
 provided by the auditory periphery.
 
 \subsubsection{Temporal transformation}
 
 The extent to which the recent past
-is used to recognize speech
+is used to perceive speech
 at the current moment
 is of crucial importance,
-yet is not often studied systematically.
+yet is difficult to study systematically.
 In the brain, spectrotemporal receptive fields
 have been measured using
 tone ramps and other temporally varying signals,
 revealing neurons that appear to be active
 hundreds of milliseconds
 after activity at
-the cell's characteristic frequency,
-but it is not clear if those
+the cell's characteristic frequency.
+However, it is not clear if those
 neurons are involved in speech,
 nor is it clear what transformation they are implementing.
 In automatic speech recognition,
@@ -374,17 +374,17 @@ or uses values known to work.
 Until recently,
 the most successful ASR systems
 were based on Hidden Markov Models (HMMs),
-which are based on the Markov assumption,
-which that is that only the information
-from the previous state is required
-to reason about the current state.
-Despite the fact that speech is highly temporally correlated,
-these systems were relatively successful.
-However, a great deal of engineering
-went into the application of HMMs
-to speech, primarily because of
-its temporal nature
-(see e.g., \citealt{rabiner1989} ??? more).
+which are based on the Markov assumption:
+only information in the current state
+is required to reason about the next state.
+Despite the fact that speech
+is highly temporally correlated,
+these systems have been relatively successful,
+due in large part to
+a great deal of engineering effort
+applying HMMs to speech,
+primarily because of its temporal nature
+(see e.g., \citealt{bahl1983,rabiner1989,lee1989}).
 One such improvement for HMM-based ASR systems
 is to include the first and second temporal derivatives
 in the state representation.
@@ -405,9 +405,9 @@ is maintained by deep RNNs,
 and how that temporal information is transformed
 would benefit Sermo
 and other speech systems.
-In particular, expressing the deep RNN's
-temporal transformation as a
-linear time-invariant (LTI) filter
+In particular, expressing deep RNNs'
+temporal transformations as
+linear time-invariant (LTI) filters
 would be of particular interest,
 as LTI filters can be efficiently implemented
 with spiking neural networks
@@ -419,17 +419,16 @@ to investigate whether decoding accuracy
 is improved in downstream
 linguistic and sensorimotor systems.
 
-The above system is primarily feed-forward
-(though feedback is used extensively in the
-auditory preprocessing layer).
+The system described above
+is primarily feed-forward.
 It is important to note that
 a complete auditory processing system
-would match the brain (??? find cite) and have
-feedback connections between all layers
+would match the brain,
+which has feedback connections
+between almost all layers
 in order to refine each layer's ability
-to provide useful output downstream layers.
-(??? more stuff from refs)
-
+to provide useful output downstream layers
+(see Figure~\ref{fig:auditory}).
 Feedback is an undeniably important
 component of a full system that operates
 for long periods of time with sensors
@@ -450,22 +449,113 @@ from different sensory modalities
 in order to guide behavior.
 In speech,
 we use visual information
-from other speakers to improve recognition,
+from other speakers to improve perception,
 and somatosensory information
 from vocal tract articulators
 to improve production.
 A fully realized version of Sermo
-would include these non-auditory sensory systems;
-however, the currently implemented
-subset of Sermo does not.
+would include these non-auditory sensory systems.
+
+\subsection{Linguistic processing}
+
+\inoutbox{Auditory feature vector \\ Non-auditory sensory information \\
+  Production information \\ Phoneme strings}{Lexemes \\ Syllable targets}
+
+As summarized in Section~\ref{sec:sm-neurobio}
+the ventral stream of the human speech system
+represents high-level linguistic features of speech.
+In Sermo, we hypothesize that
+the linguistic processing system
+\textit{decodes lexical information}
+from sensory and production information,
+and \textit{provides syllable targets}
+to be voiced to the sensorimotor integration system.
+Much of these processes require
+higher level linguistic processing,
+which would be implemented by
+models of higher cortical areas.
+
+Decoding lexical items from speech
+has been the primary topic of research
+in ASR systems for decades.
+As such, we are confident that
+the methods used in ASR systems
+can be implemented in a mechanistic model
+suitable for incorporation with Sermo,
+as has been done for similar
+visual classification systems
+(e.g., \citealt{hunsberger2013,hunsberger2015}).
+Once classified, lexical items
+will be used in higher level linguistic
+systems that will associate
+semantics (as in \citealt{blouw2013,blouw2015})
+and syntax (as in \citealt{stewart2014,stewart2015})
+to these representations.
+As these higher level systems
+have been developed with
+the Semantic Pointer Architecture
+(SPA; see Section~\ref{sec:methods-spa}),
+we hypothesize that the linguistic processing system
+produces lexical representations
+in the form of semantic pointers.
+However, we do not further constrain these representations
+as constraints will come from the needs of
+higher-level linguistic and cognitive systems,
+which are not currently part of Sermo.
+
+The output of these higher-level systems,
+is constrained by the needs
+of Sermo's sensorimotor integration system.
+Specifically, Sermo requires that
+the output of the
+linguistic processing system
+be in the form of syllable targets.
+Therefore, for the portion
+of the linguistic system connected
+to the sensorimotor system,
+semantic pointers representing
+sentences or words must contain
+syllable representations that can be
+queried through unbinding.
+
+We follow the theoretical work
+embodied in the WEAVER++ model
+\citet{roelofs2000,roelofs2008,roelofs2014}
+explaining how syllable targets might be generated
+in the linguistic processing system.
+Higher cortical areas are responsible
+for providing a sequence of phonemes,
+which are composed into syllables on the fly
+through a prosodiciation process.
+Not included in the WEAVER++ model
+is the notion of syllable sequencing,
+which we believe is necessary.
+The syllables constructed by the
+prosodiciation process
+may or may not be constructed
+at the same rate as syllables
+are being uttered.
+Specifically, it is likely that
+the next syllable,
+or the next several syllables,
+is conceptualized well before it is uttered.
+For this reason, a process for
+temporally sequencing syllables
+is necessary.
+Syllable targets are therefore provided
+to the sensorimotor integration system
+at the appropriate times.
 
 \subsection{Sensorimotor integration}
 \label{sec:model-sm}
 
+\inoutbox{Auditory feature vector \\ Non-auditory sensory information \\
+  Syllable targets}{Syllable classifications \\ Production information}
+
 As summarized in Section~\ref{sec:prod-neurobio},
 the dorsal stream of the human speech system
 represents both sensory and motor information
-when recognizing and producing speech.
+when perceiving and producing speech.
 In Sermo,
 we hypothesize that
 the sensorimotor integration system
@@ -484,15 +574,14 @@ as each syllable requires
 a time series of sensory features
 on the order of hundreds of milliseconds
 to be reliably classified.
-Second, static syllable representations
-are associated with
+Finally, syllable targets are associated with
 trajectories of speech production information;
 we call this \textit{trajectory generation},
-as a time series of vocal tract movements
+as a time series of vocal tract movement commands
 are necessary to voice a syllable.
 
 As in the auditory feature extraction system,
-a great deal of effort in involved in
+a great deal of effort is involved in
 dealing with the temporal nature of speech.
 Were the sensory and motor representations static,
 the associations in the sensorimotor system
@@ -511,8 +600,8 @@ A convenient side effect of
 the intermediate syllable representation
 is that it also enables
 top-down influence from
-other system,
-most notably the linguistic processing subsystem.
+other systems,
+most notably the linguistic processing system.
 It is not reasonable to expect
 linguistic areas to communicate
 production information directly
@@ -520,27 +609,31 @@ to motor cortex;
 however, it is reasonable to expect
 that the lexical representations
 in the linguistic system
-can be queried for the syllables
-that make up those lexical items.
+can be used to generate syllable targets
+which are used by sensorimotor areas.
 
-Sermo makes the strong claim
-that sensorimotor integration,
-and therefore speech motor control,
-is organized at the level of syllables.
-While there are ??? reasons
-to make this claim
-??? cite something about mental syllabary?,
-our motivation for using syllables
-as the primary unit
-of speech motor representation
-is that we believe
-it enables sufficiently flexible speech
-with the lowest expenditure of neural resources.
+Note that Sermo follows
+the theoretical and empirical
+speech production work
+in \citet{levelt1994,levelt1999,cholin2004},
+which says that the
+speech production is organized
+at the level of syllables.
+While this literature
+is sufficient reason to use syllables,
+Sermo also allows us to
+provide two additional reasons
+for organizing speech production
+at the level of syllables:
+enabling transfer learining,
+and efficient use of neural resources.
 
 Syllables enable flexible speech
-because we can fine-tune the
-trajectory generated by any
-one syllable representation individually.
+because we can use learning to
+fine-tune the trajectory generated by any
+one syllable representation individually,
+and that fine-tuning transfers
+to other words using that syllable.
 For example,
 if Sermo can improve its ability
 to voice the syllable \ipa{[bA]},
@@ -551,13 +644,13 @@ Had we chosen word representations,
 then this transfer learning
 would not be possible.
 On the other hand,
-has we chosen phoneme representations,
+had we chosen phoneme representations,
 then it would be difficult
 to fine tune trajectories at all,
 as the motor trajectory of a phoneme
 is dependent on the
-previous and next phonemes;
-we therefore could not fine tune
+previous and next phonemes,
+and we therefore could not fine tune
 the trajectory of each phoneme individually.
 
 Syllables minimize the expenditure of neural resources
@@ -573,14 +666,16 @@ regardless of the representation used.
 If we choose phonemes as the basic representation,
 then we have a small number of basic units;
 for the sake of argument,
-say around 50 phonemes.
-However, because the motor trajectory
+say around 50 phonemes,
+which is slightly above the amount
+in English.
+Because the motor trajectory
 of a phoneme is dependent on the
 phonemes before and after it,
 we need neural resources not only for
-the basic unit, but in the worst case,
+each phoneme, but in the worst case,
 also for all possible
-interactions of those basic units;
+permutations of three phones;
 i.e., we would need $50^3n$ or 125,000$n$ resources.
 On the other hand, if we chose
 words as the basic unit of representation,
@@ -589,23 +684,15 @@ between word interactions,
 but the number of words in a language
 is much larger than the number of syllables
 in a language.
-Using estimates for English
-from ??? \url{http://semarch.linguistics.fas.nyu.edu/barker/Syllables/index.txt}
-and ??? \url{http://www.languagemonitor.com/number-of-words/number-of-words-in-the-English-language-1008879/},
+Using a conservative estimate
+for the number of English words
+and syllables
+\citep{schiller1996},
 word representations would use approximately
-1,025,109.8$n$ resources,
-compared to just 15,831$n$ resources for syllables.
+30,000$n$ resources,
+compared to just 500$n$ resources for syllables.
 Syllable representations are clearly the most tractable
 given these assumptions.
-% ??? reminder: make sure we use this to argue
-% that this scales in the results section.
-Indeed, the influential WEAVER speech production model
-also theorizes that syllables
-are the basic organizational units
-in speech production ???cite,
-and has received empirical support
-???cite cholin2003.pdf.
-% cite{schiller1996} for 500 ish frequent syllables
 
 So far, we have not been explicit
 about our representation of production information.
@@ -628,40 +715,29 @@ as is done in all articulatory synthesizers.
 Therefore, we consider the choice
 of production information representation
 to be an empirical question
-that we aim to answer
-with the subset of Sermo that we implement
-in this thesis.
+that we aim to explore with Sermo.
 
 \subsubsection{Trajectory generation}
 
 In trajectory generation,
-the static syllable representation
+the syllable target
 is used to generate
 a time series of production information.
 
 There are several criteria
 that a trajectory generation system
-must meet in order for it to be
-useful in the sensorimotor integration system.
+must meet in order to be
+useful in Sermo's sensorimotor integration system.
 First, the system must be able to produce
 trajectories with high degrees of freedom.
-There are over twenty degrees of freedom,
-whether we use vocal tract gestures
-or articulator positions.
-Note that these degrees of freedom
-are independent,
-so separate trajectory generators
-can be employed for each degree of freedom,
-but these generators must be
-tightly synchronized as
-consonantal constrictions can require
-the temporal coordination
-of several gestures or articulators.
-Regardless, whether one large generator
-or several smaller generators are used,
-the neural resources required by each
-must be reasonable,
-as there may be many thousands
+There are at least twenty degrees of freedom
+for both vocal tract gestures
+and articulator positions.
+Despite the high dimensionality,
+the neural resources required
+for each syllable trajectory
+must be relatively low,
+as there may be up to a few thousand
 of these trajectory generators
 in an adult speech system.
 
@@ -672,16 +748,15 @@ they generate a trajectory.
 There is significant variability
 in how we voice syllables.
 During a stressful situation,
-all of our syllables may be
-voiced quickly;
+all of a speaker's syllables may be
+voiced quickly, and
 syllables are often elongated
 or shortened for emphasis.
 A trajectory generator must be
 able to produce appropriate
 production information
 at speeds that vary
-between and within
-trajectory generation trials.
+between and within syllables.
 
 Third, the trajectory generators
 must be able to operate
@@ -699,7 +774,7 @@ resulting from those syllables
 must be able to blend naturally into one another
 without obvious pauses between
 different syllables,
-or even multiple utterances of the same syllable.
+or multiple utterances of the same syllable.
 
 \subsubsection{Trajectory classification}
 
@@ -707,7 +782,7 @@ In trajectory classification,
 we are essentially solving the inverse problem
 of trajectory generation.
 Given some time series of production information,
-we must infer the static syllable representation
+we must infer the syllable
 that would produce that trajectory.
 
 As an inverse problem,
@@ -750,12 +825,12 @@ is that it provides a site in which to
 aggregate production information
 gathered from multiple sensory modalities.
 The McGurk effect discussed
-in Section~\ref{sm-neurobio}
+in Section~\ref{sec:sm-neurobio}
 indicates that we use both auditory
 and visual information to
 determine which syllable is being voiced.
 If part of our syllable classification system
-if informed by a decoding of production information,
+is informed by a decoding of production information,
 then both auditory and visual systems
 can contribute to that decoding.
 The speech development systems
@@ -772,21 +847,22 @@ Novel syllables that are made up of sounds
 that are frequently encountered
 in one's language can be
 repeated readily.
-Novel syllables that also feature
+Novel syllables that feature
 novel vocal tract gestures
 are more difficult to repeat readily.
-Since novel syllables do not have
-a learned production information trajectory,
+Since both types of novel syllables do not have
+a learned production information trajectory
+(i.e., are not in the mental syllabary),
 it is reasonable to hypothesize that
 the syllable's production trajectory
 is decoded from the speech information,
 and passed through to the
 speech motor control system unchanged.
-Repeated repetitions of the syllable
+Repeated experience with the novel syllable
 would lead to a production trajectory
 being learned and consolidated.
-Both the trajectory decoding and
-the learning procedure are likely
+Both trajectory decoding and
+learning are likely
 to use existing elements
 in the mental syllabary
 that closely resemble the
@@ -794,7 +870,7 @@ infrequent syllable to be learned
 (e.g., a similar CV syllable could
 be used to learn a different CV syllable,
 following the frame/content theory
-of ???macneilage2001).
+of \citet{macneilage2001}).
 
 \citet{uria2011} has shown that it is possible to
 do this decoding,
@@ -810,79 +886,14 @@ in this thesis;
 however, we are able to use Sermo
 to produce a corpus of time-locked
 synthesized auditory information
-and vocal tract gestures.
-We will make this corpus available
-to other researchers
-to collaboratively determine
-if this decoding process is possible.
-
-\subsection{Linguistic processing}
-
-As summarized in Section~\ref{sec:sm-neurobio}
-the ventral stream of human speech system
-represents high-level linguistic features of speech.
-In Sermo, we hypothesize that
-the linguistic processing system
-decodes linguistically relevant information
-like words or morphemes
-from sensory and production information,
-and provides syllable targets
-to be voiced to the sensorimotor integration system.
-
-Decoding words from speech
-(or, more accurately,
-classifying words from speech)
-has been the primary topic of research
-in ASR systems for decades.
-As such, we are confident that
-the methods used in ASR systems
-can be implemented in a mechanistic model
-suitable for incorporation with Sermo,
-as has been done for similar
-visual classification systems
-(e.g., \citealt{hunsberger2013}).
-Once classified, lexical items
-will be used in higher level linguistic
-systems that will associate
-semantics (as in \citealt{blouw2013,blouw2015})
-and syntax (as in \citealt{stewart2014,stewart2015})
-to these representations.
-As these higher level systems
-have been developed with
-the Semantic Pointer Architecture (SPA),
-we hypothesize that the linguistic processing system
-produces lexical representations
-in the form of semantic pointers.
-However, we do not further constrain these representations
-as constraints will come from the needs of
-higher-level linguistic and cognitive systems,
-which are not currently part of Sermo.
-
-??? on the motor side, would also need some kind of
-syllabification / prosodiciation to generate
-syllables on the fly, as predicted by
-cholin2003, WEAVER++, etc
-
-The output of these higher-level systems,
-however, is constrained by the needs
-of the sensorimotor system.
-Specifically, Sermo requires that
-the output of the
-linguistic processing system
-be in the form of static syllable representations.
-Therefore, for the portion
-of the linguistic system connected
-to the sensorimotor system,
-semantic pointers representing
-sentences or words must contain
-syllable representations that can be
-queried through unbinding.
-See Section~\ref{sec:spa-transformation}
-for more information
-on unbinding in the SPA.
+and vocal tract gestures,
+which can serve as a
+benchmark data set.
 
 \subsection{Speech motor control}
 \label{sec:model-motorcontrol}
+
+\inoutbox{Production information}{Audio waveform}
 
 The speech motor control system
 uses a continuous trajectory
@@ -892,13 +903,11 @@ speech synthesis system,
 which produces audio waveforms.
 It is composed of two components.
 The first is the \textit{motor expansion} system,
-which projects the speech production information
+which projects production information
 into the vector space that
 directly controls the articulatory synthesizer.
 The second is
-the \textit{articulatory synthesizer} itself,
-which includes a vocal tract model
-and an acoustic model.
+the \textit{articulatory synthesizer} itself.
 
 \subsubsection{Motor expansion}
 
@@ -913,28 +922,25 @@ their own physical vocal tract,
 an internal model of which
 would be learned through
 sensorimotor associations.
-
 In Sermo, however,
 there is no perfect choice
 for an articulatory synthesizer.
 Indeed, it is a long-term goal of Sermo
 to provide a unified control system
-that can be used to productively
-explore and test the quality
-of articulatory synthesizers
+that can be used to
+compare the speech quality
+of different articulatory synthesizers
 by providing a control system
-that can be used for any synthesizer,
-if a motor expansion system
-for that synthesizer can be created.
-As such, the control signals
-that each articulatory synthesizer
-expects may differ significantly.
-The motor expansion system
-maps the production information
-produced by the sensorimotor system
-into the vector space that
-the target articulatory synthesizer
-uses as control signals.
+that can be used for any synthesizer.
+In order to reach that goal,
+we must choose a canonical
+production information representation.
+However, since different synthesizers
+have different control parameters,
+a motor expansion system
+is necessary to translate
+Sermo's production information representation
+to control signals for a specific synthesizer.
 It allows the rest of Sermo
 to be designed agnostic
 to the articulatory synthesizer chosen
@@ -943,21 +949,22 @@ will handle the mapping
 from production information
 to control signals.
 
-The motor expansion system implies
-that Sermo should employ
-a standardized production representation,
+One important first step, then,
+is to choose a canonical
+production information representation,
 so that only one mapping is required
 for each articulatory synthesizer.
 Currently, it is not clear
 what production representation
 should become that standard.
 Previously, we have argued
-vocal tract gestures may be an
-ideal choice for representing production information.
+vocal tract gestures are a
+good choice for representing production information.
 However, we have not yet determined
 if vocal tract gestures can be decoded
 from acoustic information
-(\citealt{uria2011} has done this for vocal tract parameters),
+(recall that \citealt{uria2011}
+has done this for vocal tract parameters),
 nor do we have empirical evidence
 that vocal tract gesture trajectories
 can be generated and classified robustly.
@@ -965,14 +972,18 @@ Additionally, there are unfortunately
 at least two systems that employ
 a disparate set of vocal tract gestures.
 The researchers that first proposed
-the task dynamics framework,
-and the ??? CASY synthesizer
-use a particular set of ??? vocal tract gestures..
-% ??? more ??? cite.
+the task dynamics framework
+and the HLSyn \citep{hanson1999}
+and CASY synthesizers \citep{iskarous2003}
+use vocal tract gestures
+which can be expressed
+as a vector of eight scalars
+\citep{zhuang2008,zhuang2009}.
 \citet{kroger2014} and \citet{birkholz2006,birkholz2013},
 on the other hand,
-use 11 gestures in their 2D synthesizer,
-and 49 gestures in the VocalTractLab synthesizer,
+use 11 scalar gestures in their 2D synthesizer,
+and 46 binary gesures and 3 scalar gestures
+in the VocalTractLab synthesizer,
 respectively.
 If a vocal tract gesture representation
 is shown to be advantageous
@@ -987,20 +998,21 @@ in the form of articulator positions
 is a more advantageous representation
 for Sermo,
 then a sufficiently expressive
-continuous set of control points
+set of control points
 will have to be chosen.
 
-While this motivation for the
+While the motivation for the
 motor expansion could be interpreted
 as meaning that it does not
 have an analogous system in the brain,
-the motor expansion system
-may also play an important role
-in compensating for vocal tract perturbations.
+a brain area playing a similar role
+as the motor expansion system
+may be useful for
+compensating for vocal tract perturbations.
 When our vocal tracts are modified in some way,
 perhaps by illness or injury,
 or by a deliberate manipulation
-as in \citet{houde1998}
+as in \citet{houde1998},
 we can adapt our speech
 such that changes in how we voice a phoneme
 transfer to other syllables containing that phoneme.
@@ -1009,7 +1021,7 @@ each syllable trajectory is modified
 when adapting to the perturbation,
 it is reasonable to assume that
 there is an intermediate representation
-in between the production information
+between the production information
 produced by the sensorimotor integration system
 and the control signal that is sent
 to the motor system.
@@ -1023,12 +1035,9 @@ Articulatory synthesizers
 generate audio waveforms
 by simulating the airflow
 through a model of the human vocal tract.
-A synthesizer consists of a vocal tract model,
-which converts control signals
-into vocal tract geometries,
-and an acoustic model,
-which converts vocal tract geometries
-into acoustic signals.
+The general organization of an
+articulatory synthesizer
+was reviewed in Section~\ref{sec:art-synth}.
 As with auditory periphery models,
 Sermo uses existing solutions
 to articulatory synthesis,
@@ -1036,7 +1045,6 @@ and aims to be a testbed
 in which articulatory synthesizers
 can be compared to one another
 using the same control system.
-
 From the perspective of Sermo,
 the details of the vocal tract
 and acoustic models
@@ -1098,14 +1106,14 @@ can be evaluated directly
 through phoneme and word error rates,
 in the case of linguistic decoding,
 and through the mean squared error
-in the case of sensorimotor decoding.
+in the case of production information decoding.
 There are several existing data sets
 with full training and testing
 input-output pairs,
 such as TIMIT for linguistic decoding
 \citep{garofolo1993},
 and the X-ray microbeam database \citep{westbury1990}
-and mngu0 \citep{steiner2012}
+and MNGU0 \citep{steiner2012}
 for continuous sensorimotor decoding.
 Currently, there are no data sets
 for discrete sensorimotor decoding
@@ -1162,7 +1170,7 @@ Therefore, we can directly
 test the sensorimotor integration system's
 ability to classify
 and generate known trajectories.
-Classification if either done
+Classification is either done
 correctly or incorrectly,
 though some classification methods
 may provide confidence information
@@ -1180,18 +1188,19 @@ However, a stronger evaluation
 is to use the generated trajectories
 to drive the speech motor control system,
 and perceptually evaluate generated audio.
+We will present other evaluation methods
+for the implemented subsystems
+in their respective sections
+in Chapter~\ref{chapt:results}.
 
 \section{Relation to other models}
 
-??? Talk about the WEAVER model in indefrey2004.pdf too
-
 As discussed in Section~\ref{sec:bg-diva-kroger},
 the models most similar to Sermo
-and the subsystems modeled in this thesis
 are the DIVA model by \citeauthor{guenther1995}
 and the Kr\"{o}ger model by \citeauthor{kroger2009}.
 Unlike Sermo, both of these models
-focuses on the development of the speech system,
+focus on the speech production development,
 rather than attempting to model
 an adult speech system directly.
 Nevertheless, there are significant overlaps
@@ -1199,7 +1208,9 @@ between these models and Sermo.
 
 DIVA (see Figure~\ref{fig:diva}) primarily models
 the trajectory generation step
-in Sermo's sensorimotor integration system.
+in Sermo's sensorimotor integration system,
+but employs feedback signals to learn
+how to generate trajectories.
 Activation of a cell in the ``speech sound map''
 generates feedforward control signals
 that drive an articulatory synthesizer.
@@ -1214,7 +1225,7 @@ of feedforward control signal trajectories
 through repeated trials in which
 auditory and somatesensory feedback
 corrects parts of the trajectory
-in which the produced sound differs
+in which the synthesized sound differs
 from the expected sound.
 We believe that Sermo can be adapted
 to learn trajectories online in a similar way,
@@ -1233,9 +1244,7 @@ correspond to phonemes, syllables, words,
 or even short phrases.
 Additionally, in DIVA
 the motor trajectory is initiated
-by activating a speech sound cell,
-(\citealt{guenther2006a} notes that a fully realized
-model would use a distributed representation),
+by activating a single speech sound cell,
 and it is not clear how sequences
 of sound cells would be temporally coordinated.
 In Sermo, considerable effort is taken
@@ -1286,17 +1295,20 @@ perfect representation and communication
 are assumed.
 In other words, there is no neural
 or synaptic model in DIVA;
-model activations are defined as
+neural activations are defined as
 differential equations
 which are computed directly.
 The state variables in these equations
 are multiplied by connection weights,
-but signals propagate immediately
-and with no degradation or noise.
+but signals propagate
+and with no delay, degradation or noise.
 In order to represent temporal effects,
-signals are perfectly delayed
+signals can be perfectly delayed
 by arbitrary amounts of time
-\citep{nieto-castanon2011}.
+\citep{nieto-castanon2011},
+an operation that is difficult
+to perform with biologically realistic
+neuron and synapse models.
 While it may be possible to approximate
 the computations that
 DIVA assumes are possible
@@ -1320,23 +1332,42 @@ by syllable representations.
 Unlike DIVA, the Kr\"{o}ger model
 assumes speech motor organization
 at the level of syllables,
-which matches Sermo's motor organization.
+which matches Sermo's motor organization,
+and linguistic theory.
 The Kr\"{o}ger model also
 introduces an intermediate representation
 between the motor plan (i.e., trajectory)
 and the articulatory synthesizer,
 playing a similar role as Sermo's
 motor expansion system.
-Thus, in terms of gross structure, then,
+Thus, in terms of gross structure,
 the Kr\"{o}ger model covers a larger subset
 of Sermo compared to DIVA.
 
-% The Kr\"{o}ger model also uses
-% a more sophisticated neural network model,
-% the growing self-organized map (GSOM).
-% ??? summarize from Cao.
+The Kr\"{o}ger model also uses
+a slightly more sophisticated neural network model,
+the growing self-organized map (GSOM).
+GSOMs build on the self-organized map
+\citep{kohonen1982,kohonen2007}
+by introducing a growing procedure
+in which new neurons can be added
+to existing maps when the error
+in a certain region is above
+a certain threshold
+\citep{cao2014}.
+While spiking versions of
+self-organized maps
+have been proposed
+(e.g., \citealp{choe1998}),
+a growing self-organized map
+would require either neurogenesis
+(which only occurs in a few brain areas)
+or recruiting neurons in nearby areas
+with novel synaptic connections,
+a form of structural plasticity
+which is currently not well understood.
 
-In terms of whether the operations
+In terms of whether other operations
 of the model can be realized in spiking neurons,
 the outlook is more promising
 for the Kr\"{o}ger model.
@@ -1358,28 +1389,23 @@ interactions between words,
 does not scale to adult vocabularies
 \citep{crawford2014}.
 
-%% just one model neuron in the phonemic map,. not at the phoentic
-%% level, see: figure 8
-
-% ??? transition
-% there is still no guarantee
-% that a spiking neural approximation
-% of GSOMs will be accurate enough
-% to reproduce the results
-% of the model.
-%% not spiking, of course
-
 \section{Subsystems modeled in this thesis}
 
 In the subsequent chapters of this thesis,
-we will present mechanistic models
+I will present mechanistic models
 implemented in spiking neurons
 spanning several systems
 in the conceptual Sermo model
 (see Figure~\ref{fig:sermo-implemented}).
 
-% \fig{sermo-implemented}{0.6}{???}{???}
-% ??? Figure with model areas highlighted
+\fig{sermo-implemented}{0.9}{Parts of Sermo implemented in this thesis.}{
+  The parts of Sermo implemented in this thesis.
+  Colors correspond to neural models.
+  Green (left) refers to the auditory feature extraction model
+  (i.e., neural cepstral coefficients).
+  Purple (right) refers to the syllable sequencing
+  and production model.
+  Yellow (top-right) refers to the syllable classification model.}
 
 The first model presents an implementation
 of the auditory feature extraction system
@@ -1389,7 +1415,7 @@ but does so in an online fashion
 using an auditory periphery model
 and a spiking neural network.
 The resulting representations are called
-neural cepstral coefficieints,
+neural cepstral coefficients,
 and we will compare their ability
 to classify speech with
 existing approaches used in ASR.
@@ -1412,45 +1438,54 @@ The third model implements
 the trajectory classification portion
 of the sensorimotor integration system.
 Production information trajectories
-will be generated
-by the trajectory generation system
-and provided to a trajectory classifier.
-We will evaluate the system by
-comparing the classified syllable
-to the intended target syllable.
+will be provided to the trajectory classifier,
+which we evaluate by
+comparing classified syllables
+to the intended target syllables.
 
 \section{Limitations}
 
 Two primary issues limit the Sermo model
 as presented in this chapter.
-First, it is clear that the subset of Sermo
+First, the subset of Sermo
 that is implemented in this thesis
 is more throughly defined than
 the parts that are not modeled in detail,
 such as the linguistic processing system
 and non-auditory sensory modalities.
-However, we envision the Sermo model
-as continually growing and adapting
-to incorporate new modeling ideas
-and new empirical results confirming,
-refuting, or constraining parts of the model.
+Existing models like the WEAVER++ model
+have given us guidelines as to
+what computations are necessary,
+but how those computations might be implemented
+in spiking neural networks
+remains unanswered,
+and may require different computations
+than have been assumed thus far.
+
+It is therefore important to emphasize
+that we envision the Sermo model
+to be a continually growing and adapting model,
+incorporating new modeling ideas
+and new empirical results
+across disciplines.
 The current presentation of Sermo
 was developed independently,
 primarily informed by the literature
 summarized in Chapter~\ref{chapt:bg}.
 We hope that upon presentation,
-feedback from researchers will
+feedback from other researchers will
 fill in missing pieces of the model,
 and clarify existing pieces,
 making the development of Sermo
 a collaborative effort.
 
-However, it should be noted that
+However, I recognize that
 organizing a collaborative effort
 like Sermo brings additional challenges.
-To enable easier collaboration,
+Therefore, to enable easier collaboration,
 we will use modern Internet-based tools
-for visualizing
+like Github and the Jupyter notebook
+to visualize
 and disseminating information,
 in addition to the traditional
 scientific publication system.
@@ -1474,21 +1509,20 @@ interest in neuromorphic hardware
 and the development of deep learning approaches
 in spiking neural networks,
 interest and expertise in spiking neural networks
-will steadily develop in the coming decades.
+will steadily increase in the coming years.
 In the same vein, it may be argued that
 the constraints placed on candidate Sermo models
 are too stringent given our current understanding
 of the human speech system,
-and spiking neural networks in general;
-we are ``not there yet,'' to put it colloquially.
+and spiking neural networks in general.
 I believe that the models presented
 in the rest of this thesis
-will serve as evidence that
+serve as evidence that
 progress can be made with
 the tools currently available.
 As interest and expertise in
 the modeling techniques used
-in the rest of the thesis grows,
+in this thesis grows,
 so will the possibility
 that all of the components in Sermo
 can be implemented efficiently.
