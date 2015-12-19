@@ -25,12 +25,13 @@ and used in ASR systems
 is called Mel-frequency cepstral coefficients (MFCCs).
 It has been widely used
 in both hidden Markov model-based
-(HMM; \citealp{hain1999,gales2008,gaikwad2010})
+(HMM; \citealp{hain1999,gales2008,gaikwad2010,alam2013})
 and deep learning-based
 \citep{graves2006,graves2008,fernandez2008} ASR systems,
 including those that achieve
 the lowest error rates
-on the popular corpus TIMIT.
+on the popular corpus TIMIT
+\citep{garofolo1993,lopes2011}.
 It has also been shown that
 MFCCs are well suited
 for both speech and music inputs
@@ -43,8 +44,8 @@ frequency decomposition
 of the audio signal
 in order to determine the relative power
 at frequencies distributed over the mel scale.
-A simple algorithm for computing an
-mel-frequency cepstral vector
+A simple algorithm for computing a
+Mel-frequency cepstral vector
 for a frame of audio is as follows.
 
 \begin{enumerate}
@@ -70,7 +71,7 @@ Recall from Section~\ref{sec:psychoacoustics}
 that the Mel scale
 describes the relationship between
 absolute frequency and perceived pitch;
-it is a logarithm of the frequency.
+it is a logarithmic function of frequency.
 The triangular filters are spaced
 equidistantly on the Mel scale,
 resulting in more filters
@@ -95,8 +96,8 @@ many ASR systems,
 both HMM-based \citep{hain1999,gales2008}
 and deep learning-based
 \citep{graves2006,graves2008,fernandez2008},
-also append the first,
-and sometimes the second,
+also append the first
+and (sometimes) second
 temporal derivatives of the MFCC
 to the feature vector.
 
@@ -123,10 +124,9 @@ would learn that temporal derivatives
 are a useful feature;
 incorporating it into the feature vector
 is not necessary,
-but it effectively bootstraps the learning process
+but effectively bootstraps the learning process
 by providing it a feature
-that would otherwise
-have to be learned.
+that would have learned regardless.
 
 Temporal derivatives are not the only
 MFCC transformation that are done in ASR frontends.
@@ -151,7 +151,7 @@ many systems have experimented with
 more physiologically accurate
 auditory periphery models
 to replace the idealized spectral analysis step
-in the feature extraction pipeline.
+in the feature extraction pipeline described above.
 
 \citet{tchorz1999,dimitriadis2005,schluter2007,shao2009}
 have separately proposed variants of MFCCs
@@ -178,7 +178,7 @@ Additionally, these networks compute
 functions of the filter output that
 may be difficult for neurons to implement.
 \citet{tchorz1999}, for example,
-implements short-term adaption
+implement short-term adaption
 through loops that perform
 a lowpass filter and a division.
 Division is, in general,
@@ -204,7 +204,7 @@ These systems produce spikes
 that emulate the spikes
 traveling down the auditory nerve,
 and since they are implemented in hardware,
-they run much faster than software system.
+they run much faster than most software systems.
 However, because they produce spikes,
 they have not been used
 as the frontend to any ASR systems,
@@ -213,14 +213,13 @@ as it is not straightforward to
 construct feature vectors
 out of spike trains.
 
-\section{Syllable sequencing and production}
+\section{Syllable sequencing}
 
 Currently,
-we are aware of only two existing models
-explaining how sequences of syllables
+we are aware of few existing models
+explaining how syllables
 might be represented
-and translated to trajectories of
-production information in the brain.
+and temporally sequenced in the brain.
 However, there have been many attempts
 to solve similar problems
 and could be applicable to speech;
@@ -228,10 +227,24 @@ specifically,
 models of song generation in songbirds
 and serial working memory.
 
-??? separate into sequencing and trajectory generation
-
-??? talk about WEAVER/WEAVER++ (roelofs)
-in the sequencing section
+A notable omission in this section
+is the WEAVER++ model
+previously discussed in
+Sections~\ref{sec:syll-words}
+and \ref{sec:sermo-linguistic}.
+While a neural implementation of WEAVER++
+would be an important contribution to Sermo,
+WEAVER++ does not solve
+the syllable sequecing problem.
+At its lowest level,
+it produces syllable targets over time,
+but those syllable targets are not temporally
+coordinated with the voicing of
+other syllables.
+As such, a neural implementation
+of WEAVER++ would still require
+a syllable sequencing model
+like the ones described in this section.
 
 \subsection{Song generation in songbirds}
 
@@ -258,7 +271,7 @@ associated with a particular syllable
 is linked to the next syllable
 in the learned sequence.
 The end result of the model
-that activating a particular
+is that activating a particular
 ensemble of syllable-specific neurons
 begins a sequence of activations
 representing a particular syllable sequence
@@ -279,7 +292,20 @@ the next motor action to be produced,
 which activates a sensory prediction,
 and so on.
 
-\fig{troyer}{0.6}{???}{???}
+\fig{troyer}{0.6}{Illustration of model results from \citet{troyer2000}.}{
+  Illustration of model results from \citet{troyer2000}.
+  Through learning, neurons in avian brain area RA
+  activate sequentially,
+  which is theorized to underlie song sequencing.
+  In the first learning stage,
+  neurons that are part of the same syllable
+  are associated together (middle).
+  In the second learning stage,
+  sensorimotor predictions enable
+  sequence learning such that
+  song syllables sequentially activate
+  in the correct order.
+  Reproduced from \citet{troyer2000}.}
 
 While the learning method
 may be useful for future iterations of Sermo,
@@ -321,7 +347,7 @@ these ensembles,
 \citeauthor{drew2003} hypothesized that
 sequences could be generated,
 rather than recognized,
-but delivering a generic timing pulse
+by delivering a generic timing pulse
 which emulated hearing all possible sensory
 inputs at once.
 The first time the pulse is delivered,
@@ -340,7 +366,12 @@ for the previous timing pulse,
 they enter a refractory period
 in which they become insensitive to further input.
 
-\fig{drew}{0.5}{???}{???}
+\fig{drew}{0.9}{Illustration of model results from \citet{drew2003}.}{
+  Illustration of model results from \citet{drew2003}.
+  A timing pulse is used to control when the next element
+  in the sequence should be activated.
+  See text for more details.
+  Reproduced from \citet{drew2003}.}
 
 While this approach is more temporally flexible
 than \citet{troyer2000} because
@@ -354,8 +385,8 @@ they note that the spacing of syllables
 can be controlled by varying the frequency
 of timing pulses,
 but do not provide any mechanism
-for generating the pulses
-or for how frequency could be varied.
+for generating pulses
+or varying the frequency of pulses.
 Additionally, the length of the sequence
 is extremely limited,
 both in terms of the total length of time
@@ -363,7 +394,7 @@ and the number of syllables.
 The refractory period of each neuron
 is only long enough to be insensitive
 to the next timing pulse;
-therefore, for sequence of length three,
+therefore, for a sequence of length three,
 \citeauthor{drew2003} added inhibitory connections
 from sequence-specific ensembles
 to non-sequence-specific ensembles.
@@ -371,7 +402,7 @@ The connectivity patterns required
 for sequences of longer lengths
 are not obvious,
 and depends on the refractory period,
-which is abnormally long.
+which can quickly become abnormally long.
 We therefore do not think that
 this model is useful for Sermo.
 
@@ -397,7 +428,7 @@ is likely to be represented
 in a similar manner
 as sequences of other static representations.
 Therefore, a useful paradigm for studying
-how humans represent sequences
+how humans represents syllable sequences
 is to investigate serial working memory tasks;
 e.g., a subject is asked to remember
 a list of numbers,
@@ -408,7 +439,7 @@ to solve these tasks
 in biologically plausible ways.
 The most sophisticated such model
 is the ordinal serial encoding model
-\citep{choo2010},,
+(OSE; \citealp{choo2010}),
 which has been incorporated into
 Spaun \citep{eliasmith2012}.
 
@@ -418,17 +449,17 @@ namely CADAM, TODAM, and TODAM2
 (see \citealt{choo2010} for more details),
 which are all based on
 vector symbolic architectures
-(see Section~\ref{sec:methods-sp}
+(see Section~\ref{sec:methods-spa}
 for details on vector symbolic architectures).
 Unlike these models,
 \citeauthor{choo2010}'s model
 is able to remember and recall
 lists of up to seven items,
 and exhibits primacy and recency effects,
-meaning that items at the beginning
-and end of a list are more likely
+meaning that items at the beginnings
+and ends of lists are more likely
 to be recalled.
-His model is also implemented
+\citeauthor{choo2010}'s model is also implemented
 in a spiking neural network,
 making it applicable to Sermo.
 Interestingly,
@@ -447,8 +478,9 @@ The ordinal serial encoding model,
 then, is well suited for representing
 discrete sequences of syllables in Sermo,
 which typically have few elements
-if we assume that most syllable sequences
-correspond to words in one's lexicon.
+if we assume that prosodification
+operates only slightly faster
+than speech production.
 However, the model is limited to
 discrete sequences,
 and therefore cannot be used
@@ -462,21 +494,23 @@ when the next element is queried
 and when it has been recalled.
 Syllables, however, are voiced in quick succession,
 sometimes even blending into one another slightly.
-In Sermo, we will use a separate but interacting model
-for trajectory generation,
-and will present a solution
-to the issue of pauses between items
-in Section~\ref{sec:impl-prod-neuralmodel}.
+In Sermo, we will extend the OSE model
+to do syllable sequencing
+(see Section~\ref{sec:impl-prod-neuralmodel}).
+
+\section{Trajectory generation}
+
+In trajectory generation,
+we must generate a sequence
+of production information
+corresponding to a syllable target.
+We will review two robust trajectory generation techniques,
+one primarily applied to speech
+(Task Dynamics),
+and one used for general motor control
+(REACH).
 
 \subsection{Task dynamics}
-
-??? be more explicit that this is about
-trajectory generation and not syllable
-sequencing
-% from Bernd:
-%% the primary idea of task dynamics is not syllable sequencing but
-%% calculation of movement contribution of articulators to a gesture
-%% (e.g. contribution of jaw and tongue to an apical closing action)
 
 A line of research encompassing work by
 several investigators at Haskins Laboratories
@@ -485,7 +519,8 @@ under the name Task Dynamics
 for generating temporal sequences
 of production information
 and using that information to drive
-an articulatory synthesizer \citep{nam2004}.
+an articulatory synthesizer
+\citep{saltzman1989,nam2004}.
 
 The key insight in Task Dynamics
 is to dissociate the task state
@@ -505,7 +540,7 @@ Cyclic attractor dynamics,
 modeled by harmonic oscillators
 with a nonlinear escapement function,
 are useful for repetitive actions.
-Initially, these task dynamics were then
+Initially, these task dynamics were
 related to articulator trajectories
 for a two degree-of-freedom arm model
 by mapping the task space
@@ -526,25 +561,26 @@ Realistic articulatory trajectories
 were achieved
 by associating a task dynamic network
 with point attractor dynamics
-with each speech gesture.
+for each speech gesture.
 Each gesture defines
 the point which the task dynamic network
 is attracted to.
-The state of each gesture network
+The state of each gesture dynamical system
 influences one or more articulator positions.
 The final articulator trajectory
 is the combined effect
-of all of the gesture networks
+of all of the gesture systems
 on all of the articulators.
 
 Given a complete gesture trajectory
 for an utterance,
 the task dynamic approach
-generate articular position trajectories
+generates articular position trajectories
 which can be synthesized
-by the HLSyn synthesizer \citep{hanson1999}.
-While this model has not been
-modified since its introduction in 1989,
+by the CASY synthesizer \citep{iskarous2003}.
+While the task dynamics model
+for inter-articulator coordination has not been
+modified significantly since its introduction in 1989,
 the same group has done significant work
 in automatically generating gesture scores
 with a similar approach.
@@ -561,10 +597,10 @@ of the gestures to which it is coupled
 Task dynamic gestural timing
 is able to capture precise timing
 in syllables with complex onsets
-and codas \citep{nam2003}.
+and codas \citep{nam2003,goldstein2006}.
 Perhaps more importantly,
 it allows for the articulatory synthesizer
-HLSyn to accept text as input,
+CASY to accept orthographic text as input,
 which is converted to a gesture score
 by looking up a syllabification
 of the word in a database
@@ -572,7 +608,7 @@ and using gestural coupling rules
 defined by linguists
 to create a system of coupled oscillators
 whose activities represent a gestural score
-\citep{goldstein2009,nam2004}.
+\citep{nam2004,goldstein2009}.
 
 In all, the task dynamic approach
 to inter-gestural and inter-articulator timing
@@ -583,7 +619,7 @@ currently published
 The dynamical systems approach
 also makes it a natural fit for Sermo,
 as it is defined in continuous time,
-and can be readily implemented
+and should be readily implementable
 in spiking neural networks,
 though we are not aware of any
 neural implementations currently available.
@@ -591,18 +627,13 @@ neural implementations currently available.
 \subsection{REACH}
 
 The final model informing
-the Sermo syllable sequencing
-and production model presented
-in this thesis is the
+Sermo's trajectory generation model is the
 Recurrent Error-driven Adaptive Control Hierarchy (REACH)
 model \citep{dewolf2015}.
-In particular, we use REACH's
-neural implementation
-of dynamic movement primitives (DMPs).
-
 The REACH model is a general motor control
 model implemented in spiking neurons.
-It uses DMPs  to generate trajectories
+It uses dynamic movement primitives (DMPs)
+to generate trajectories
 for the system to follow;
 these trajectories are mapped into
 motor space using operational space control,
@@ -616,10 +647,8 @@ in handwriting and reaching tasks,
 even when an unknown force field
 is applied to the end effector.
 
-DMPs are a general method for generating motor trajectories;
-they will be discussed in more detail
-in Section~\ref{sec:methods-dmp}.
-DMPs are similar to Task Dynamics in many respects.
+DMPs are a general method for generating motor trajectories,
+and are similar to Task Dynamics in many respects.
 Both define methods to generate trajectories
 for one-time and rhythmic actions.
 Both use point attractor dynamics
@@ -662,15 +691,15 @@ by most ASR systems
 using a labeled acoustic data set.
 In the sensorimotor integration system
 in Sermo, however,
-we aim to classify syllables
+we aim to recognize syllables
 based only on production information
 which is decoded from acoustic information.
 It should be noted that we do not expect
 this system to perform perfectly,
 as the dominant speech decoding system
 will be linguistic;
-however, we are nevertheless able
-to hear infrequent syllables
+however, humans are nevertheless able
+to recognize infrequent syllables
 and voice them.
 The ability to differentiate
 between frequent and infrequent syllables
@@ -678,8 +707,9 @@ may depend on whether they
 can be classified
 on the basis of production information.
 
-One of the few attempts to classify speech
-solely on the basis production information
+To my knowledge,
+the only attempt to recognize speech
+based solely on production information
 is \citet{mitra2014}.
 \citeauthor{mitra2014} were able to
 decode continuous production information
@@ -696,13 +726,13 @@ as the feature vector
 were high ($\sim$70\% with no noise).
 
 The apparent difficulty
-in classifying sounds based on
+in recognizing words based on
 production information alone
 could be due to several factors.
 For one, the details of the decoding mechanism
 in \citet{mitra2014} are not clear.
 The authors note that they use a
-``deep neural network''
+deep neural network
 with as many as six hidden layers;
 however, the choice of neural activation function,
 optimization procedure,
@@ -728,23 +758,17 @@ and automatic video analysis.
 \subsection{Trajectory classification}
 \label{sec:prev-classification}
 
-% ??? list some desirable qualities of a traj classifier
-% from later on; e.g.,
-% speed invariance (works regardless of how fast
-% the traj is playing out),
-% online classification, ...
-
 Unsurprisingly, many of the existing
 solutions for trajectory classification
 are based on generative statistical models,
-in particular Hidden Markov Models
+particularly Hidden Markov Models (HMMs),
 as has been dominant in speech recognition
 (see \citealt{mlich2008,nascimento2010}
 and \citealt{mitra2007,weinland2011,rautaray2015}
 for reviews).
 Given the failure of the statistical approach
 in \citet{mitra2014},
-we instead focused on systems
+we focus here on systems
 that recognize trajectories
 through tracking the trajectory
 either in comparison to some known template,
@@ -794,7 +818,7 @@ as is required for production information trajectories.
 
 \citet{quiroga2013}
 proposed a system called competitive neural classifiers (CNC)
-that can recognize arabic number hand gestures
+that can recognize number hand gestures
 using small training sets (three examples per gesture).
 CNC uses a collection of sub-classifiers
 that compete in order to collectively
@@ -832,11 +856,19 @@ with spiking neural networks
 making this system unsuitable
 for use in Sermo.
 
-\fig{quiroga}{0.5}{???}{???}
+\fig{quiroga}{0.55}{Resampling in \citet{quiroga2013}.}{
+  Example of the resampling procedure in \citet{quiroga2013}.
+  The original trajectory (left) has more sample points
+  at the beginning and end of the trajectory.
+  The resampled trajectories (middle, right)
+  have sample points distributed to maximize the probability
+  of a successful classification,
+  which cannot be done in a continuous online system.
+  Adapted from \citet{quiroga2013}.}
 
 Finally, \citet{caramiaux2014}
 presented an algorithm called the
-Gesture Variation Follower (GFV),
+Gesture Variation Follower (GVF),
 based on an online HMM-based
 trajectory tracking technique
 called Gesture Following (GF)
@@ -845,8 +877,8 @@ The goal of the algorithm is to match
 an input gesture sequence
 with a set of predefined template gestures.
 Unlike the HMM-based GF algorithm,
-GFV views the trajectory as a dynamical system,
-and uses a Particle Filtering algorithm
+GVF views the trajectory as a dynamical system,
+and uses a particle filtering algorithm
 to learn a set of weights
 that denote the importance of
 each randomly generated particle
@@ -873,8 +905,8 @@ between the particle's sample
 and the observed input.
 If too many particles have small weights
 associated with them,
-then a resampling procedure is done
-based on the current weights.
+then particles are resampled
+based on their current weights.
 
 What differentiates this algorithm from
 other particle filtering algorithms
@@ -885,7 +917,7 @@ is associated with,
 and a probability distribution
 over the phase of the trajectory
 (i.e., how far along the trajectory
-we currently are),
+we currently are)
 and the speed of the trajectory
 (i.e., how far along the trajectory
 do we expect to be on the next timestep).
@@ -893,11 +925,11 @@ The state evolves over time according to
 predefined state transition functions,
 and on each timestep,
 each particle emits an observation
-according to a possibly non-linear function.
+according to a possibly nonlinear function.
 
 A useful analogy for this algorithm
 is that it implements an online version of an HMM.
-Like HMMs, it maintains some internal representation
+Like an HMM, it maintains some internal representation
 that can be used to estimate the probability
 of a particular sequence
 by forming a prediction
@@ -933,9 +965,9 @@ however, as continuous time particle filtering
 has been done in the past
 \citep{ng2005}.
 Second, while the dynamical system
-at the core of GVF is well suited
-to be implemented in spiking neurons,
-the resampling process is not.
+at the core of GVF should be
+implementable in spiking neurons,
+the resampling procedure is likely not.
 On each step of the algorithm,
 each particle represents a probability
 distribution over the system state,
@@ -945,20 +977,20 @@ possible with spiking neurons;
 see \citealt{buesing2011}).
 However, when the importance weights
 of a sufficient number of particles
-is below a particular threshold,
+are below a particular threshold,
 a new set of particles
-is randomly generated
+are randomly generated
 to replace those with low importance weights.
 This procedure would translate to
 a significant reorganization
 of the neurons implementing
 the sampling procedure,
-which we believe
+which I believe
 would not have evolved if
 procedures that do not require
 reorganization exist.
 
-We will propose a trajectory classification technique
+I will propose a trajectory classification technique
 in Section~\ref{sec:impl-recog}
 that shares many of the positive
 characteristics of the GVF algorithm,
