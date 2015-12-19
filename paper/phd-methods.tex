@@ -1478,3 +1478,115 @@ so we instead subclass Brain's
 \textit{Sound} object
 and provide samples from
 Nengo when needed.
+
+\section{VocalTractLab articulatory synthesizer}
+\label{sec:vtl}
+
+\begin{wrapfigure}{l}{0.421\textwidth}
+  \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.42\textwidth]{birkholz}
+  \end{center}
+  \vspace{-12pt}
+  \caption{Birkholz articulatory synthesizer
+    \citep{birkholz2013}. See text for details.}
+  \label{fig:birkholz}
+  \vspace{-20pt}
+\end{wrapfigure}
+
+\begin{wrapfigure}{l}{0.41\textwidth}
+  \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.41\textwidth]{birholz-params}
+  \end{center}
+  \vspace{-24pt}
+\end{wrapfigure}
+
+
+One of the most successful articulatory
+synthesizers\footnote{An early version of the synthesizer
+  came second in a singing challenge
+  at Interspeech 2007; results available at
+  \url{http://www.interspeech2007.org/Technical/synthesis_of_singing_challenge.php}.}
+is one by Birtkholz et al,
+(available at \url{http://www.vocaltractlab.de/};
+\citealp{birkholz2013}).
+We will refer to it as the Birkholz synthesizer.
+The Birkholz synthesizer uses
+an analog electrical circuit transmission line
+for generating acoustics,
+a geometric model for the vocal tract,
+and an action based control model.
+
+While the full details of the acoustic model
+and the vocal tract model are not
+essential for the work proposed here,
+it is useful to note
+the 23 degrees of freedom
+being controlled by Birkholz's
+action based control model.
+
+\begin{tabular}{llrrl}
+\toprule
+{\bf Name} & {\bf Description} & {\bf Min.} & {\bf Max} & {\bf Unit} \\
+\midrule
+$HX$ & Horizontal hyoid position & 0.0 & 1.0 & \\
+$HY$ & Vertical hyoid position & -6.0 & -3.4 & cm \\
+$JX$ & Horizontal jaw displacement & -0.5 & 0.0 & cm \\
+$JA$ & Jaw angle & -7.0 & 0.0 & deg \\
+$LP$ & Lip protrusion & -1.0 & 1.0 & \\
+$LD$ & Vertical lip distance & -2.0 & 4.0 & cm \\
+$VS$ & Velum shape & 0.0 & 1.0 & \\
+$VO$ & Velic opening & -0.1 & 1.0 & \\
+$TCX$ & Tongue body center X & -3.0 & 4.0 & cm \\
+$TCY$ & Tongue body center Y & -3.0 & 1.0 & cm \\
+$TTX$ & Tongue tip X & 1.5 & 5.5 & cm \\
+$TTY$ & Tongue tip Y & -3.0 & 2.5 & cm \\
+$TBX$ & Tongue blade X & -3.0 & 4.0 & cm \\
+$TBY$ & Tongue blade Y & -3.0 & 5.0 & cm \\
+$TRX$ & Tongue root X & -4.0 & 2.0 & cm \\
+$TRY$ & Tongue root Y & -6.0 & 0.0 & cm \\
+$TS1$ & Tongue side elevation 1 & -1.4 & 1.4 & cm \\
+$TS2$ & Tongue side elevation 2 & -1.4 & 1.4 & cm \\
+$TS3$ & Tongue side elevation 3 & -1.4 & 1.4 & cm \\
+$TS4$ & Tongue side elevation 4 & -1.4 & 1.4 & cm \\
+$MA1$ & Minimum area tongue back region & 0.0 & 0.3 & cm$^2$ \\
+$MA2$ & Minimum area tongue tip region & 0.0 & 0.3 & cm$^2$ \\
+$MA3$ & Minimum area lip region & 0.0 & 0.3 & cm$^2$ \\
+\bottomrule
+\end{tabular}
+
+In \citet{birkholz2013}, the actions generated from
+the phonetic and prosodic representation
+are mapped to changes in
+the 23-dimensional control parameters
+through analysis of MRI and dynamic MRI recordings
+of a single speaker.
+From that starting point,
+each vowel phoneme was optimized
+by minimizing the difference
+between the simulated formants
+and the speaker's formants\footnote{A
+speech formant is a frequency that
+has a high amplitude for a specific sound.
+Three such formants have been identified
+for most phonemes, though usually only the first
+two are necessary to uniquely identify
+a phoneme; for example, the long \textit{e}
+vowel sound (as in fr\textit{ee})
+can be uniquely identified with
+formants $f_1=240$ Hz and $f_2=2400$ Hz.}
+The optimization
+was done using a greedy hill-climbing algorithm
+in which each degree of freedom in
+the control signal for a given vowel
+was varied positively and negatively
+and the formant difference was evaluated
+until a local minimum was found.
+
+Despite this optimization procedure
+being relatively simple,
+subjective error rates dropped dramatically,
+pointing to the possibility
+of greatly improved synthesis
+by using more sophisticated optimization techniques.

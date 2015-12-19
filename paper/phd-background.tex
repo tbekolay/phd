@@ -117,8 +117,7 @@ and amplify mid frequency sounds
   the tectorial membrane,
   and act as a dynamic amplifier
   (see text for more details).
-  Adapted from
-  \url{https://commons.wikimedia.org/wiki/File:Organ_of_corti.svg}.}
+  Adapted from \citet{kandel2000}.}
 
 The inner ear transduces vibrations
 of the liquid in the cochlea
@@ -1290,7 +1289,8 @@ to emit phoneme labels,
 which are then composed into words
 using large corpora of
 lexical and linguistic information
-(see Figure~\ref{fig:asr} and
+(see Figure~\ref{fig:asr},
+\citet{bahl1983}, and
 \cite{rabiner1989,gales2008} for reviews).
 The first part of the pipeline
 that produces feature vectors
@@ -1494,7 +1494,7 @@ it translates electrical activity in the brain
 into muscle activations,
 which cause fluctuations in air pressure.
 
-\fig{vt}{0.4}{Sagittal view of the human vocal tract.}{
+\fig{vt}{0.6}{Sagittal view of the human vocal tract.}{
   Sagittal view of the human vocal tract,
   showing the seven main articulators;
   refer to the text for details
@@ -1638,7 +1638,7 @@ and these constraints will
 inform the structure of the model
 we present in Chapter~\ref{chapt:model}.
 
-\fig{production}{0.2}{Hierarchy of linguistic concepts in speech production.}{
+\fig{production}{0.4}{Hierarchy of linguistic concepts in speech production.}{
   Hierarchy of linguistic concepts in speech production.
   While there are many important linguistic processes
   generating sequences of words,
@@ -1669,19 +1669,19 @@ of the articulators in the vocal tract
   as vocal tract actions or speech actions,
   which may better match terminology used in
   general motor control literature.
-  However, we will use
-  the terminology of vocal tract gestures
-  in this thesis.}
+  However, we will refer to
+  sets of learned vocal tract movements as
+  vocal tract gestures in this thesis.}
 Gestures are the basic unit of
 the speech production hierarchy
 (playing a similar role to phonemes
 in the speech perception hierarchy),
 making them integral to language.
-Howver, there is evidence that children
+However, there is evidence that children
 learning to say their first words
 often use the correct gestures,
 but take time to order them correctly
-to produce the desired utterance,
+to produce speech,
 indicating that gestures develop
 before language,
 and are leveraged when
@@ -1753,7 +1753,7 @@ The horizontal axis of
 a gestural score represents time,
 though the time axis may be
 stretched depending on
-the global parameter, stiffness.
+the global stiffness parameter.
 Gestural scores can also
 be visualized as a graph,
 as in Figure~\ref{fig:gs},
@@ -1794,11 +1794,22 @@ in speech.
 We will discuss our interpretation
 of gestures in Section~\ref{sec:results-production}.
 
-\subsubsection{Syllables}
+\subsubsection{Syllables \& words}
 
-%% START UP HERE %%
+Words can be composed into one or more syllables
+(syllabified),
+which provides information about
+how that word is pronounced.
+While the syllabification of a word
+may vary between speakers
+or even utterances by the same speaker,
+syllables are thought to be the
+basic freestanding unit of production
+(see \citealt{levelt1994,levelt1999,cholin2004}
+for arguments and empirical support).
 
-Syllables are groups of one or more phonemes
+In terms of speech perception concepts,
+syllables are groups of one or more phonemes
 with a well-specified structure.
 They consist of a loud vocalic center,
 with optional quieter consonantal components
@@ -1811,24 +1822,33 @@ when voicing a syllable.
 
 The phonemes that make up a syllable
 are typically grouped into
-the onset and rime,
+the onset and rhyme,
 where the onset is a cluster of
 consonant phonemes,
-and the rime is a vowel phoneme
+and the rhyme is a vowel phoneme
 (called the nucleus)
 and an optional cluster of consonant
 phonemes (called the coda).
 In English, the onset is also optional,
 though this is not true in all languages.
-Figure~\ref{fig:syllables} summarizes this grouping.
+Figure~\ref{fig:syllables} gives
+examples with this grouping.
 Note that other ways to describe
 syllables exist
-(e.g. the \textit{mora}; \citealt{otake1993}),
+(e.g., the \textit{mora}; \citealt{otake1993}),
 but we adopt this method
 as it is the most common
 for Germanic languages like English.
 
-\fig{syllables}{0.6}{???}{???}
+\fig{syllables}{0.7}{Example syllable structure.}{
+  Syllable structures of monosyllabic words
+  ``pout'' and ``pond.''
+  Syllables in English are composed of an optional
+  onset consonant cluster,
+  a vocalic nucleus,
+  and an optional coda consonant cluster.
+  Adapted from
+  \url{https://en.wikipedia.org/wiki/File:Syllable_illustrations_3and4.svg}.}
 
 Phonetically, syllables are a useful
 level of organization because
@@ -1848,14 +1868,14 @@ and can co-occur.
 One aspect of the stress of an utterance
 is the weight of a syllable.
 ``Heavy'' or ``strong'' syllables
-have a branching rime,
+have a branching rhyme,
 or a branching nucleus,
 meaning that they
 end in a consonant,
 or contain a long vowel or diphthong,
 respectively.
 ``Light'' or ``weak'' syllables
-do not have branching rime or nucleus,
+do not have branching rhyme or nucleus,
 and in general are shorter
 and quieter.
 In English, most vowel phonemes
@@ -1873,7 +1893,7 @@ can be stressed.
 
 Like all levels of phonetics and phonology,
 the above description is a useful simplification
-of a more complex phenomenon.
+of more complex phenomena.
 In terms of syllable production,
 the onset-nucleus-coda grouping
 is not always sufficient.
@@ -1891,15 +1911,75 @@ asked to segment an utterance
 into its component syllables.
 Yet, the meaning of the utterance
 is understood by all subjects.
-Therefore, while the syllable
-may be a useful level of organization
-for producing utterances,
-its role in perceiving them
-may be limited.
+Therefore, the syllable's
+role in speech perception may be limited.
 
-% ??? Here or somewhere else, summarize
-% the ``mental syllabary'' from Levelt and Wheeldon, 1994
-% also Burki 2015
+Syllables, however, play a critical role
+in speech production.
+A series of theoretical and experimental studies
+by Levelt, Roelofs, and colleagues
+has proposed that speech production
+involves several stages,
+including phonological encoding,
+and phonetic encoding
+\citep{levelt1999,roelofs2000,cholin2004}.
+In phonological encoding,
+a sequence of phonemes is retrieved
+from the mental lexicon corresponding
+to a lexical item,
+and are organized into syllables
+through an excplicit syllabification stage
+(called ``prosodification'' as it
+includes prosodic elements of syllables).
+This method of phonological encoding
+constrasts with other speech production theories
+which assume that the syllabification
+of a word is stored in the mental lexicon
+(e.g., \citealt{dell1988}).
+Using phoneme strings and constructing
+syllables on the fly
+is necessary to capture
+the phenomenon of ``resyllabification,''
+in which the same word
+has a different syllabification
+in different contexts
+(e.g., ``pre-dict'' versus
+``pre-dic-ted'';
+see \citealt{cholin2004}).
+
+In phonetic encoding,
+phonological syllables are
+mapped to ``syllabic gestures,''
+which are learned gesture scores
+corresponding to frequently used syllables.
+\citet{levelt1992,levelt1994} theorize
+that we have a repository
+of learned gesture scores
+for frequenty used syllables
+called a ``mental syllabary,''
+which is queried
+in the phonetic encoding process.
+These learned gesture scores
+are then executed by a motor system
+to generate speech.
+See Figure~\ref{fig:weaver}
+for an illustration of both
+the phonological
+and phonetic encoding processes.
+
+\fig{weaver}{0.55}{Phonological and phonetic encoding.}{
+  Phonological and phonetic encoding processes
+  theorized by \citet{levelt1994,roelofs2000}.
+  In the phonological enconding process,
+  a sequence of phonemes is generated
+  and organzed according to
+  learned syllable structures.
+  Gesture scores corresponding to these syllables,
+  which may contain
+  phonemes from multiple words,
+  are retrieved from the learned mental syllabary
+  and then voiced.
+  Adapted from \citet{levelt1994}.}
 
 \subsection{Neurobiology}
 \label{sec:prod-neurobio}
@@ -1915,22 +1995,15 @@ through study of two patient
 with profound difficulty producing language;
 one patient could only produce the word ``tan,''
 while the other had only a vocabulary
-of five words which he would utter repetitively.
-% While speech neurobiology is
-% difficult to study in depth
-% (invasive studies are typically deemed unethical
-% in species that can express themselves
-% through language),
+of five words which he would utter repetitively
+\citep{broca1861}.
 While we now have a much better understanding
 of the brain regions
 involved in speech production,
 how these regions are connected
 and what information they communicate
 to connected areas is still
-the subject of active research,
-which we hope to contribute to
-through generating predictions
-from our model.
+the subject of active research.
 
 Modern understanding of
 the neurobiology of speech production
@@ -1940,7 +2013,7 @@ of both brain hemispheres
 that temporally controls a series
 of tightly timed activations
 of motor cortex.
-\citep{flinker2015}
+\citet{flinker2015}
 showed through Granger causality analysis
 that Broca's area is activated
 before motor cortex,
@@ -1998,17 +2071,20 @@ of motor synergies to the abstract concept,
 and do not choose a specific variant.
 As such, our primary interest
 is in what brain areas correspond
-to the level of the speech hierarchy
-(see Figure~\ref{fig:prod-hierarchy}).
+to the levels of the speech production hierarchy
+(see Figure~\ref{fig:production}).
 
-Motor synergies, then,
-can be thought of as the highest level
-of the human speech motor hierarchy.
-There is evidence that these motor synergies
+We theorize that motor synergies
+are reponsible
+for moving vocal tract articulators
+to target positions.
+There is evidence that motor synergies
+related to speech
 exist in the ventral sensorimotor cortex (vSMC).
-\citet{bouchard2013} found that activations
-of vSMC during the voicing of a syllable
-represent activation of vocal tract articulators,
+\citet{bouchard2013} found that the activity
+in vSMC during the voicing of a syllable
+is highly correlated with
+activation of specific vocal tract articulators,
 and that the vSMC is organized somatotopically
 (i.e., distinct regions of the vSMC
 influence different vocal tract articulators).
@@ -2021,27 +2097,6 @@ They also found that the somatotopic organization
 of vSMC varied for each subject,
 but all subjects' vSMCs were organized
 in dorsal-ventral articulator order.
-
-% Note: Bernd worries about using this for speech.
-% Perhaps add in a sentence or two justifying.
-
-%% a severe difference between modeling speech movements
-%% (i.e. gestures) and arm movements First: arm movements are
-%% sequential (like phonemes) but speech gestures overlap in time for
-%% different articulators. May be we can argue, that for each
-%% articulator (each articulatory tier), there is a phonemic sequence
-%% of gestures, but these gestures need to be timed with respect to
-%% other gestures occurring on other articulatory tiers . And this
-%% "between tiers" temporal coordination (within phoneme coordination)
-%% may be more important than the temporal seqencing of phonemes.
-%% Second: gestures are simple point attractor movemetns towards ONE
-%% SINGLE target while the arm movement for writing a digit comprizes
-%% a sequence of around 10 target points in order to draw a
-%% digit. thus, the definition of "target" is totally different for
-%% digit drawing and for a gesture in speech articulation.  Third:
-%% Intrinsic timing and the notion of brain oscillators may be very
-%% important for speech, because there is an intrinsic timining in
-%% speech (which may be not thus important for digit drawing).
 
 \citet{dewolf2010} integrated neurobiological research
 into a model of the motor hierarchy
@@ -2064,17 +2119,23 @@ provides support for
 the role of primary motor cortex
 in speech.
 
-% \fig{noch}{0.4}{???}{???}
-% % just steal
+\fig{noch}{0.9}{Neural Optimal Control Hierarchy (NOCH) model.}{
+  Illustration of the main components of
+  the Neural Optimal Control Hierarchy (NOCH) model,
+  which summarizes available empirical data
+  of the function of motor-related brain regions.
+  Acronyms: PM is premotor cortex;
+  SMA are supplementary motor areas;
+  M1 is primary motor cortex; and
+  S1/S2 are primary and secondary somatosensory cortices.
+  Reproduced from \citet{dewolf2015}.}
 
-The motor synergies for vocal tract movements
+Motor synergies for vocal tract movements
 provide a method for implementing
-vocal tract gestures,
+vocal tract articulator movements,
 but there remains a link
-between the phonemic
-speech hierarchy in Figure~\ref{fig:prod-hierarchy}
-and the motor hierarchy
-in Figure~\ref{fig:noch}.
+between vocal tract gestures
+and articulator movements.
 Neurobiologically,
 that missing link appears to be
 implemented by the anterior insula,
@@ -2094,24 +2155,160 @@ the left anterior insula operates
 discretely on a fast phoneme-level timescale,
 while the right anterior insula
 operates continuously on a slower
-syllable or tone-unit level timescale,
+syllable or word timescale
 suggesting that these two timescales
 would be represented
 with separate neural resources
 in a neural model of the speech system.
 
-\subsection{Articulatory speech synthesis}
+\subsection{Articulatory speech synthesizers}
 
+The final piece in speech synthesis
+is the translation of vocal tract gestures
+of continuous articulator positions
+to audio signals.
+Articulatory speech synthesizers
+include an explicit model
+of the vocal tract,
+a model of the glottis,
+and an acoustical model
+which generates audio signals
+from the glottis and vocal tract models.
+Many systems have been proposed
+for the three models that make up
+an articulatory synthesizer.
+We will briefly review
+the main approaches,
+but leave a detailed treatment
+of the articulatory synthesizer
+used in this thesis
+for Section~\ref{sec:vtl}.
 
+Glottis models emulate the function
+of the glottis,
+which generates a pulse of air
+that is modified by the shape
+of the vocal tract.
+Glottis models generate periodic pulses
+that are modified by the vocal tract model
+to generate an audio waveform.
+One of the earliest glottis models
+is the two-mass model
+presented in \citet{ishizaka1972},
+which models the vocal folds
+as two stiffness-coupled
+spring-mass systems.
+\citet{titze1989}
+proposed a geometric model
+parameterized such that
+the glottal flow,
+glottal area, and vocal fold
+contact area can be varied.
+\citet{birkholz2011}
+proposed a modified two-mass model
+in which the two masses
+are angled, instead of parallel
+to one another.
+\citeauthor{birkholz2011}'s two-mass model
+is able to simulate
+different vocal qualities,
+including whispery and falsetto voices.
+
+Vocal tract models
+fall into a few different classes.
+One class of vocal tract models
+are statistical models,
+which extract relevant characteristics
+from a large set of data,
+mostly magnetic resonance imaging (MRI)
+paired with audio recordings
+(e.g., \citealp{badin2002}).
+A full three-dimensional representation
+of a subject's vocal tract
+can be reconstructed with sufficient data.
+Using dimensionality reduction techniques,
+the articulatory control parameters
+can be of relatively low dimensionality
+while still producing a full
+3D representation of a vocal tract.
+
+Another class of vocal tract models
+are biomechanical models,
+which attempt to fully reconstruct
+the physiology of the vocal tract
+(e.g., \citealp{dang2004}).
+This type of model is similar
+to the statistical model,
+in that MRI and other anatomical measurements
+are used to develop a 3D representation
+of the vocal tract.
+However, instead of statistically
+reducing the dimensionality
+to determine the degrees of freedom
+available to the control system,
+these models also incorporate how
+muscle activations affect the shape
+of the vocal tract,
+and use each muscle
+as a degree of freedom.
+
+A final class of vocal tract models
+are geometric models,
+which generalize the overall
+shapes observed in
+MRI and anatomical studies
+(e.g., \citep{mermelstein1973}).
+A set of parameters
+are used to generate a 3D model
+of a vocal tract.
+While these models are typically
+less detailed than those
+generated from precise
+measurements of one subject's vocal tract,
+they can be used to generate vocal tracts
+for different subjects
+(both male and female).
+The parameters of the model
+can therefore be tuned to a specific speaker,
+though the resulting vocal tract
+will not be as detailed
+as one determined solely through
+measurements of that speaker.
+
+The acoustic model takes
+a vocal tract representation
+and simulates the airflow from
+the lungs, through the vocal tract,
+to the air pressure coming out of the mouth.
+These models typically relate
+the vocal tract to some other
+device with known physics.
+One set of models treat the vocal tract
+as an analog transmission line,
+similar to models simulating
+arterial blood flow \citep{meyer1989}.
+Another set of models treat the vocal tract
+as an analog electrical circuit
+\citep{maeda1982}.
+A final set of models,
+called finite element wave propagation models,
+explicitly model the air pressure wave
+as it travels through each section
+of the vocal tract \citep{elmasri1996}.
+Hybrid techniques combine one
+of the above techniques
+with an analogous transformation
+in the frequency domain for added accuracy,
+as in \citet{sondhi1987}.
 
 \section{Sensorimotor integration}
 
-Unlike the sensory and motor aspects of speech
-sensorimotor integration
-is difficult to interrogate through
-traditional psychological or linguistic means,
-as it is most directly observable
-during development and other forms of adaptation.
+At some point in the human speech system,
+sensory and motor aspects of speech
+are interconnected.
+These interconnections are especially important
+during speech development
+and other situations which require adaptation.
 Here, we briefly review leading theories
 of how we develop and learn speech,
 then look at neurobiological studies
@@ -2119,7 +2316,7 @@ of sensorimotor integration.
 
 \subsection{Development and learning}
 
-There are two findings in the
+There are two main findings in
 speech development literature
 that are relevant to our model.
 The first is that in
@@ -2138,7 +2335,7 @@ and increasingly less sensitive
 to phonemes that they hear rarely or never
 \citep{kuhl2008}.\footnote{
   Interestingly, it has been shown that
-  remaining sensitive to phoneme
+  remaining sensitive to phonemes
   that are not regularly encountered
   is predictive of poor language performance
   at two years of age \citep{kuhl2008}.}
@@ -2150,7 +2347,7 @@ is less effective,
 and speaking foreign languages
 without an accent is more difficult
 \citep{hurford1991}.
-This finding suggests that
+These findings suggests that
 parts of our model
 that include learning
 through changes in synaptic connection weights
@@ -2178,19 +2375,19 @@ Despite the prominent role of sensorimotor integration
 in development,
 it is not the case that this system
 plays no role in the adult speech system.
-One influential study by \citet{houde1998)
+One influential study by \citet{houde1998}
 investigated sensorimotor learning
 by manipulating adult speech
 through a device that recorded
-a subject's voicing a syllable,
+a subject voicing a syllable,
 adjusted the sound such that the syllable's vowel sound
-was adjusted in a predictable way,
+was manipulated in a predictable way,
 and played the adjusted sound back through headphones.
 Subjects were able to compensate
 for the adjustment such that
 subsequently uttered syllables
-more closely matched the desired syllable,
-and that adjustment generalized
+more closely matched the desired syllable.
+That adjustment generalized
 to other syllables that had not yet
 been tested.
 
@@ -2239,7 +2436,7 @@ In this thesis, we develop
 a model of parts of the dorsal pathway,
 but developing an
 interacting ventral pathway
-would be a logical extension.
+is an important next step.
 
 \citet{hickok2007}
 suggest that the dorsal stream
@@ -2256,16 +2453,17 @@ Anatomically, the dorsal stream begins with
 the dorsal superior temporal gyrus (STG; i.e., Wernicke's area)
 and the superior temporal sulcus (STS),
 which both project to
-a parietal-temporal boundary area in the Sylvian fissure
-(called area Spt).
-They propose that the Spt is a sensorimotor interface,
+a parietal-temporal boundary area in the Sylvian fissure,
+called area Spt.
+They propose that area Spt is a sensorimotor interface,
 which also takes in input from other sensory modalities
 (i.e., visual and somatosensory information).
 Spt then projects to higher-level articulatory areas,
 including the posterior inferior frontal gyrus (pIFG; i.e., Broca's area),
 premotor cortex (PM) and the anterior insula.
 As was discussed in
-Sections~\ref{recog-neurobio} and \ref{prod-neurobio},
+Sections~\ref{sec:recog-neurobio}
+and \ref{sec:prod-neurobio},
 the STG has clear roles in auditory processing,
 and the anterior insula has clear roles in
 motor processing;
@@ -2310,13 +2508,13 @@ but several experiments appear
 to support this hypothesis.
 First, we are able to integrate
 gestural information from multiple modalities;
-the direct perception of gestures
+visual perception of gestures
 influences how we perceive the sound.
 A well-known demonstration of
 this phenomenon is the McGurk effect
 \citep{mcgurk1976},
 in which the same audio waveform
-in perceived as representing a different syllable
+is perceived as a different syllable
 when accompanied by a video
 showing the lip gesture that produces
 the audio waveform.\footnote{
@@ -2376,8 +2574,9 @@ so it is likely that they share
 a representation which might be vocal tract gestures.
 Indeed, while much of the auditory literature
 attempts to decode phonemes
-from these brain areas
-(e.g., ??? cite),
+from brain areas
+(see e.g., \citealt{mesgarani2014}
+and Figure~\ref{fig:stg-phones}),
 neural activities representing vocal tract gestures
 would necessarily be capable of
 decoding phonemes due to the fact that
@@ -2386,22 +2585,45 @@ for effecting movements that produce
 those phonemes.
 While they do not make this link directly,
 \citet{mesgarani2014}
-showed support for the motor theory of speech perception
+showed support for
+the motor theory of speech perception
 by showing that in the STG,
 which is typically thought of
 as an auditory-specific brain region,
 there is topographic organization
-based on the acoustic properties
+based on the phonetic properties
 of the phoneme being listened to
 (see Figure~\ref{fig:stg-phones}).
-These acoustic properties are
+These phonetic properties are
 directly linked to the articulators
-producing the phoneme
-(e.g., labial versus dorsal consonant phonemes)
+producing the phone
+(e.g., labial versus dorsal consonant phone)
 and therefore it is plausible that
-the STG represents vocal tract gestures.
+the STG represents vocal tract gestures,
+despite being an area primarily linked
+to speech perception.
 
-\fig{stg-phones}{0.8}{???}{???}
+\fig{stg-phones}{0.9}{Phonetic feature encoding in human STG.}{
+  Phonetic feature encoding in human STG.
+  (A) Intracranial recordings yield many recording electrodes
+  with activity strongly correlated
+  with the presentation of realizations of certain phonemes.
+  PSI stands for Phoneme Selectivity Index,
+  and is a measure of how selective a certain electrode is
+  to a given phoneme (scale: 0--32).
+  Rows correspond to phonemes,
+  and columns correspond to electrodes.
+  (B) The same data now associated with phonetic features
+  rather than individual phonemes;
+  rows correspond to phonetic features,
+  and columns correspond to electrodes.
+  Many electrodes are highly selective
+  for a small set of phonetic features,
+  which indicates that the STG
+  represents information related to
+  vocal tract articulators,
+  possibly vocal tract gestures.
+  Reproduced from \citet{mesgarani2014}.}
 
 Given that neurobiological evidence can
 support both theories,
@@ -2411,7 +2633,7 @@ represents vocal tract gestures explicitly,
 though this may or may not be the case
 in the ventral stream.
 Our model, which purports to replicate
-functions of the dorsal stream only,
+functions of the dorsal stream,
 will reflect these two theories
 by explicitly representing vocal tract gestures.
 
@@ -2420,13 +2642,13 @@ by explicitly representing vocal tract gestures.
 
 In terms of higher-level biological organization,
 almost all speech recognition systems
-can be mapped most directly
+can be mapped
 to the ventral stream of the human speech system,
 as they attempt to decode
 lexical information in order to
 transcribe speech to text.
 In this thesis, we aim to model
-the dorsal stream of the human speech system,
+parts of the dorsal stream of the human speech system,
 which we hypothesize follows the
 motor theory of speech perception,
 meaning that it uses vocal tract gestures
@@ -2459,7 +2681,7 @@ by more 60\% (relative).
 \citet{eide2001}
 augmented the feature vector
 in a standard HMM system
-articulatory features and
+with articulatory features and
 reduced word error rates
 by 34\% (relative).
 Similar studies have been done
@@ -2508,7 +2730,7 @@ however, this model assumed that the
 words in the utterance were known \textit{a priori},
 and applied their technique primarily
 for annotating data sets with time-aligned gesture scores.
-Surprisingly, we have been unable to find any literature
+We have been unable to find any literature
 attempting to extract vocal tract gesture scores
 from acoustic information directly,
 nor through a pipeline in which
@@ -2516,27 +2738,21 @@ articulator positions are decoded,
 and then gesture scores are estimated
 from those articulator positions.
 
-\subsection{Integrated recognition and synthesis systems}
+\subsection{Sensorimotor integration models}
 \label{sec:bg-diva-kroger}
 
-??? There are very few of these.
-The most well known, DIVA,
-does not actually fit our definition,
-as it is primarily a speech production system.
-However, since it uses sensorimotor feedback
-(unlike many other synthesis systems)
-we include it regardless.
-
-For the purposes of this thesis,
-we consider a system to be integrated
-if speech recognition and synthesis
-share internal representations
+Currently, there are only a few models
+of sensorimotor integration in speech.
+In this thesis, we aim to build
+an integrated system
+in which the speech recognition and synthesis
+systems share internal representations
 (i.e., representations other than
 the incoming audio waveform or text),
 and are connected such that
-the output of one system
-can be used to improve
-the performance of the other system.
+the output of the synthesis system
+can be used as the input
+to the recognition system.
 By this definition,
 the most widely used
 speech recognition and synthesis systems
@@ -2552,16 +2768,23 @@ cannot be modified over time
 as it relies on a large corpus
 of recorded speech.
 
-The most well known integrated system
+The most well known system
+that could be considered integrated\footnote{
+  Note that while DIVA uses sensorimotor associations,
+  it does not have a speech recognition system.
+  Auditory information is processed online
+  to improve synthesis,
+  but the lexical identity of auditory information
+  is not decoded.}
 is called DIVA
 (Direction Into Velocities of Articulators;
-see Figure~\ref{fig:diva};
-\citealp{guenther1995,guenther2004,guenther2006,guenther2006a}).
-DIVA consists of an articulator synthesizer,
+see Figure~\ref{fig:diva} and
+\citealt{guenther1995,guenther2004,guenther2006,guenther2006a}).
+DIVA consists of an articulator synthesizer
 and several interconnected artificial neural networks
 that drive the articulatory synthesizer
 and process auditory and somatosensory feedback
-in order to improve future synthesized speech.
+to improve future synthesized speech.
 DIVA is not pre-programmed with a repository
 of programs to effect various sounds;
 instead, it mimics human speech development
@@ -2581,7 +2804,17 @@ to brain regions that are hypothesized
 to perform similar functions
 as the neural networks in the model.
 
-\fig{diva}{0.7}{???}{???}
+\fig{diva}{0.9}{Overview of the DIVA system.}{
+  Overview of the DIVA system.
+  DIVA is a speech production model that
+  uses auditory and somatosensory feedback
+  to improve speech synthesis.
+  An utterance is initiatiated by the
+  feedforward control system,
+  and is improved through
+  auditory and somatosensory error signals
+  computed by the feedback control system.
+  Adapted from \citet{guenther2006a}.}
 
 DIVA is a productive research tool
 for studying speech development.
@@ -2591,7 +2824,7 @@ can scale to maintaining conversations
 with adult vocabularies.
 Currently, DIVA is focused on speech synthesis,
 so while it can incorporate acoustic feedback
-to learn better speech synthesis,
+to better synthesize speech,
 there is no clear path
 to incorporate speech recognition
 and higher-level linguistic capabilities.
@@ -2601,12 +2834,11 @@ neuron per speech plan,
 where a speech plan can correspond to
 a single phoneme, a syllable, or one or more words.
 In \citet{guenther2006a},
-they note that ``it is expected that
+they acknolwedge that ``it is expected that
 premotor cortex sound maps in the brain
 involve distributed representations
 of each speech sound.''
-Using such distributed representations,
-as we do in our model,
+Using such distributed representations
 would require several changes to DIVA's
 structure and learning algorithms.
 While these changes are possible,
@@ -2634,7 +2866,7 @@ much easier than a learning procedure
 that must deal with delayed feedback,
 as happens in the real world.
 
-\citet{kroger2009} proposed
+\citet{kroger2009,kroger2014a,kroger2015} proposed
 a large integrated model
 similar to DIVA in that
 it is composed of
@@ -2643,15 +2875,26 @@ and learns to produce syllables
 through a babbling stage
 in which feedback from
 auditory and somatosensory systems
-tunes the weights between
+tune the weights between
 neural populations
 (see Figure~\ref{fig:kroger}).
 The primary improvements in
 Kr\"{o}ger's model compared to DIVA
-are the introduction of a phonetic map,
+are the introduction of semantic and  phonetic maps,
 and a motor planning network.
 
-\fig{kroger}{0.7}{???}{???}
+\fig{kroger}{0.7}{Kr\"{o}ger's sensorimotor model}{
+  Kr\"{o}ger's neurocomputational model of speech acquisition.
+  Rounded dark gray boxes indicate neural maps.
+  Like DIVA, Kro\"{o}ger's model uses auditory
+  and somatosensory information to improve
+  future speech synthesis.
+  The inclusion of a semantic map
+  and a phonetic map links
+  the model to additional linguistic theory
+  (the mental lexicon and mental syllabary,
+  respectively).
+  Adapted from \citet{kroger2015}.}
 
 In DIVA, auditory and somatosensory feedback
 is directly associated with a cell
@@ -2707,8 +2950,6 @@ and learned motor sequences
 will scale better than DIVA's approach
 that does not use an intermediate representation.
 
-% ??? Update Kroger section for Cao and 2015 paper
-
 In contrast to these two models,
 the model that we present
 in the subsequent chapters does not focus on
@@ -2727,15 +2968,16 @@ portions of the human speech system
 not modeled by these two models,
 and aims to be more biologically realistic.
 Biological realism is achieved
-by more sophisticated neural network models
-that use distributed representations
+using spiking neural network models
+to represent information
+in a distributed manner
 that can scale to the level
 of adult vocabularies,
-and by using a human auditory model
+and by using an auditory periphery model
 to process incoming sounds
 rather than preprocessing the sound
 to obtain the first three formants.
-In addition, while Kr\"{o}ger model
+In addition, while Kr\"{o}ger's model
 improves on the DIVA model by
 introducing phoneme representations,
 we follow the motor theory
