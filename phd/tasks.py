@@ -553,19 +553,34 @@ def task_combine():
     def cp(name, subdir='results'):
         pin = figures.svgpath(name, pdir="plots", subdir=subdir)
         pout = figures.svgpath(name, pdir="figures", subdir=subdir)
+        for p in [pin, pout]:
+            if not os.path.exists(os.path.dirname(p)):
+                os.makedirs(os.path.dirname(p))
+
         return {'name': os.path.basename(pin)[:-4],
                 'actions': ['cp %s %s' % (pin, pout)],
                 'file_dep': [pin],
                 'targets': [pout]}
 
-    def fig(func, fin, fout):
-        return {'name': func.__name__,
-                'actions': [func],
-                'file_dep': [figures.svgpath(f) for f in fin],
-                'targets': [figures.svgpath(fout, pdir="figures")]}
+    def fig(func, fin, fout, subdir='results', f_args=()):
+        name = func.__name__
+        if len(f_args) > 0:
+            name += "(%s)" % (",".join(str(a) for a in f_args))
+        return {'name': name,
+                'actions': [(func, f_args)],
+                'file_dep': [figures.svgpath(f, subdir=subdir) for f in fin],
+                'targets': [
+                    figures.svgpath(fout, subdir=subdir, pdir="figures")]}
 
     yield cp('el-curves', subdir='background')
     yield cp('erb-mel', subdir='background')
+    yield cp('gammatone-impulse', subdir='methods')
+    yield cp('log-gammachirp-impulse', subdir='methods')
     yield fig(figures.temp_scaling,
               ['ncc-mfcc', 'ncc-ncc', 'ncc-mfcc-long', 'ncc-ncc-short'],
               'temp-scaling')
+    for filt in ['gammatone', 'log-gammachirp', 'dual-resonance',
+                 'compressive-gammachirp', 'tan-carney']:
+        yield fig(figures.filter,
+                  ['%s-noise' % filt, '%s-ramp' % filt, '%s-speech' % filt],
+                  filt, subdir='methods', f_args=(filt,))

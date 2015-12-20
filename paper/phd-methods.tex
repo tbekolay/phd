@@ -1,7 +1,7 @@
 \chapter{Methods}
 \label{chapt:methods}
 
-The three models that we implement
+The three models implemented
 in this thesis employ methods
 for auditory processing
 and trajectory generation
@@ -31,45 +31,52 @@ Section~\ref{sec:ncc}.
 \subsection{Gammatone filter}
 
 The Gammatone filter was proposed
-in the 1970 (see \citealt{johannesma1972,deboer1975,patterson1976}
-and has become
-the most widely used auditory filter
+in the 1970s
+(see \citealt{johannesma1972,deboer1975,patterson1976})
+and quickly became
+the most widely used auditory filter,
 as it emulates the basic function
 of the inner ear,
 yet can be implemented efficiently
-on general purpose computers.
-It capture many of the
+on general purpose computers
+and digital signal processors.
+It captures many of the
 psychoacoustical phenomena discussed
 in Section~\ref{sec:psychoacoustics},
-but does not capture some basic phonemena
-(e.g., the auditory filter is symmetric).
-However, most importantly,
+but does not capture some basic phonemena;
+for example, the Gammatone auditory filter is symmetric.
+However,
 it can process audio online
 and in continuous time,
 making it applicable to Sermo.
+
+\fig{gammatone-impulse}{0.65}{Impulse response of Gammatone filter.}{
+  Impulse response of the Gammatone filter.
+  It is clear from visual inspection that the
+  Gammatone filter is a cosine wave
+  convolved with a Gamma function.
+  See text for equation.}
 
 As described in \citet{patterson1976},
 the Gammatone filter has
 an impulse response of the form
 \begin{equation}
-  \text{IR}(t) = t^{n-1} \cos(2 \pi f t) e^{-2 \pi b \text{ERB}(f) t}},
+  \text{IR}(t) = t^{n-1} \cos(2 \pi f t) \, e^{-2 \pi b \text{ERB}(f) t},
 \end{equation}
 where $n$ is the order of the filter,
 $b$ is a parameter determining the filter bandwidth,
 and ERB$(f)$ is the equivalent rectangular bandwidth
 of the filter centered at frequency $f$
-($\text{ERB}(f) = 24.7 + 0.108f$).
+($\text{ERB}(f) = 24.7 + 0.108f$;
+see Figure~\ref{fig:gammatone-impulse}).
 Intuitively, the impulse response
 is the convolution of a
-carrier signal (the cosine)
+carrier signal (a cosine wave)
 and an envelope
 (a Gamma function, hence the name Gammatone).
 Fourth order Gammatone filters
 are the most common
 \citep{patterson1992}.
-See Figure~\ref{fig:gammatone} for ???.
-
-\fig{gammatone}{0.8}{???}{???}
 
 \citet{slaney1993} proposed an efficient
 digital filter implementation
@@ -115,6 +122,22 @@ and $B$ controls the bandwidth of the filter
 See \citet{slaney1993} for the derivation
 of the Z-transforms.
 
+Figure~\ref{fig:gammatone} shows the output
+of the auditory periphery model
+using the Gammatone filter
+for white noise, tone ramp, and speech inputs.
+
+\fig{gammatone}{1.0}{Auditory periphery with Gammatone filter.}{
+  Auditory periphery model using the Gammatone filter.
+  The top row plots the rectified and compressed output of the filter,
+  which we take to be the activity of an inner hair cell (IHC).
+  The middle row plots the activity across
+  the IHC-auditory nerve (AN) synapse.
+  The bottom row plots the spiking activity
+  of neurons that project down the auditory nerve.
+  The model is fed (A) white noise, (B) tone ramp,
+  and (C) speech input.}
+
 \subsection{Log Gammachirp filter}
 
 A primary weakness of the Gammatone filter
@@ -129,15 +152,15 @@ and have a sharp dropoff in sensitivity
 for power in frequencies
 above the characteristic frequency.
 The family of Gammachirp filters
-are IIR filters that remain
-computationally efficient,
+are infinite impulse response (IIR) filters
+that remain computationally efficient,
 like the Gammatone filter,
 but have an asymmetric frequency response.
 They are based on spectral masking experiments
 (see Section~\ref{sec:psychoacoustics})
 in which the listener has to
 detect a brief sinusoidal signal
-along ``notched'' white noise,
+among ``notched'' white noise,
 in which the power spectrum of the noise
 at frequencies just above and just below
 the frequency of the sinusoid
@@ -152,7 +175,7 @@ in that it is more numerically stable.
 The impulse response
 of the Log Gammachirp filter is
 \begin{equation}
-  \text{IR}(t) = t^3 \cos(2 \pi (f t + c \ln(t)) e^{-2 \pi b \text{ERB}(f) t}},
+  \text{IR}(t) = t^3 \cos(2 \pi (f t + c \ln(t))) \, e^{-2 \pi b \text{ERB}(f) t},
 \end{equation}
 where $c$ is a ``chirp'' parameter
 that affects the asymmetry
@@ -160,12 +183,26 @@ of the auditory filter;
 typically, $c$ is set to a negative value,
 raising the response to lower frequency sounds
 and attenuating the response to higher frequency sounds.
-See Figure~\ref{fig:log-gammachirp} for a plot of the impulse response.
-Unlike the Gammatone impulse response,
-the Gammachirp ???more,
-use the word frequency sweep
+The Gammachirp impulse response
+(see Figure~\ref{fig:log-gammachirp})
+is similar to that of the Gammatone,
+except that the frequency of the cosine wave
+carrier signal increases (for $c < 0$)
+or decreases (for $c > 0$)
+throughout the impulse response.
+The ability for the Gammachirp filter to
+change the frequency it is sensitive to
+(i.e., to perform ``frequency sweeps''
+or ``frequency glides'')
+causes the asymmetry.
 
-\fig{log-gammachirp}{0.8}{???}{???}
+\fig{log-gammachirp-impulse}{0.65}{Impulse response of Log Gammachirp filter.}{
+  Impulse response of the Log Gammachirp filter.
+  Increasing frequency can be seen when
+  $c=-1$ (left);
+  decreasing frequency can be seen when
+  $c=1$ (right).
+  See text for equation.}
 
 Gammachirp filters are closely related
 to Gammatone filters.
@@ -178,27 +215,42 @@ $|G_T(f)|$ is the amplitude sepctrum
 of the Gammatone filter,
 and $|H_A(f)|$ is the asymmetric function
 that depends on the parameter $c$.
-See Figure~\ref{???} for a visualization.
-The final IIR filter
+The final filter
 is designed by determining
 an asymmetric filter $H_C(f)$
-that simulated the
+that simulates the
 asymmetric function $H_A(f)$
 (see \citealt{unoki2001} for details).
-The Log Gammachirp improves upon
+The Log Gammachirp filter improves upon
 the original Gammachirp filter
 by identifying parameter values
 that yield discrepancies
 between $H_A(f)$ and $H_C(f)$,
-and present an alternative $H_C(f)$
+and using an alternative $H_C(f)$
 with a parameter that is optimized
 to minimize the error between
 $H_C(f)$ and $H_A(f)$.
 
+Figure~\ref{fig:log-gammachirp} shows the output
+of the auditory periphery model
+using the Log Gammachirp filter
+for white noise, tone ramp, and speech inputs.
+
+\fig{log-gammachirp}{1.0}{Auditory periphery with Log Gammachirp filter.}{
+  Auditory periphery model using the Log Gammachirp filter.
+  The top row plots the rectified and compressed output of the filter,
+  which we take to be the activity of an inner hair cell (IHC).
+  The middle row plots the activity across
+  the IHC-auditory nerve (AN) synapse.
+  The bottom row plots the spiking activity
+  of neurons that project down the auditory nerve.
+  The model is fed (A) white noise, (B) tone ramp,
+  and (C) speech input.}
+
 \subsection{Dual resonance nonlinear filter}
 
 The filters discussed to this point
-are independent linear filters.
+are linear filters.
 However, as discussed in
 Section~\ref{sec:recog-neurobio},
 there are many nonlinearities
@@ -212,7 +264,7 @@ consists of two parallel pathways
 that are summed together
 (see Figure~\ref{fig:drnl-structure}).
 The linear path (top, Figure~\ref{fig:drnl-structure})
-scales the input by some gain $g$,
+scales the input by some gain factor,
 filters the signal through
 two or three first-order Gammatone filters,
 and then through a cascade of
@@ -234,8 +286,12 @@ the final result of the filter,
 which models the velocity of
 basilar membrane deflection.
 
-% \fig{drnl-structure}{0.7}{???}{???}
-% fig 3 of lopez-poveda
+\fig{drnl-structure}{0.9}{Dual resonance nonlinear filter pathways.}{
+  Signal processing pathways of the DRNL filter.
+  The linear path is on the top;
+  the nonlinear path is on the bottom.
+  See text for more details.
+  Adapted from \citet{lopez2001}.}
 
 The nonlinear gain in the nonlinear path
 is a ``broken stick'' nonlinearity;
@@ -250,40 +306,53 @@ Like the parameters of the linear path's filters,
 these parameters are fit to human data.
 Detail on the fitting procedure
 and the digital filter implementation
-of the filter can be found in \citet{lopez2001}
-
-\fig{drnl}{0.8}{???}{???}
+of the filter can be found in \citet{lopez2001}.
 
 Due to its complexity,
 the DRNL impulse response does not have a simple closed form.
-However, its impulse response
-and frequency response can be simulated;
-see Figure~\ref{fig:drnl}?.
+However, Figure~\ref{fig:dual-resonance} shows the output
+of the auditory periphery model
+using the DRNL filter
+for white noise, tone ramp, and speech inputs.
+
+\fig{dual-resonance}{1.0}{
+  Auditory periphery with dual resonance nonlinear (DRNL) filter.}{
+  Auditory periphery model using the DRNL filter.
+  The top row plots the rectified and compressed output of the filter,
+  which we take to be the activity of an inner hair cell (IHC).
+  The middle row plots the activity across
+  the IHC-auditory nerve (AN) synapse.
+  The bottom row plots the spiking activity
+  of neurons that project down the auditory nerve.
+  The model is fed (A) white noise, (B) tone ramp,
+  and (C) speech input.}
 
 \subsection{Dynamic compressive Gammachirp model}
 
-Just as the DRNL filter can be thought of
+While the DRNL filter can be thought of
 as an nonlinear extension of Gammatone filters,
 the Dynamic Compressive Gammachirp model (DCGC)
 \citep{irino2006}
 is a nonlinear extension of Gammachirp filters.
 It also consists of two pathways,
-which, unlike the DRNL,
+which, unlike the DRNL filter,
 interact nonlinearly.
 
-% \fig{dcgc-structure}{0.7}{???}{???
-% fig 3 from paper
+\fig{dcgc-structure}{0.8}{Dynamic Compressive Gammachirp filter pathways.}{
+  Signal processing pathways of the DCGC filter.
+  See text for more details.
+  Adapted from \citet{irino2006}.}
 
 Figure~\ref{fig:dcgc-structure}
 gives the overall structure of the filter.
-In the control pathway,
+In the control (level estimation) pathway,
 the signal is filtered by
 a bank of passive Gammachirp filters,
-and then a highpass filter.
+and then highpass filters.
 The signal pathway
 also begins with a bank of Gammachirp filters,
-and then a highpass filter,
-but the high pass filters in the signal pathway
+and then highpass filters,
+but the highpass filters in the signal pathway
 have variable cutoff frequencies
 depending on the output of the control pathway.
 
@@ -298,10 +367,20 @@ of filter output
 Like the DRNL filter, it is too complicated
 to express the impulse response
 in a simple closed form,
-but simulated impulse and frequency response
-curves are shown in Figure~\ref{fig:dcgc}.
+but responses to input signals
+are shown in Figure~\ref{fig:compressive-gammachirp}.
 
-\fig{dcgc}{0.8}{???}{???}
+\fig{compressive-gammachirp}{1.0}{
+  Auditory periphery with Dynamic Compressive Gammachirp (DCGC) filter.}{
+  Auditory periphery model using the DCGC filter.
+  The top row plots the rectified and compressed output of the filter,
+  which we take to be the activity of an inner hair cell (IHC).
+  The middle row plots the activity across
+  the IHC-auditory nerve (AN) synapse.
+  The bottom row plots the spiking activity
+  of neurons that project down the auditory nerve.
+  The model is fed (A) white noise, (B) tone ramp,
+  and (C) speech input.}
 
 \subsection{Full auditory periphery modeling}
 
@@ -312,22 +391,12 @@ given some audio signal.
 These filters are an important part
 of a full auditory periphery model,
 which should also include
-a filter emulating the function
-of the outer and middle ear,
 a method for transducing
 the basilar membrane deflections
 into inner hair cell activity,
 and a method for generating
 action potentials from the inner hair cell activity,
 mimicking the function of spiral ganglion cells.
-See Figure~\ref{fig:periphmodel} for the full pipeline
-of an auditory periphery model.
-
-% ??? figure: hierarchy from wilson et al
-% \fig{periphmodel}{0.6}{???}{??? \cite{wilson2005}}
-
-The middle ear function...
-??? figure out
 
 For transducing the inner hair cell activity,
 we rectify and compress the output
@@ -336,7 +405,7 @@ to account for two effects.
 First, the basilar membrane may deflect
 positively or negatively
 (as can be seen in the impulse response
-in Figure~\ref{fig:gammatone}),
+in Figure~\ref{fig:gammatone-impulse}),
 but only positive deflections result in
 inner hair cell activity.
 Second, the amount of inner hair cell activity
@@ -357,22 +426,28 @@ is interpreted as the inner hair cell activity,
 which is the input to a simulated neuron.
 Synapses and neurons are simulated with Nengo;
 see Section~\ref{sec:nengo} for details.
+Figures~\ref{fig:gammatone}, \ref{fig:log-gammachirp},
+\ref{fig:dual-resonance}, and \ref{fig:compressive-gammachirp},
+include the compression and neural model
+for illustrative purposes.
 
 \subsection{Tan \& Carney model}
 
 Finally, we also test
-an auditory periphery model
+the auditory periphery model
 presented in \citet{tan2003}
 which takes into account
-the full auditory periphery pathway
-in Figure~\ref{fig:periphmodel}.
+the full auditory periphery pathway.
 
-\fig{tancarney-structure}{0.8}{???}{???}
+\fig{tan-carney-structure}{0.8}{Tan Carney model pathways.}{
+  Signal processing pathways of the Tan Carney model.
+  See text for more details.
+  Adapted from \citet{tan2003}.}
 
 The model, depicted in
 Figure~\ref{fig:tancarney-structure},
 consists of a middle ear model,
-a auditory filter consisting
+an auditory filter consisting
 of a control path and signal path,
 and an inner hair cell
 and synapse model.
@@ -385,7 +460,7 @@ characteristic frequency.
 
 The signal path in the model
 consists of a linear bandpass filter
-with two eight-order poles
+with two eighth-order poles
 and one fourth-order pole,
 their complex conjugates,
 and a tenth-order zero
@@ -398,9 +473,6 @@ to capture physiological effects
 like frequency glides
 and sharp frequency response curves.
 
-% \fig{tancarney}{0.8}{???}{???}
-% ??? fig impulse, freq
-
 The bandwidth and gain of the linear filter
 in the signal path is controlled
 by the output of the control path,
@@ -412,7 +484,7 @@ a nonlinear wideband filter,
 a symmetric nonlinear function,
 an asymmetric nonlinear Boltzmann function,
 and a second-order lowpass filter
-with a cutoff frequency of 800 Hz.
+with a cutoff frequency of 800~Hz.
 As mentioned above,
 the output of the control path
 controls the bandwidth
@@ -423,10 +495,10 @@ to control the bandwidth of the initial
 wideband filter.
 
 In the full model, the output of the signal path
-is used to simulate an inner hair cell,
+is used to simulate an inner hair cell
 and the synapse between an inner hair cell
 and a spiral ganglion cell
-\citep{{zhang2001}.
+\citep{zhang2001}.
 The IHC model
 consists of a log-sigmoid transfer function
 and a seventh-order lowpass filter.
@@ -434,11 +506,28 @@ The synapse model is a three-store
 diffusion model \citep{carney1993},
 which generates the instantaneous
 rate of a spiral ganglion cell.
-However, in this thesis,
+However,
 we will instead use a synapse
-and neuron model in Nengo
+and neuron model from Nengo
 to reduce computational complexity
 and make the five models more consistent.
+
+Figure~\ref{fig:tan-carney} shows the output
+of the auditory periphery model
+using the Tan-Carney model
+(with Nengo neurons and synapses)
+for white noise, tone ramp, and speech inputs.
+
+\fig{tan-carney}{1.0}{Auditory periphery with Tan-Carney model.}{
+  Auditory periphery model using the Tan-Carney model.
+  The top row plots the rectified output of the filter,
+  which we take to be the activity of an inner hair cell (IHC).
+  The middle row plots the activity across
+  the IHC-auditory nerve (AN) synapse.
+  The bottom row plots the spiking activity
+  of neurons that project down the auditory nerve.
+  The model is fed (A) white noise, (B) tone ramp,
+  and (C) speech input.}
 
 \subsection{Brian hears software}
 \label{sec:brian-hears}
@@ -454,7 +543,8 @@ neural simulator capable
 of simulating spiking neural networks
 with relatively high precision
 but slow speed
-(see \citealt{bekolay2013} for benchmark results).
+(\citealp{goodman2008};
+see \citealt{bekolay2013} for benchmark results).
 Due in part to its slow speed,
 we use \textit{Brian} only for
 the auditory periphery model implementations
@@ -465,8 +555,8 @@ for all other model implementations.
 \section{Dynamic movement primitives}
 \label{sec:methods-dmp}
 
-Dynamic movement primitives (DMPs)
-are a method for planning and controlling trajectories
+The dynamic movement primitive (DMP)
+is a method for planning and controlling trajectories
 that requires little parameter tuning
 and is stable for trajectories
 with many degrees of freedom.
@@ -485,7 +575,7 @@ for further details and extensions.
 DMPs use dynamical systems
 with specified, stable behavior
 to generate trajectories
-with more complicated behavior.
+with more complex behavior.
 The main insight in the DMP framework
 is to define two separate systems,
 a point attractor,
@@ -521,33 +611,35 @@ with dynamics
     0 &\text{if } x \ge 1,
   \end{cases}
 \end{equation}
-Typically the initial value of $x$
+Typically, the initial value of $x$
 is set to 0,
 so the discrete forcing function
 is defined over the range $[0, 1]$.
 In the rhythmic case,
 the state evolves with
-2D oscillator dynamics
+two-dimensional oscillator dynamics
 \begin{align}
   \tau \dot{x_1} &= -2 \pi x_2 \nonumber \\
   \tau \dot{x_2} &= 2 \pi x_1.
   \label{dmp-rhythmic}
 \end{align}
 
-% \fig{dewolf}{0.5}{???}{???}
-% ??? Figure 3.1 from dewolf thesis
+\fig{dmp-dewolf}{0.7}{Dynamic movement primitive (DMP) forcing function.}{
+  DMP forcing function, computed with evenly spaced Gaussians
+  as basis functions, $\psi$..
+  Reproduced from \citet{dewolf2015}.}
 
 The forcing function $f(x, g)$ is
-the weighted sum
-over some basis functions
-$\psi_i$
-(see Figure~\ref{fig:dewolf}).
+not directly computed;
+instead, it computed as the weighted sum
+over some basis functions $\psi_i$
+(see Figure~\ref{fig:dmp-dewolf}).
 In the discrete case,
 the basis functions are evaluated
 for the system state $x$ directly.
 In the rhythmic case,
-the basis functions are evaluated
-for $\frac{1}{2\pi}\tan^{-1}\left(\frac{x_2}{x_1}\right) + \frac{1}{2}$,
+the basis functions are evaluated for
+$\textstyle \frac{1}{2\pi}\tan^{-1}\left(\frac{x_2}{x_1}\right)+ \frac{1}{2}$,
 which maps the 2D oscillator state
 to the range $[0, 1]$,
 allowing the forcing function to be defined
@@ -570,8 +662,8 @@ Typically, Gaussian functions
 tiling the range of $x$ with some overlap
 are used as the basis functions
 for the forcing function
-(as are used in Figure~\ref{fig:dewolf}).
-\citet{dewolf2015} dewolf showed that
+(as are used in Figure~\ref{fig:dmp-dewolf}).
+\citet{dewolf2015} showed that
 the response curves of spiking neurons
 could be used as the
 basis functions instead
@@ -604,7 +696,7 @@ using any spiking or non-spiking neuron model.
 \label{sec:representation}
 
 The representation scheme in the NEF
-is based on \textit{population coding},
+is based on population coding,
 which was first proposed by
 \citet{georgopoulos1986}
 based on experiments in monkey cortex.
@@ -635,6 +727,8 @@ The exact neural activity depends on
 a nonlinear function, $G[\cdot]$,
 which is defined by the neuron model.
 
+\subsubsection{Encoding}
+
 In this thesis, we will primarily use
 leaky integrate-and-fire (LIF) neurons.
 LIF neurons are defined by the differential equation
@@ -653,7 +747,8 @@ In the general case,
 the neural activity $a(J)$
 is determined by direct simulation.
 However, the LIF neuron is
-simple enough that it can be
+simple enough that
+the instantaneous activity rate can be
 solved for directly.
 \begin{equation}
   \label{eq:lif-activity-j}
@@ -669,8 +764,8 @@ $\tau^{RC}$ is the RC time constant,
 and $J^{th}$ is the current threshold
 above which the neuron will spike.
 
-The remaining question, then,
-is how to relate the desired vector
+In order to represent $\V{x}$,
+we must relate the desired vector
 $\V{x}$ to the input current
 $J$ for each cell.
 To do this, we first assign some
@@ -680,7 +775,7 @@ that will represent $\V{x}$.
   \item $\V{e}$ is a unit length \textit{encoder}
     that specifies the direction in vector space
     to which the neuron is sensitive.
-  \item $alpha$ is a gain term that scales
+  \item $\alpha$ is a gain term that scales
     incoming signals.
   \item $J^{bias}$ is background current that
     is always present, biasing the cell
@@ -694,13 +789,13 @@ in that neuron is
 where $\cdot$ is the dot product.
 Since the dot product gives us
 the projection of one vector on another,
-it is high when the two vectors are similar;
+input current is high when the two vectors are similar;
 effectively, the $\V{e} \cdot \V{x}$ term
 tells us that neurons fire
 more strongly when the input signal
 is similar to the part of the vector space
 that the neuron is sensitive to.
-That similarity is then scaled by $alpha$
+That similarity is then scaled by $\alpha$
 and biased by $J^{bias}$,
 giving us the input current for each neuron.
 
@@ -724,20 +819,21 @@ are chosen in order to better implement
 a particular function.
 For example, if we are attempting to
 implement a thresholding function
-(e.g., $f(\V{x}) = 1 \text{if } \V{x} > 0.9$)
-then using all positive encoders
+(e.g., $f(x) = 1 \text{ if } x > 0.9$)
+then we may use all positive encoders
 and biases such that the cells
-will only fire when $\V{x} > 0.9$.
+will only fire when $x > 0.9$.
+
+\subsubsection{Decoding}
 
 In decoding, the goal is to estimate
 the originally encoded vector $\V{x}$.
 The NEF does this with a weighted sum
 of the neural activities with a set
 of decoding weights, $\V{d}$.
-I.e.,
-\begin{equation}
-  \label{vec}
-  \V{\hat{x}} = \sum_{i=0}^n \V{d}_i a_i,
+That is,
+\begin{equation} \label{eq:dec}
+  \V{\hat{x}} = \sum_{i=0}^{n-1} \V{d}_i a_i,
 \end{equation}
 where $\V{\hat{x}}$ is the
 decoded estimate of the encoded vector $\V{x}$,
@@ -748,45 +844,45 @@ To determine the decoding weights $\V{d}$
 we minimize the reconstruction error
 $\V{x} - \V{\hat{x}}$
 by setting up the relation
-\begin{equation*}
+\begin{equation} \label{eq:dec-lsq}
   \V{Ad} = \V{X},
-\end{equation*}
+\end{equation}
 where $\V{X}$ is a set of sample points
 in the vector space,
-and $A$ is a matrix with the activities
+and $\V{A}$ is a matrix with the activities
 of all neurons for all neurons;
 i.e.,
-\begin{equation*} \label{eq:decoding}
-  \label{A}
+\begin{equation} \label{eq:decoding}
   \V{A} =
   \begin{bmatrix}
-    a_0(X_0) & a_1(X_0) & \dots  & a_n(X_0) \\
-    a_0(X_1) & a_1(X_1) & \dots  & a_n(X_1) \\
+    a_0(X_0) & a_1(X_0) & \cdots  & a_{n-1}(X_0) \\
+    a_0(X_1) & a_1(X_1) & \cdots  & a_{n-1}(X_1) \\
     \vdots & \vdots & \ddots & \vdots \\
-    a_0(X_m) & a_1(X_m) & \dots  & a_n(X_m).
+    a_0(X_{m-1}) & a_1(X_{m-1}) & \cdots  & a_{n-1}(X_{m-1}).
   \end{bmatrix}
-\end{equation*}
+\end{equation}
 This equation is in the form
 of a linear least squares problem,
 which can be solved with standard methods
 \citep{lawson1974}.
 See Figure~\ref{fig:dec-scalar} for an illustration
-of how the decoding vectors
-result in an estimate of the encoded vector.
+of how the weighted sum
+results in an estimate of an encoded scalar.
 
-% \begin{figure}[ht!]
-%   \centering
-%   \includegraphics[width=0.45\columnwidth]{lif_est_resp_2}
-%   \includegraphics[width=0.45\columnwidth]{lif_est_out_2} \\
-%   \includegraphics[width=0.45\columnwidth]{lif_est_resp_5}
-%   \includegraphics[width=0.45\columnwidth]{lif_est_out_5} \\
-%   \includegraphics[width=0.45\columnwidth]{lif_est_resp_15}
-%   \includegraphics[width=0.45\columnwidth]{lif_est_out_15}
-%   \caption{Illustration showing how the tuning curves of a population of LIF
-%     neurons can be linearly combined to estimate an input signal, $x$. From
-%     \cite{Choo2010}.}
-%   \label{fig:dec-scalar}
-% \end{figure}
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.45\columnwidth]{lif_est_resp_2}
+  \includegraphics[width=0.45\columnwidth]{lif_est_out_2} \\
+  \includegraphics[width=0.45\columnwidth]{lif_est_resp_5}
+  \includegraphics[width=0.45\columnwidth]{lif_est_out_5} \\
+  \includegraphics[width=0.45\columnwidth]{lif_est_resp_15}
+  \includegraphics[width=0.45\columnwidth]{lif_est_out_15}
+  \caption{Illustration showing how the tuning curves
+    of a population of LIF neurons can be
+    linearly combined to estimate an input signal, $x$.
+    Reproduced from \citet{choo2010}.}
+  \label{fig:dec-scalar}
+\end{figure}
 
 For neurons with instantaneous rate equations,
 like the LIF neuron (see Equation~\eqref{eq:lif-activity-j}),
@@ -797,7 +893,7 @@ we must explicitly consider time,
 which to this point has been an implicit
 part of all of the equations.
 We model neural spikes as
-Dirac $\delta$ functions,
+Dirac-$\delta$ functions,
 and define the time-varying
 neural activity as
 \begin{equation}
@@ -818,7 +914,7 @@ of neurotransmitter.\footnote{
 Typically, we emulate post-synaptic current curves
 recorded empirically by using a decaying exponential;
 i.e.,
-\begin{equation}
+\begin{equation} \label{eq:ht}
   h(t) = e^{-t / \tau^{PSC}},
 \end{equation}
 where $\tau^{PSC}$ is the time constant
@@ -830,25 +926,25 @@ Putting these equations together,
 we get the final expression for
 the decoded estimate of the input $\V{x}$
 using spiking neuron models,
-\begin{equation}
-  \label{dec-time}
+\begin{equation} \label{eq:dec-time}
   \V{\hat{x}}(t) = \sum_{i=0}^n \V{d}_i \sum_{s_i} h(t-t_{s_i}).
 \end{equation}
 See Figure~\ref{fig:temporal-dec} for an illustration of
-the decoding process.
+the temporal decoding process.
 
-% \scalefigonesumm{temporal-dec}{0.8}{Decoding a time-varying
-%   scalar signal using a filtered spike train.}
-%   {Example of decoding a time-varying
-%   scalar signal using a filtered spike train. For each spike, the
-%   filter $h(t)$ is pasted in, weighted by the decoding weight
-%   (1 or -1 in this case). Recreated from \cite{Eliasmith2011}.}
+\fig{temporal-dec}{0.8}{NEF temporal decoding process.}{
+  Example of decoding a scalar signal
+  using a filtered spike train. For each spike, the
+  filter $h(t)$ is pasted in, weighted by the decoding weight.
+  Adapted from \citet{eliasmith2011}.}
 
 \subsection{Transformation}
 
 In the representation principle,
 we treated neurons as though
-it were possible to directly inject current in them.
+it were possible
+to directly inject current to the somas
+of each neuron.
 While direct current injections
 can make sense for modeling
 sensory systems,
@@ -866,11 +962,10 @@ Given some neuron $j$
 in an ensemble downstream
 of an ensemble with neurons indexed by $i$,
 the input current to neuron $j$ is
-\begin{equation}
-  \label{Jin}
-  J_j = \sum_{i=0}^n \omega_{ij} a_i + J_j^{bias},
+\begin{equation} \label{eq:jin}
+  J_j = \sum_{i=0}^{n-1} \omega_{ij} a_i + J_j^{bias},
 \end{equation}
-where $omega_{ij}$ is the strength of the connection
+where $\omega_{ij}$ is the strength of the connection
 between neurons $i$ and $j$.
 
 Consider the case in which we want
@@ -878,18 +973,18 @@ an ensemble to represent
 the same vector as the ensemble
 providing it input;
 i.e., we want to implement the function
-$\V{y} = f(\V{x}) = \V{x}$.
-Equation~\eqref{...} tells us how
+$f(\V{x}) = \V{x}$.
+Equation~\eqref{eq:dec} tells us how
 we can approximate $\V{x}$, so let us
 substitute that approximation
-into equation~\eqref{...}.
+into equation~\eqref{eq:encoding}.
 \begin{align} \label{eq:jin-xhat}
   J_j &= \alpha_j \V{e}_j \cdot \V{\hat{x}} + J_j^{bias} \nonumber \\
-      &= \alpha_j \V{e}_j \cdot \sum_{i=0}^n \V{d}_i a_i + J_j^{bias} \nonumber \\
-      &= \sum_{i=0}^n \alpha_j \V{e}_j \cdot \V{d}_i a_i + J_j^{bias}
+      &= \alpha_j \V{e}_j \cdot \sum_{i=0}^{n-1} \V{d}_i a_i + J_j^{bias} \nonumber \\
+      &= \sum_{i=0}^{n-1} \alpha_j \V{e}_j \cdot \V{d}_i a_i + J_j^{bias}
 \end{align}
 
-Setting \eqref{...} equal to \eqref{...},
+Setting~\eqref{eq:jin} equal to~\eqref{eq:jin-xhat},
 we can rearrange terms to
 obtain an equation for $\omega_{ij}$.
 \begin{align} \label{eq:omega}
@@ -899,12 +994,12 @@ obtain an equation for $\omega_{ij}$.
 
 Since the decoding process is linear,
 we can implement any linear function
-by introducing a matrix $L_{ji}$
+by introducing a matrix $\V{L}_{ji}$
 that performs a different combination
-of the downstream ensemble's encoders, $\V{e_j}$,
-and the upstream ensemble's decoders, $\V{d_i}$.
+of the downstream ensemble's encoders, $\V{e}_j$,
+and the upstream ensemble's decoders, $\V{d}_i$.
 \begin{equation} \label{eq:linear-trans}
-  \omega_{ij} &= \alpha_j \V{e}_j \V{C}_{ji} \V{d}_i
+  \omega_{ij} &= \alpha_j \V{e}_j \V{L}_{ji} \V{d}_i
 \end{equation}
 
 Since the decoding process is
@@ -919,27 +1014,28 @@ from each ensemble to the downstream ensemble.
   \label{eq:nef-sum}
   J_j &= J_j^{\V{x}} + J_j^{\V{y}} + J_j^{bias} \nonumber \\
       &= \sum_i \omega_{ij}^{\V{x}}a_i^{\V{x}} + \sum_i \omega_{ij}^{\V{y}}a_i^{\V{y}} + J_j^{bias} \nonumber \\
-  \omega_{ij}^{\V{x}} &= \alpha_j \V{e}_j \V{C}^{\V{x}}_{ji} \V{d}_i^{\V{x}} \text{ and }
-  \omega_{ij}^{\V{y}} = \alpha_j \V{e}_j \V{C}^{\V{y}}_{ji} \V{d}_i^{\V{y}},
+  \omega_{ij}^{\V{x}} &= \alpha_j \V{e}_j \V{L}^{\V{x}}_{ji} \V{d}_i^{\V{x}}
+  \,\text{ and }\,
+  \omega_{ij}^{\V{y}} = \alpha_j \V{e}_j \V{L}^{\V{y}}_{ji} \V{d}_i^{\V{y}},
 \end{align}
 and so on for any number of input ensembles.
 
 Nonlinear transformations
 of some vector $\V{x}$ can be implemented
 by computing a new set of decoding weights,
-$\V{d}^{f(\V{x})$,
+$\V{d}^{f(\V{x})}$,
 which minimizes the reconstruction error
 between the estimate $\V{\hat{x}}$
-and the result of applying the function,
-$f(\V{x})$. I.e., equations~\eqref{...} and \eqref{...} become
+and the result of applying the function, $f(\V{x})$.
+That is, equations~\eqref{eq:dec-lsq} and~\eqref{eq:decoding} become
 \begin{align*}
   \V{A}^{f(\V{x})}d^{f(\V{x})} &= f(\V{X}) \\
   \V{A}^{f(\V{x})} &=
   \begin{bmatrix}
-    a_0(f(X_0)) & a_1(f(X_0)) & \dots  & a_n(f(X_0)) \\
-    a_0(f(X_1)) & a_1(f(X_1)) & \dots  & a_n(f(X_1)) \\
+    a_0(f(X_0)) & a_1(f(X_0)) & \cdots  & a_{n-1}(f(X_0)) \\
+    a_0(f(X_1)) & a_1(f(X_1)) & \cdots  & a_{n-1}(f(X_1)) \\
     \vdots & \vdots & \ddots & \vdots \\
-    a_0(f(X_m)) & a_1(f(X_m)) & \dots  & a_n(f(X_m)),
+    a_0(f(X_{m-1})) & a_1(f(X_{m-1})) & \cdots  & a_{n-1}(f(X_{m-1})),
   \end{bmatrix}
 \end{align*}
 and the remaining equations only change
@@ -947,19 +1043,22 @@ in the set of decoding weights used.
 See Figure~\ref{fig:dec-func} for an illustration
 of decoding a nonlinear function.
 
-% \begin{figure}[ht!]
-%   \centering
-%   \includegraphics[width=0.45\columnwidth]{lif_func_resp_2}
-%   \includegraphics[width=0.45\columnwidth]{lif_func_out_2} \\
-%   \includegraphics[width=0.45\columnwidth]{lif_func_resp_5}
-%   \includegraphics[width=0.45\columnwidth]{lif_func_out_5} \\
-%   \includegraphics[width=0.45\columnwidth]{lif_func_resp_15}
-%   \includegraphics[width=0.45\columnwidth]{lif_func_out_15}
-%   \caption{Illustration showing how the tuning curves of a population of LIF
-%     neurons can be linearly combined to estimate a nonlinear function, in this
-%     case $\sin(2\pi x)$. From \cite{Choo2010}.}
-%   \label{fig:dec-func}
-% \end{figure}
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.45\columnwidth]{lif_func_resp_2}
+  \includegraphics[width=0.45\columnwidth]{lif_func_out_2} \\
+  \includegraphics[width=0.45\columnwidth]{lif_func_resp_5}
+  \includegraphics[width=0.45\columnwidth]{lif_func_out_5} \\
+  \includegraphics[width=0.45\columnwidth]{lif_func_resp_15}
+  \includegraphics[width=0.45\columnwidth]{lif_func_out_15}
+  \caption{Illustration showing how the tuning curves
+    of a population of LIF neurons can be
+    linearly combined to estimate a nonlinear function;
+    in this case, the nonlinear function being estimated
+    is $\sin(2\pi x)$.
+    Reproduced from \citet{choo2010}.}
+  \label{fig:dec-func}
+\end{figure}
 
 Note that this method
 of computing nonlinear transformations
@@ -999,8 +1098,15 @@ implement differential equations
 as are descried in dynamical systems
 and control theory.
 
-\fig{dynamics}{0.6}{???}{???}
-% ??? fig 6.5 from dewolf, or htbab 2.12
+\fig{dynamics}{0.6}{Network architecture for NEF dynamics.}{
+  Network architecture for implementing linear control systems
+  with the NEF.
+  The input ensemble represents the input signal, $\V{u}(t)$,
+  which is scaled by the input matrix $\V{B}$.
+  The state ensemble represents the system state, $\V{x}(t)$.
+  The recurrent connection implements dynamics
+  according to the dynamics matrix $\V{A}$.
+  Reproduced from \citet{dewolf2015}.}
 
 The architecture depicted in Figure~\ref{fig:dynamics}
 implements a linear control system,
@@ -1013,24 +1119,24 @@ and $\V{B}$ is the input matrix.
 Normally, transforming this equation
 into Laplace space results
 results in dynamics scaled by
-the filter $H(s) = \frac{1}{s}$.
+the filter $\textstyle H(s) = \frac{1}{s}$.
 However, the actual dynamics of the system
 are based on the synaptic dynamics,
-$h(t)$ from equation~\eqref{...}.
+$h(t)$ from equation~\eqref{eq:ht}.
 The Laplace transform of $h(t)$ is
-$H'(s) = \frac{1}{1 + s\tau}$.
+$\textstyle H'(s) = \frac{1}{1 + s\tau}$.
 By accounting for the difference
 between these two filters
 (see \citealt{eliasmith2004,eliasmith2013}
 for a full derivation),
 we get
 \begin{align}
-  \V{A'} &= \tau \V{A} + \V{I} \\
-  \V{B'} &= \tau \V{B},
+  \V{A'} &= \tau \V{A} + \V{I} \\ \label{eq:dyn-a}
+  \V{B'} &= \tau \V{B}, \label{eq:dyn-b}
 \end{align}
 where $\V{I}$ is the identity matrix.
 
-Equations~\eqref{...} and \eqref{...}
+Equations~\eqref{eq:dyn-a} and~\eqref{eq:dyn-b}
 allow us to implement any linear dynamical system
 in spiking neural networks
 by setting up the recurrent connection
@@ -1049,6 +1155,8 @@ introduces an exponential ``forgetting''
 of the system state
 which must be accounted for by scaling
 connections with the time constant $\tau$.
+See \citet{eliasmith2004,eliasmith2013}
+for more details.
 
 \section{Semantic Pointer Architecture (SPA)}
 \label{sec:methods-spa}
@@ -1063,7 +1171,7 @@ involved in speech.
 However, speech also connects
 to linguistic and cognitive systems
 that have traditionally been described
-with static symbols
+with symbols
 and rule-based algorithms.
 The Semantic Pointer Architecture (SPA; \citealp{eliasmith2013})
 provides a method to implement
@@ -1077,7 +1185,7 @@ a vector symbolic architecture
 using the NEF.
 While many vector symbolic architectures exist,
 the SPA specifically uses
-Holographic Reduced Representations (HER),
+Holographic Reduced Representations (HRRs),
 developed by \citet{plate1994},
 as it scales well to high dimensional spaces,
 and can be implemented naturally
@@ -1100,7 +1208,7 @@ word symbols, and so on.
 
 In order to robustly implement
 the transformations discussed
-in the subsequent section,
+subsequently,
 we use vectors of unit length
 when possible.
 When we have no information
@@ -1111,7 +1219,6 @@ for each dimension of the vector,
 then normalizing by the L2-norm
 of the vector.
 
-
 When we do have information about
 the structure of vector,
 we construct them by
@@ -1119,12 +1226,11 @@ using the transformations below
 with randomly generated vectors,
 or vectors learned through
 unsupervised methods.
-However, it is possible that
-the transformations below
-result in vectors that are
+However, when doing these transformations,
+it is possible that
+we will obtain vectors that are
 no longer of unit length.
-To limit the number of situations
-in which this occurs,
+To avoid this,
 we can use random \textit{unitary} vectors
 \citep{plate1994}.
 
@@ -1136,10 +1242,10 @@ is sensitive to noise,
 which is prevalent in biological systems.
 Therefore, when a transformation needs to
 invert a vector,
-it instead uses an approximation
+HRRs instead uses an approximation
 of the inverse called the \textit{involution}.
 Given a vector $\V{A}$, the involution
-of that vector $\V{A'}$,
+of that vector, $\V{A'}$,
 is a rearrangement of the vector dimensions;
 specifically,
 \begin{equation}
@@ -1241,9 +1347,9 @@ the computational complexity,
 the DFT and IDFT functions are linear,
 making them easy to implement
 in a spiking neural network.
-Also, observe that in this formulation,
-convolving with a unitary vector,
-which has DFT coefficients of unit magnitude,
+Also, we can observe in this formulation
+that convolving with a unitary vector
+(which has DFT coefficients of unit magnitude)
 does not change the magnitude
 of the resulting element-wise product.
 Therefore, when convolving a unit vector
@@ -1266,13 +1372,14 @@ mixes the two vectors together,
 they cannot be recovered exactly.
 However, vectors can be subsequently
 ``cleaned up'' to known
-vocabulary items using an autoassociative memory.
+vocabulary items using an autoassociative memory
+\citep{stewart2011}.
 
 It is important to note that
 the HRR definitions for merging and binding
 do not change the dimensionality
 of the vector space, unlike other VSAs
-(e.g., \citealt{smolensky1990}).
+(e.g., tensor products \citet{smolensky1990}).
 One can therefore think of the
 merging and binding operators
 as compressing the information
@@ -1297,7 +1404,7 @@ also contain shallow semantics,
 so that the compressed
 representations themselves
 can be used to implement cognitive behaviors.
-From here on, We will refer to
+From here on, we will refer to
 the vectors in a conceptual vocabulary
 as semantic pointers.
 
@@ -1348,7 +1455,7 @@ used to construct a spiking neural model.
 The \textit{Ensemble} is
 a population of spiking neurons
 that represents a vector over time.
-It presents a simplified interface
+Ensembles present a simplified interface,
 allowing modelers to specify
 details important for modeling,
 rather than manually specifying
@@ -1388,14 +1495,14 @@ For connections between ensembles,
 connections can be specified in vector space
 as a function of the input ensemble,
 or in neuron space
-by fulling specifying the connection weight matrix.
+by fully specifying the connection weight matrix.
 When functions are provided,
 the decoder solving process
 (see Equation~\eqref{eq:decoding})
-is done automatically,
-though parameters affecting
-how the decoders are solved for
-can be specified.
+is done automatically.
+Parameters affecting
+the decoder solving process
+can also be specified.
 
 \textit{Probes} specify quantities
 in the model that should be recorded
@@ -1421,25 +1528,26 @@ for defining large models
 in few lines of Python code.
 The SPA transformations
 described in the previous section
-are implemented as a several
+are implemented as several
 interacting networks.
 The models described
 in Chapter~\ref{chapt:implementation} consist
 of some instances of
 these SPA networks,
 and several networks
-that we have constructed.
+that will be explained
+in Chapter~\ref{chapt:implementation}.
 
 Python scripts using Nengo to construct
 the models discussed in the next chapter
-are available at \url{https://github.com/tbekolay/phd},
-and in simplified form in the appendix.
+are available at \url{https://github.com/tbekolay/phd}.
+%% and in simplified form in the appendix.
 
 \subsection{Integrating Brian in Nengo}
 
 As discussed in Section~\ref{sec:brian-hears},
-we use the Brain neural simulator's
-Brian Hears package
+we use the \textit{Brian} neural simulator's
+\textit{Brian hears} package
 to simulate auditory periphery models.
 As our models are implemented in Nengo,
 it is necessary for Brian and Nengo
@@ -1482,111 +1590,25 @@ Nengo when needed.
 \section{VocalTractLab articulatory synthesizer}
 \label{sec:vtl}
 
-\begin{wrapfigure}{l}{0.421\textwidth}
-  \vspace{-30pt}
-  \begin{center}
-    \includegraphics[width=0.42\textwidth]{birkholz}
-  \end{center}
-  \vspace{-12pt}
-  \caption{Birkholz articulatory synthesizer
-    \citep{birkholz2013}. See text for details.}
-  \label{fig:birkholz}
-  \vspace{-20pt}
-\end{wrapfigure}
-
-\begin{wrapfigure}{l}{0.41\textwidth}
-  \vspace{-30pt}
-  \begin{center}
-    \includegraphics[width=0.41\textwidth]{birholz-params}
-  \end{center}
-  \vspace{-24pt}
-\end{wrapfigure}
-
-
 One of the most successful articulatory
 synthesizers\footnote{An early version of the synthesizer
   came second in a singing challenge
   at Interspeech 2007; results available at
   \url{http://www.interspeech2007.org/Technical/synthesis_of_singing_challenge.php}.}
-is one by Birtkholz et al,
+is the VocalTractLab synthesizer
 (available at \url{http://www.vocaltractlab.de/};
 \citealp{birkholz2013}).
-We will refer to it as the Birkholz synthesizer.
-The Birkholz synthesizer uses
+VocalTractLab uses
 an analog electrical circuit transmission line
 for generating acoustics,
-a geometric model for the vocal tract,
-and an action based control model.
-
-While the full details of the acoustic model
-and the vocal tract model are not
-essential for the work proposed here,
-it is useful to note
-the 23 degrees of freedom
-being controlled by Birkholz's
-action based control model.
-
-\begin{tabular}{llrrl}
-\toprule
-{\bf Name} & {\bf Description} & {\bf Min.} & {\bf Max} & {\bf Unit} \\
-\midrule
-$HX$ & Horizontal hyoid position & 0.0 & 1.0 & \\
-$HY$ & Vertical hyoid position & -6.0 & -3.4 & cm \\
-$JX$ & Horizontal jaw displacement & -0.5 & 0.0 & cm \\
-$JA$ & Jaw angle & -7.0 & 0.0 & deg \\
-$LP$ & Lip protrusion & -1.0 & 1.0 & \\
-$LD$ & Vertical lip distance & -2.0 & 4.0 & cm \\
-$VS$ & Velum shape & 0.0 & 1.0 & \\
-$VO$ & Velic opening & -0.1 & 1.0 & \\
-$TCX$ & Tongue body center X & -3.0 & 4.0 & cm \\
-$TCY$ & Tongue body center Y & -3.0 & 1.0 & cm \\
-$TTX$ & Tongue tip X & 1.5 & 5.5 & cm \\
-$TTY$ & Tongue tip Y & -3.0 & 2.5 & cm \\
-$TBX$ & Tongue blade X & -3.0 & 4.0 & cm \\
-$TBY$ & Tongue blade Y & -3.0 & 5.0 & cm \\
-$TRX$ & Tongue root X & -4.0 & 2.0 & cm \\
-$TRY$ & Tongue root Y & -6.0 & 0.0 & cm \\
-$TS1$ & Tongue side elevation 1 & -1.4 & 1.4 & cm \\
-$TS2$ & Tongue side elevation 2 & -1.4 & 1.4 & cm \\
-$TS3$ & Tongue side elevation 3 & -1.4 & 1.4 & cm \\
-$TS4$ & Tongue side elevation 4 & -1.4 & 1.4 & cm \\
-$MA1$ & Minimum area tongue back region & 0.0 & 0.3 & cm$^2$ \\
-$MA2$ & Minimum area tongue tip region & 0.0 & 0.3 & cm$^2$ \\
-$MA3$ & Minimum area lip region & 0.0 & 0.3 & cm$^2$ \\
-\bottomrule
-\end{tabular}
-
-In \citet{birkholz2013}, the actions generated from
-the phonetic and prosodic representation
-are mapped to changes in
-the 23-dimensional control parameters
-through analysis of MRI and dynamic MRI recordings
-of a single speaker.
-From that starting point,
-each vowel phoneme was optimized
-by minimizing the difference
-between the simulated formants
-and the speaker's formants\footnote{A
-speech formant is a frequency that
-has a high amplitude for a specific sound.
-Three such formants have been identified
-for most phonemes, though usually only the first
-two are necessary to uniquely identify
-a phoneme; for example, the long \textit{e}
-vowel sound (as in fr\textit{ee})
-can be uniquely identified with
-formants $f_1=240$ Hz and $f_2=2400$ Hz.}
-The optimization
-was done using a greedy hill-climbing algorithm
-in which each degree of freedom in
-the control signal for a given vowel
-was varied positively and negatively
-and the formant difference was evaluated
-until a local minimum was found.
-
-Despite this optimization procedure
-being relatively simple,
-subjective error rates dropped dramatically,
-pointing to the possibility
-of greatly improved synthesis
-by using more sophisticated optimization techniques.
+a geometric three-dimensional model for the vocal tract,
+and contains several glottis models.
+We will use VocalTractLab
+for articulatory synthesis
+in this thesis
+due to its high-quality synthesis
+and gestural control model.
+We will use the default JD2 parameters
+for the vocal tract model
+and the default modified two-mass model
+of the glottis \citep{birkholz2011}.

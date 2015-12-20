@@ -65,8 +65,19 @@ def temp_scaling():
     fig.append(el("B", svgpath('ncc-mfcc-long'), w, 0))
     fig.append(el("C", svgpath('ncc-ncc'), 0, h))
     fig.append(el("D", svgpath('ncc-ncc-short'), w, h))
-
     savefig(fig, 'temp-scaling')
+
+
+def filter(filt):
+    w = 4 * in2px
+    h = 8 * in2px
+
+    fig = svgfig(w * 3, h)
+    fig.append(el("A", svgpath('%s-noise' % filt, subdir='methods'), 0, 0))
+    fig.append(el("B", svgpath('%s-ramp' % filt, subdir='methods'), w, 0))
+    fig.append(
+        el("C", svgpath('%s-speech' % filt, subdir='methods'), w * 2, 0))
+    savefig(fig, filt, subdir='methods')
 
 
 # ############################

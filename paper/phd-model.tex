@@ -42,7 +42,12 @@ in subsequent chapters.
   The goal of the model is to explicitly define
   computations needed
   for speech recognition and synthesis.
-  See text for details.}
+  Solid lines indicate connections that
+  are necessary for Sermo to function.
+  Dashed lines indicate connections that
+  we hypothesize to exist,
+  but are not essentialy for Sermo to function.
+  See text for more details.}
 
 Sermo is split into five interacting systems,
 as summarized in Figure~\ref{fig:sermo}.
@@ -179,8 +184,8 @@ We treat each subsystem as a separate
 module that is defined primarily
 by the input it expects,
 and the output it provides;
-however, in development
-and other forms of learning,
+however, during development
+and learning,
 there would be a proliferation of
 interconnections between modules
 providing error information.
@@ -265,7 +270,7 @@ and sensorimotor information decoding.
 
 \subsubsection{Spectral analysis}
 
-Sermo theorizes that spectral analysis
+We theorize in Sermo that spectral analysis
 is performed by a model
 of the auditory periphery.
 An auditory periphery model
@@ -748,11 +753,11 @@ the timescale at which
 they generate a trajectory.
 There is significant variability
 in how we voice syllables.
-During a stressful situation,
+Syllables are often elongated
+or shortened for emphasis,
+and during a stressful situation,
 all of a speaker's syllables may be
-voiced quickly, and
-syllables are often elongated
-or shortened for emphasis.
+voiced quickly.
 A trajectory generator must be
 able to produce appropriate
 production information
@@ -1374,7 +1379,11 @@ the outlook is more promising
 for the Kr\"{o}ger model.
 The auditory representation used
 is the power spectrum of the audio signal,
-which is computed as a bark-scaled spectrogram.
+which is computed as a Bark-scaled spectrogram.\footnote{
+  The Bark scale is a psychoacoustic
+  perceptual pitch scale,
+  similar in many respects to the Mel scale
+  \citep{zwicker1961}.}
 While this is an ideal mathematical transform,
 it performs the same function as the
 auditory periphery models used in Sermo.
@@ -1429,7 +1438,8 @@ and generates production information trajectories
 from those syllables.
 The production information will be
 used to synthesize speech samples
-with the VocalTractLab articulatory synthesizer.
+with the VocalTractLab articulatory synthesizer
+\citep{birkholz2006,birkholz2013}.
 We will compare the generated trajectories
 to target trajectories,
 and make qualitative observations

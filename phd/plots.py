@@ -81,18 +81,16 @@ def cochleogram(data, time, freqs, ax=None, cax=None, cbar=True):
 
     mesh = ax.pcolormesh(time, freqs, data.T,
                          linewidth=0, rasterized=True, cmap=cmap)
-    if cbar and cax is None:
-        fig.colorbar(mesh, pad=0.015, use_gridspec=True)
-    elif cbar:
-        fig.colorbar(mesh, ticklocation='right', cax=cax)
-        cax.yaxis.set_ticks_position('none')
-
     ax.set_yscale('log')
     ax.set_yticks((200, 1000, 2000, 4000, 8000))
     ax.yaxis.set_major_formatter(ScalarFormatter())
     ax.set_ylabel('Frequency (Hz)')
     ax.set_ylim(freqs[0], freqs[-1])
     ax.set_xlim(time[0], time[-1])
+    if cbar and cax is None:
+        fig.colorbar(mesh, pad=0.015, use_gridspec=True)
+    elif cbar:
+        fig.colorbar(mesh, ticklocation='right', cax=cax)
     sns.despine(ax=ax)
 
 
