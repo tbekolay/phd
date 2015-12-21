@@ -42,15 +42,16 @@ as the human auditory system, spiking neurons.
 
 \subsection{Model overview}
 
-\fig{ncc}{0.4}{Neural Cepstral Coefficient pipeline.}{
+\fig{ncc}{0.45}{Neural Cepstral Coefficient pipeline.}{
   Pipeline for generating neural cepstral coefficients (NCCs),
   compared to MFCCs.
   While the NCC pipeline initially appears to be simpler,
   the missing components from the MFCC pipeline
-  are instead incorporated into parts of the NCC pipeline.
-  The logarithmic compression is part of the
+  are instead incorporated into parts of the NCC pipeline;
+  e.g., the logarithmic compression is part of the
   auditory periphery model.
-  No explicit smoothing step is necessary,
+  No explicit smoothing and normalization
+  step is necessary,
   as signals will be smoothed and normalized
   in the NCC model by virtue of being represented
   by spiking neurons, and filtered by
@@ -159,12 +160,12 @@ which is unsurprising as MFCC extraction
 is designed to emulate certain aspects
 of the human auditory system.
 
-\fig{ncc-network}{0.8}{Neural Cepstral Coefficient network.}{
+\fig{ncc-network}{1.0}{Neural Cepstral Coefficient network.}{
   Network diagram for the neural cepstral coefficient model.
   A bank of auditory filters processes incoming sounds,
   projecting their output to an ensemble
   for each auditory filter.
-  Those ensembles are connected to ensemble
+  Those ensembles are connected to ensembles
   representing cepstral coefficients
   through the linear $\V{T}$ matrix,
   which implements the inverse discrete cosine transform.
@@ -633,11 +634,12 @@ that are defined manually.\footnote{
 \subsection{Neural model}
 \label{sec:impl-prod-neuralmodel}
 
-\fig{prod-network}{0.8}{Syllable sequencing and production network.}{
+\fig{prod-network}{0.7}{Syllable sequencing and production network.}{
+  \footnotesize
   Network diagram for the syllable sequencing and production model.
-  (A) The sequence network iterates through
+  The \textbf{sequence network} iterates through
   syllable positions in interconnected
-  working memory modules,
+  working memory modules (ovals represent SPA modules),
   which are switched through a connection from
   the sequencer network.
   Syllable positions are bound with the
@@ -646,7 +648,7 @@ that are defined manually.\footnote{
   the current and next syllable targets.
   DMPs assocaited with those syllable targets
   are disinhibited by the associative memories.
-  (B) The sequencer network receives input
+  The \textbf{sequencer network} receives input
   from all DMPs in order to keep track
   of the timing of the current syllable.
   When the current syllable is nearly finished,
@@ -660,7 +662,7 @@ that are defined manually.\footnote{
   the timer is advanced through a
   recurrent connection with a
   separate ensemble, which is normally inhibited.
-  (C) DMP networks are primarily composed of
+  \textbf{DMP networks} are primarily composed of
   an oscillator which represents
   the two-dimensional canonical system state.
   Production information trajectories
@@ -673,8 +675,8 @@ that are defined manually.\footnote{
   The DMP must be both disinhibited and
   driven to the initial position
   to generate a production information trajectory.
-  (D) Production information network.
-  Aggregates information from all DMP networks.}
+  The \textbf{production information network}
+  aggregates information from all DMP networks.}
 
 SPA modules implemented in Nengo are used
 to robustly iterate through
@@ -1431,9 +1433,10 @@ to produce that syllable.
 \subsection{Neural model}
 \label{sec:impl-recog-neural}
 
-\fig{recog-network}{0.8}{Syllable recognition network.}{
+\fig{recog-network}{0.7}{Syllable recognition network.}{
+  \footnotesize
   Network diagram for the syllable recognition model.
-  (A) The trajectory input consists of
+  The \textbf{trajectory input} consists of
   an ensemble for each possible gesture.
   One connection is made from each ensemble
   to each iDMP state ensemble.
@@ -1444,7 +1447,7 @@ to produce that syllable.
   that does not sure that gesture,
   then it projects to the system state
   of the iDMP with a negative weight.
-  (B) Each iDMP network is primarily composed of
+  Each \textbf{iDMP network} is primarily composed of
   a large recurrently connected state ensemble.
   The state ensemble's recurrent connection
   predicts an observation given the current system state,
@@ -1456,7 +1459,7 @@ to produce that syllable.
   the state ensemble once a classification is made.
   State output is also projected to
   an associative memory.
-  (C) The associative memory takes input
+  The \textbf{associative memory} takes input
   from all iDMPs in order to emit
   a semantic pointer corresponding to
   classified syllables.

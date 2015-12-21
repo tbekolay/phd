@@ -576,11 +576,26 @@ def task_combine():
     yield cp('erb-mel', subdir='background')
     yield cp('gammatone-impulse', subdir='methods')
     yield cp('log-gammachirp-impulse', subdir='methods')
-    yield fig(figures.temp_scaling,
-              ['ncc-mfcc', 'ncc-ncc', 'ncc-mfcc-long', 'ncc-ncc-short'],
-              'temp-scaling')
     for filt in ['gammatone', 'log-gammachirp', 'dual-resonance',
                  'compressive-gammachirp', 'tan-carney']:
         yield fig(figures.filter,
                   ['%s-noise' % filt, '%s-ramp' % filt, '%s-speech' % filt],
                   filt, subdir='methods', f_args=(filt,))
+    yield fig(figures.temp_scaling,
+              ['ncc-mfcc', 'ncc-ncc', 'ncc-mfcc-long', 'ncc-ncc-short'],
+              'temp-scaling')
+    yield fig(figures.ncc_zscore,
+              ['ncc-zscore-acc-v', 'ncc-zscore-acc-b'],
+              'ncc-zscore')
+    yield cp('ncc-derivatives-acc-b')
+    yield cp('ncc-periphery-acc-t')
+    yield cp('ncc-feature-acc-t')
+    yield cp('ncc-feature-time')
+    yield cp('ncc-dt-acc-b')
+    yield fig(figures.ncc_phones,
+              ['ncc-phones-acc-b', 'ncc-phones-racc-b'],
+              'ncc-phones')
+    yield cp('ncc-phones-time')
+    yield cp('ncc-periphmodel-racc-b')
+    yield cp('ncc-periphmodel-time')
+    yield cp('ncc-adaptive-racc-b')

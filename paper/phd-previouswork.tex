@@ -43,7 +43,7 @@ in the sense that they perform
 frequency decomposition
 of the audio signal
 in order to determine the relative power
-at frequencies distributed over the mel scale.
+at frequencies distributed over the Mel scale.
 A simple algorithm for computing a
 Mel-frequency cepstral vector
 for a frame of audio is as follows.
@@ -170,9 +170,9 @@ have been applied successfully
 for noisy ASR tasks,
 they are not suitable
 for inclusion in Sermo in their current form.
-None of the methods currently available,
-to our knowledge, produce spiking behavior
-that could
+To my knowledge,
+none of the methods currently available
+produce spiking behavior that could
 be easily integrated with the rest of Sermo.
 Additionally, these networks compute
 functions of the filter output that
@@ -208,12 +208,13 @@ they run much faster than most software systems.
 However, because they produce spikes,
 they have not been used
 as the frontend to any ASR systems,
-to our knowledge,
+to my knowledge,
 as it is not straightforward to
 construct feature vectors
 out of spike trains.
 
 \section{Syllable sequencing}
+\label{sec:prev-sequencing}
 
 Currently,
 we are aware of few existing models
@@ -310,7 +311,7 @@ and so on.
 While the learning method
 may be useful for future iterations of Sermo,
 the rest of the model is not suitable for Sermo
-because it does allow for
+because it does not allow for
 flexible temporal dynamics
 in the motor trajectories within and between syllables,
 which is one of the hallmarks of human speech.
@@ -510,7 +511,7 @@ one primarily applied to speech
 and one used for general motor control
 (REACH).
 
-\subsection{Task dynamics}
+\subsection{Task Dynamics}
 
 A line of research encompassing work by
 several investigators at Haskins Laboratories
@@ -578,7 +579,7 @@ the task dynamic approach
 generates articular position trajectories
 which can be synthesized
 by the CASY synthesizer \citep{iskarous2003}.
-While the task dynamics model
+While the Task Dynamics model
 for inter-articulator coordination has not been
 modified significantly since its introduction in 1989,
 the same group has done significant work
@@ -615,7 +616,7 @@ to inter-gestural and inter-articulator timing
 is the most temporally flexible
 syllable production system
 currently published
-(to our knowledge).
+(to my knowledge).
 The dynamical systems approach
 also makes it a natural fit for Sermo,
 as it is defined in continuous time,
@@ -980,15 +981,15 @@ of a sufficient number of particles
 are below a particular threshold,
 a new set of particles
 are randomly generated
-to replace those with low importance weights.
+to replace those with lower importance weights.
 This procedure would translate to
 a significant reorganization
 of the neurons implementing
 the sampling procedure,
 which I believe
 would not have evolved if
-procedures that do not require
-reorganization exist.
+procedures that did not require
+reorganization existed.
 
 I will propose a trajectory classification technique
 in Section~\ref{sec:impl-recog}

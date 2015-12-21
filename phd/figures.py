@@ -80,6 +80,26 @@ def filter(filt):
     savefig(fig, filt, subdir='methods')
 
 
+def ncc_zscore():
+    w = 5 * in2px
+    h = 3.5 * in2px
+
+    fig = svgfig(w * 2, h)
+    fig.append(el("A", svgpath('ncc-zscore-acc-v'), 0, 0))
+    fig.append(el("B", svgpath('ncc-zscore-acc-b'), w, 0))
+    savefig(fig, 'ncc-zscore')
+
+
+def ncc_phones():
+    w = 5 * in2px
+    h = 3.5 * in2px
+
+    fig = svgfig(w * 2, h)
+    fig.append(el("A", svgpath('ncc-phones-acc-b'), 0, 0))
+    fig.append(el("B", svgpath('ncc-phones-racc-b'), w, 0))
+    savefig(fig, 'ncc-phones')
+
+
 # ############################
 # Model 2: Syllable production
 # ############################

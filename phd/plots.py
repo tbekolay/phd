@@ -216,8 +216,8 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
     df = analysis.load_results(AuditoryFeaturesResult, columns + ['phones'])
     filter_by = [('phones', 'consonants')] if filter_by is None else filter_by
     phones = 'Consonants'
-    common_args = {'x_label': 'Feature',
-                   'y_label': 'Accuracy',
+    common_args = {'x_label': 'Data set',
+                   'y_label': 'Correctness',
                    'hue_order': hue_order,
                    'filter_by': filter_by,
                    'group_by': vary}
@@ -226,7 +226,7 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
         for k, v in filter_by:
             if k == 'phones':
                 phones = v
-                common_args['y_label'] = '%s accuracy' % phones[:-1].capitalize()
+                common_args['y_label'] = '%s correctness' % phones[:-1].capitalize()
 
     for plot_f in [sns.violinplot, sns.barplot]:
         acc = plt.figure()
@@ -239,7 +239,7 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
                     **common_args)
             plt.axhline(1.0, c='k', ls=':')
             plt.ylim(bottom=0.95)
-            plt.ylabel('Relative %s accuracy' % phones[:-1].lower())
+            plt.ylabel('Relative %s correctness' % phones[:-1].lower())
         else:
             compare(df,
                     columns=['mfcc_train_acc', 'mfcc_test_acc',
@@ -248,9 +248,10 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
                             'NCC training', 'NCC testing'],
                     plot_f=plot_f,
                     **common_args)
-            plt.ylabel('%s accuracy' % phones[:-1].capitalize())
+            plt.ylabel('%s correctness' % phones[:-1].capitalize())
         plt.xlabel("")
 
+        acc.tight_layout()
         savefig(acc, 'results', 'ncc-%s-%sacc-%s' % (
             vary, 'r' if relative else '', plot_f.__name__[0]))
 
@@ -259,8 +260,8 @@ def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
     df = analysis.load_results(AuditoryFeaturesResult, columns + ['phones'])
     filter_by = [('phones', 'consonants')] if filter_by is None else filter_by
     phones = 'Consonants'
-    common_args = {'x_label': 'Feature',
-                   'y_label': 'Accuracy',
+    common_args = {'x_label': 'Data set',
+                   'y_label': 'Correctness',
                    'filter_by': filter_by,
                    'group_by': vary}
 
@@ -268,7 +269,7 @@ def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
         for k, v in filter_by:
             if k == 'phones':
                 phones = v
-                common_args['y_label'] = '%s accuracy' % v[:-1].capitalize()
+                common_args['y_label'] = '%s correctness' % v[:-1].capitalize()
 
     acc = plt.figure()
     if relative:
@@ -278,7 +279,7 @@ def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
                    x_keys=['Training', 'Testing'],
                    **common_args)
         plt.axhline(1.0, c='k', ls=':')
-        plt.ylabel('Relative %s accuracy' % phones[:-1].lower())
+        plt.ylabel('Relative %s correctness' % phones[:-1].lower())
     else:
         timeseries(df,
                    columns=['mfcc_train_acc', 'mfcc_test_acc',
@@ -286,8 +287,9 @@ def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
                    x_keys=['MFCC training', 'MFCC testing',
                            'NCC training', 'NCC testing'],
                    **common_args)
-        plt.ylabel('%s accuracy' % phones[:-1].capitalize())
+        plt.ylabel('%s correctness' % phones[:-1].capitalize())
     plt.xlabel("")
+    acc.tight_layout()
     savefig(acc, 'results', 'ncc-%s-acc-t' % vary)
 
 
@@ -300,12 +302,12 @@ def ncc_time(columns, vary, hue_order, filter_by=None):
             columns=['mfcc_time', 'ncc_time', 'mfcc_fit_time', 'ncc_fit_time'],
             group_by=vary,
             filter_by=filter_by,
-            x_keys=['MFCC generation', 'NCC generation',
-                    'MFCC SVM fitting', 'NCC SVM fitting'],
+            x_keys=['MFCC', 'NCC', 'SVM for MFCC', 'SVM for NCC'],
             x_label='Scenario',
             y_label='Time (s)',
             plot_f=sns.barplot,
             hue_order=hue_order)
     plt.ylabel("Time (s)")
     plt.xlabel("")
+    time.tight_layout()
     savefig(time, 'results', 'ncc-%s-time' % vary)

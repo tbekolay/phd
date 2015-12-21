@@ -243,6 +243,7 @@ that are at least as statistically separable
 as the equivalent MFCC trajectories.
 
 \subsection{Experiments and results}
+\label{sec:results-ncc}
 
 In each experiment,
 we isolate the TIMIT speech samples
@@ -373,7 +374,15 @@ and normalizing to unit variance).
 We investigated whether these
 choices were important for NCCs.
 
-\fig{ncc-zscore}{0.8}{???}{???}
+\fig{ncc-zscore}{1.0}{Varying z-score in NCC model.}{
+  Results for the NCC experiment in which we vary
+  whether the feature vector is z-scored or not.
+  (A) Violin plot of the training and testing accuracy.
+  Note that a violin plot is a kernel density estimation
+  for each column, showing the entire distribution of results.
+  (B) Bar plot of the training and testing accuracy.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
 Figure~\ref{fig:ncc-zscore} shows
 the training and testing correctness
@@ -410,9 +419,14 @@ Therefore, for future simulations,
 we will z-score the MFCC feature vector,
 but not the NCC feature vector.
 
-\fig{ncc-deriv}{0.8}{???}{???}
+\fig{ncc-derivatives-acc-b}{0.65}{
+  Varying number of derivatives in NCC model.}{
+  Results for the NCC experiment in which we varied
+  the number of derivatives used in both the MFCC and NCC vectors.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
-Figure~\ref{fig:ncc-deriv} shows
+Figure~\ref{fig:ncc-derivatives-acc-b} shows
 results varying the number of derivatives
 used while always z-scoring MFCCs,
 and never z-scoring NCCs.
@@ -463,9 +477,14 @@ in different layers of the model
 in order to see their impact
 on speed and performance.
 
-\fig{ncc-periph}{0.8}{???}{???}
+\fig{ncc-periphery-acc-t}{0.65}{
+  Varying number of periphery neurons in NCC model.}{
+  Results for the NCC experiment in which we varied
+  the number of neurons in the auditory periphery.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
-Figure~\ref{fig:ncc-periph} shows the results of
+Figure~\ref{fig:ncc-periphery-acc-t} shows the results of
 varying the number of neurons
 in the auditory periphery layer.
 In this layer,
@@ -490,12 +509,12 @@ relative to the mean correctness
 of the same number
 of MFCC model instance accuracies.
 
-As seen in Figure~\ref{fig:ncc-periph},
+As seen in Figure~\ref{fig:ncc-periphery-acc-t},
 training correctness
 does not change significantly
 whether we use
 1 or 32 neurons neurons per filter,
-thought variance is higher
+though variance is higher
 with fewer neurons.
 Testing correctness,
 however, improves up to
@@ -508,9 +527,16 @@ subsequent experiments,
 we use 8 neurons to represent
 the output of each auditory filter.
 
-\fig{ncc-feature}{0.8}{???}{???}
+\fig{ncc-feature-acc-t}{0.65}{
+  Varying number of feature neurons in NCC model.}{
+  Results for the NCC experiment in which we varied
+  the number of neurons in the ensemble representing elements
+  of the feature vector (i.e., cepstral coefficients
+  and the first derivative of the cepstral coefficients).
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
-Figure~\ref{fig:ncc-feature} shows the results
+Figure~\ref{fig:ncc-feature-acc-t} shows the results
 of varying the number of neurons
 in the feature layer,
 which includes ensembles
@@ -541,7 +567,11 @@ steadily increases up to
 the highest number of neurons tested,
 64 neurons per ensemble.
 
-\fig{ncc-feature-time}{0.65}{???}{???}
+\fig{ncc-feature-time}{0.65}{Time taken for NCC feature neurons experiment.}{
+  Time taken to run a trial for the NCC experiment
+  varying the number of feature neurons.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
 The number of neurons in the feature layer
 has a big impact on the amount of time
@@ -587,9 +617,13 @@ in the same way by the
 shortening algorithm,
 which averages over a time window.
 
-\fig{ncc-timewindow}{0.8}{???}{???}
+\fig{ncc-dt-acc-b}{0.65}{Varying the MFCC frame advance step.}{
+  Results for the NCC experiment in which we varied
+  the MFCC frame advance step.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
-Figure~\ref{fig:ncc-timewindow}
+Figure~\ref{fig:ncc-dt-acc-b}
 shows the consonant correctness
 as a function of the
 frame window advance in seconds.
@@ -628,11 +662,19 @@ vowel phones, consonant phones,
 and all phones together
 (including the silent phone).
 
-\fig{ncc-phones}{0.8}{???}{???}
+\fig{ncc-phones}{1.0}{Testing NCCs with different phone sets.}{
+  Results for the NCC experiment in which we varied
+  the set of phones used in both training and testing.
+  (A) Consonant correctness values for both MFCC and NCC models
+  are shown.
+  (B) The correctness of the NCC model relative to the mean
+  of the MFCC models is shown.
+  In all cases, error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
 Figure~\ref{fig:ncc-phones} presents the results.
 Looking at the absolute correctness values,
-using MFCCs yield slightly worse correctness
+using MFCCs yields slightly worse correctness
 when using all phones compared
 to vowel or consonant phone sets.
 Using NCCs yielded the same
@@ -646,7 +688,11 @@ it can be seen that for all phone sets,
 NCCs perform significantly better
 than MFCCs.
 
-\fig{ncc-phones-times}{0.65}{???}{???}
+\fig{ncc-phones-time}{0.65}{Time taken for NCC phone sets experiment.}{
+  Time taken to run a trial for the NCC experiment
+  varying the set of phones used.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 10 trials.}
 
 As seen in Figure~\ref{fig:ncc-phones-times},
 using all phones increases the
@@ -702,7 +748,7 @@ so all models use frequencies
 evenly distributed over the Mel scale
 from 200~Hz to 8000~Hz.
 
-\fig{ncc-periphmodel}{0.8}{???}{???}
+\fig{ncc-periphmodel-racc-b}{0.65}{???}{???}
 
 The results are plotted
 in Figure~\ref{fig:ncc-periphmodel}.
@@ -734,7 +780,7 @@ provides by far the best tradeoff
 between classification correctness
 and computational cost.
 
-\fig{ncc-adaptive}{0.8}{???}{???}
+\fig{ncc-adaptive-racc-b}{0.65}{???}{???}
 
 We also varied whether we used
 normal LIF neuron or adaptive LIF neurons,
