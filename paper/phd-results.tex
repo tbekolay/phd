@@ -830,6 +830,7 @@ evaluated for each auditory periphery model
 individually (not pictured).
 
 \subsection{Scaling}
+\label{sec:res-ncc-scaling}
 
 The model used in these experiments
 represents a small portion
@@ -1230,6 +1231,7 @@ it is not the primary measure
 by which the model should be judged.
 
 \subsection{Experiments and results}
+\label{sec:prod-results}
 
 \subsubsection{Basic model operation}
 
@@ -1248,7 +1250,7 @@ at around 2~Hz while the other
 two syllables are voiced around 1~Hz.
 The activities in various ensembles
 reflect the transformations
-and dynamics expected of model,
+and dynamics expected of the model,
 and result in a final
 production information trajectory
 that looks similar
@@ -1980,7 +1982,7 @@ of each syllable is randomly assigned
 between 1.3 and 1.5~Hz,
 except where noted otherwise.
 For each experimental condition,
-we run 20 trials using
+we ran 20 trials using
 a trajectory made from
 three random syllables
 in a repository of three syllables,
@@ -2039,8 +2041,8 @@ First is the similarity threshold
 in Equation~\eqref{idmp-dynamics1}.
 As can be seen in Figure~\ref{fig:recog-similarity},
 classification accuracy peaks with
-similarity threshold around 0.8
-up to 0.8, the number of insertions
+similarity threshold around 0.8.
+Up to 0.8, the number of insertions
 is high, while after 0.8
 the number of deletions increases.
 Since insertions do not always harm
@@ -2069,7 +2071,7 @@ so we choose a similarity threshold of
 
 The next parameter of interest is the
 scale on the iDMP system state dynamics
-($\alpha$ in Equation~\eqref{imdb-dynamics1}).
+($\alpha$ in Equation~\eqref{imdp-dynamics1}).
 As can be seen in Figure~\ref{fig:recog-scale},
 with similarity threshold of 0.82,
 the scale makes a smaller difference
@@ -2107,7 +2109,7 @@ until around 300 neurons per dimension,
 and continues to increase
 to the maximum size attempted,
 1000 neurons per dimension.
-As then number of neuron increases,
+As the number of neuron increases,
 the probability of deletions decreases,
 as an ensemble with more neurons
 can better approximate Equation~\eqref{idmp-dynamics1}.
@@ -2275,6 +2277,7 @@ whether repeated syllables are allowed or not.
 All other measure are within confidence intervals as well.
 
 \subsection{Scaling}
+\label{sec:res-recog-scaling}
 
 The number of neurons in the
 syllable recognition model is

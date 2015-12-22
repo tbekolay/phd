@@ -279,6 +279,11 @@ should therefore be investigated
 and used to dynamically modify
 the effective scale
 depending on the overall speech rate.
+Interestingly, \citet{pasley2012}
+also suggested that the human auditory system
+contains nonlinearities that depend
+on speech rates
+(see Section~\ref{sec:recog-neurobio}).
 
 The poor results of the model
 with increased numbers
@@ -641,443 +646,540 @@ general motor control).
 
 \section{Predictions}
 
-%% \subsection{Mapping to brain areas}
+Sermo and the systems of Sermo modeled in this thesis
+are in early stages,
+primarily informed by existing
+theories and models.
+As such, we embody many of the predictions made
+by these theories and models.
+Whle the predictive power of Sermo
+will develop as the models develop,
+we can nevertheless make some predictions
+based on the models presented in this thesis
+as they currently exist.
 
-% In the background we discussed the brain areas
-% involved in speech recognition and production,
-% in part to place connectivity constraints
-% on the model as a whole.
-% However, in order to generate testable predictions,
-% we can also impose a mapping from
-% the neural structures in the model
-% to speech-related brain regions.
+\subsection{Role of the auditory periphery in speech perception}
 
-% cepstral coefficients currently require activity
-% from all frequencies. But, this may not be anatomically
-% consistent. Could be possible, instead, to do this
-% hierarchically.
+In Section~\ref{sec:results-periphmodel} we showed
+that more complicated auditory periphery models
+obtained better phone correctness rates
+than simpler models
+(with the exception of the Gammatone filter).
+We therefore predict that
+the nonlinear effects modeled
+in the dynamic compressive Gammachirp
+and Tan Carney auditory filter models
+are important for perceiving speech.
+
+Similarly, we showed that using adaptive LIF neurons
+did not affect the phone correctness rate.
+However, it is usually the case that
+adaptive neuron models fire fewer action potentials
+than do non-adpative models like the LIF neuron.
+The adaptive LIF fires more action potentials
+during the onset of a signal,
+but then fires fewer action potentials
+as it becomes adapted to that signal.
+We therefore predict that
+the spiral ganglion cells in the inner ear
+are adaptive because it is more energy efficienct,
+rather than because the responses
+of adaptive neurons are more effective
+for perceiving speech.
+
+\subsection{Syllabification limits}
+
+In Section~\ref{sec:prod-results},
+we showed that producing
+sequences of syllables
+tends to break down
+when the sequence length is four or above.
+While it is possible to increase the
+dimensionality of the
+semantic pointer representations
+to improve the accuracy
+of longer syllable sequences,
+we nevertheless predict that
+there is a limit to the speed
+of the linguistic system's
+prosodification process.
+Recall that the prosodificaton process
+organizes strings of phonemes
+into discrete syllables,
+which become syllable targets for
+the sequencing system.
+If speech production is suppressed,
+the prosodification process
+could plan the syllabification
+of an entire utterance.
+Our model predicts that
+the linguistic system
+cannot plan that far ahead;
+it can construct a sequence of four
+(or possibly up to five or six)
+syllable targets ahead of time,
+but in general,
+the syllabification of an utterance
+must be generated on the fly.
+
+\subsection{Mapping to brain areas}
+
+In Chapter~\ref{chapt:bg}
+we reviewed the brain areas
+involved in speech recognition and production,
+in part to place connectivity constraints
+on the model as a whole.
+However, in order to generate testable predictions,
+we can also impose a mapping from
+the neural structures in the model
+to speech-related brain regions.
+
+The NCC model is primarily a model
+of the auditory periphery,
+which is cochleotopically organized.
+The ensembles representing
+cepstral coefficients and derivatives
+aggregate information across
+all frequencies,
+so we predict that cepstral coefficients
+(or, in general, decorrelated acoustic information)
+would be represented
+in higher auditory areas in the
+superior and middle temporal gyrus.
+More specifically,
+we predict that activity in the
+first layer of non-tonotopically organized
+auditory cortex would
+closely resembe the activity of
+the neurons in the cepstral coefficient
+ensembles in the NCC model.
+Note that the fact that the
+human auditory system integrates information
+from many more frequencies than
+are integrated in the model
+points to a need for additional
+hierarchical processing layers
+before combining all this information together,
+as is done in human auditory cortex.
+The NCC model should also
+include these hierarchical process layers
+when scaling up.
+
+The sequencing and production model
+can be related to
+ventral sensorimotor cortex (vSMC) literature,
+as reviewed in Section~\ref{sec:prod-neurobio}.
+Specifically, we predict that
+the vSMC can be mapped to the
+production information network in our model.
+As such, vSMC activity should be very similar
+to the activity of production information network
+ensembles in the production model.
+Briefly, because the production information network
+assigns a separate ensemble to each
+vocal tract gesture, we predict that
+vocal tract gestures could be decoded
+from recordings of vSMC activity.
+If this turns out to not be case,
+then it would either indicate that
+the sequencing and production model
+should produce vocal tract articulator position targets
+rather than vocal tract gestures,
+or it may indicate that the representation
+of vocal tract gestures
+in the production information network
+is more distributed than is currently in the model.
+The model can be modified to use
+fewer multidimensional ensembles
+in the production information network to test
+these more specific predictions.
+
+Finally, we believe that
+the syllable recognition model
+can be mapped to area Spt,
+which we reviewed
+in Section~\ref{sec:sm-neurobio}.
+We therefore predict that
+activity in Spt would
+be closely related to the activity
+in the syllable recognition model.
+Since the syllable recognition model
+is likely to be used in situations
+where a lexical decoding must be
+disambiguated,
+we propose an experiment to test
+the prediction that are Spt
+performs syllable recognition.
+In the experiment,
+subjects would watch videos
+of people voicing sentences
+with words that can be manipulated
+with the McGurk effect;
+i.e., one word would be perceived
+differently depending on the
+video clip associated with the audio.
+We predict that transient
+deactivation of area Spt would
+abolish the McGurk effect,
+making the sentences sound the same
+regardless of the video clip viewed.
+Unfortunately, this kind of manipulation
+is difficult to perform in humans;
+transcranial magnetic stimulation (TMS)
+may be an option if a subject's
+area Spt is not too deep in the
+Sylvian fissure.
+
+Many more mappings can be made
+in future iterations of these models,
+and with a more thorough investigation
+of neurobiological literature.
 
 \section{Limitations}
 
-% iDMPs aren't complete yet; we recover
-% the canonical system state, but more work
-% needs to be done to get the point attractor
+The primary limitation of these models
+is that they are still in early stages,
+and do not scale to the challenges
+of natural speech,
+either in terms of the speed
+of speech (as in the recognition model)
+or in the number of syllables
+in the mental syllabary
+(as in the production and recognition models).
+However, as we showed in
+Sections~\ref{sec:res-ncc-scaling},
+\ref{sec:res-prod-scaling},
+and~\ref{sec:res-recog-scaling},
+all of the models presented in this thesis
+scale well in terms of neural resources,
+meaning that adding additional neural structures
+to increase scaling performance
+will not result in biologically implausible
+neural models.
 
-Many of the benefits of these models
-also underlie their limitations
+In terms of the algorithms used
+by these models,
+our treatment of DMPs is currently incomplete,
+as we do not consider
+the DMP point attractor.
+As mentioned previously,
+incorporating the point attractor
+in the production model
+should be possible with tighter integration
+between the model
+and the articulatory synthesizer.
+However, in the recognition model,
+the novel iDMP algorithm
+requires further development
+to estimate both the state of the
+canonical system,
+and the state of the system
+with respect to the point attractor.
+
+Finally, the conceptual Sermo model
+only describes the computations necessary
+for recognizing and synthesizing syllables.
+However, speech involves much more
+than perceiving and producing syllables;
+even the perception and production of syllables
+is affected by prosody,
+which is not currently reflected in Sermo.
+Sermo is only a first step toward
+an integrated closed-loop model
+of speech.
 
 \section{Future work}
 
-??? these can interact with silicon cochleas.
-obviously, we should try doing this.
+While we have already mentioned many
+aspects of Sermo and the three models
+implemented in this thesis
+that can be improved in future work,
+there are nevertheless many more
+avenues of interesting future research
+that I wish to highlight.
 
-??? actually replicate some experiments,
-e.g. the syllable repeating one
+\subsection{Model extensions}
 
-% ??? add bursting neurons in both production
-% and recognition systems for better timing
+Part of the motivation for the NCC model
+is that there are existing hardware devices
+called silicion cochleas
+which aim to replicate the function
+of the biological cochlea
+such that they can be implanted
+into the brain to partially recover the sense of hearing.
+As we have shown that the NCC model
+can be used to classify phones
+in pre-segmented speech,
+it would be useful to
+implement the NCC model using
+a silicon cochlea
+as the auditory periphery model
+and run the same experiment
+to determine is phones can be classified
+in pre-segmented speech.
+If so, then the NCC model could serve
+as a way of comparing different
+silicon cochlea implementations
+without having to implant them
+in human subjects.
+Additionally, the NCC model
+would be a useful tool in silicon cochlea design,
+as long as there is agreement
+between the results of the NCC model
+and the perceptual evaluations
+of human subjects
+with cochlear implants.
 
-% ??? more sophisticated classification mechanisms
-% in classification section
+Currently, the syllable sequencing and production model
+can instantiate syllable DMPs with different
+intrinsic frequencies.
+However, syllable speed can also vary within syllables.
+The DMP framework makes this possible through
+dissociating the canonical system state
+from the forcing function itself.
+In order for the production model to take advantage
+of this dissociation,
+we would need to make the DMP system state oscillator
+a controlled oscillator.
+Fortunately, controlled oscillators
+have already been implemented successfully
+with the NEF and Nengo \citep{bekolay2013},
+so this modification should be straightforward.
 
-% ??? add speed control to the DMPs;
-% pretty easy, just add a dimension to the oscillator.
+In the syllable recognition model,
+the classifier ensemble uses adaptive LIF neurons
+in order to provide a slightly longer
+burst of activity when a syllable is classified,
+ensuring that the states
+of the iDMPs are cleared
+when a classification occurs.
+However, as can be seen in Figure~\ref{fig:recog-bad},
+states are not always reset completely,
+resulting in erroneous syllable classifications.
+One way to mitigate this issue
+would be to use a neuron model
+that instrinsically bursts,
+rather than the adaptive LIF neuron
+which fires only slighlty more
+action potentials than normal.
+Incorporating a bursting model
+into Nengo would be useful for other models as well;
+I anticipate that precisely timed models,
+including the production model,
+could benefit from bursting neurons
+in situations where neural inhibition
+plays an important role.
 
-% ??? neural implementation of mapping
-% from gesture sequence to articulator positions
+Finally, we currently use
+production information trajectories
+computed offline as the input to
+the syllable recognition model.
+Using actual trajectories,
+either from databases like
+MNGU0 \citep{steiner2012},
+or from a model that decodes
+production information from
+auditory features,
+would be a better test
+of the syllable recognition model.
 
-% Summary of things from other sections:
+\subsection{Syllable consolidation}
 
-% \subsection{Recognition system}
+Currently, we have implemented models
+of sensorimotor integration,
+including a mental syllabary,
+as the endpoint of a learning process.
+However, with the recent development
+of synaptic plasticity rules
+for the NEF
+\citep{macneil2011,bekolay2013a},
+is is possible to also model
+sensorimotor development,
+which is important because
+the role of sensorimotor integration
+is most prominent during speech development,
+not in adult speech.
 
-% How to deal with semivowels, semiconsonants and glides?
-% Should it just be one monolithic phoneme detector?
+A full picture of speech development involves
+learning vocal tract gestures
+through reinforced motor babbling,
+learning basic syllables
+through mimicry,
+and building a repository of
+learned syllable representations
+(i.e., a mental syllabary).
+While I believe that Sermo can be
+a useful starting point for a
+model of all developmental stages,
+adding elements to the mental syllabary
+would be possible with few modifications.
+We call this learning process
+``syllable consolidation,''
+and provide a sketch for designing
+such a model in the remainder of this section.
 
-% Represent prosody in a second feature layer (hierarchical organization).
+Syllable consolidation involves
+learning a novel vocal tract gesture trajectory
+to voice a syllable that
+is initially infrequently encountered,
+but through repeated presentations,
+becomes frequent
+(i.e., is consolidated in the mental syllabary).
+We propose that it would be learned
+in three steps.
 
-% Learn all of this stuff rather than optimizing for it.
+\begin{enumerate}
+\item Initialize a new syllable from the most
+  similar existing syllable.
+  For example, when learning to voice
+  the syllable \ipa{[bA]}, the system should
+  start from the syllable \ipa{[gA]} if it is known.
+\item Swap compatible speech gestures.
+  For example, vowel producing gestures
+  would be compatible, allowing for modifying
+  a \ipa{[bA]} to a \ipa{[bu]}, and so on.
+  The choice of which gesture to swap and
+  how to swap it will be informed by
+  the syllable recognition system.
+\item Fine-tune the voiced syllable
+  until it can be recognized as the
+  syllable to be learned.
+\end{enumerate}
 
-% How to set baseline pitch and volume on the fly?
+This type of learning system
+could be called ``bootstrapped''
+because it assumes that a system
+with an existing repertoire of syllables
+already exists.
+These existing syllables would be
+used in learning the new syllable.
+Bootstrapped syllable learning contrasts with
+the type of syllable learning
+done as an infant and toddler,
+which uses reinforced speech babbling
+to learn novel syllables.
 
-% Can we use artificial cochleas as is?
+Bootstrapped learning
+would be accomplished with the NEF and Nengo
+by setting up a new DMP with a system state oscillator.
+Initially, the forcing function decoded from the state
+would always return zero.
+The prescribed error sensitivity learning rule
+\citep{bekolay2011}
+would be applied to the
+connection decoding the forcing function.
+Initially, the error signal would be provided
+by the syllable DMP that is most similar
+to the syllable to be learned.
+Once that transfer learning has finished,
+the error signal would be provided by
+the production information decoding,
+which would swap the compatible gestures,
+and fine-tune the newly consolidated syllable.
 
-% \subsection{Synthesis system}
-
-% We can use this synthesis system to explore
-% important phonological questions.
-% For example, syllabic consonants
-% Do they sound right as separate syllables?
-% Or do they sound right as protracted versions
-% of the analogous syllable with the vowel included?
-% Can these be distinguished from one another?
-
-% We haven't done forward model prediction
-% to determine how to adapt
-% when things go wrong.
-% However, since we've implemented everything
-% with the NEF and SPA,
-% we can just use the REACH model.
-
-% ??? there's also a bunch of prosodic stuff;
-% this could be added (see comments below)
-
-% Aside from phonemes, we also represent pitch and volume.
-% Neither of these features are useful
-% as an absolute quantity---most humans are poor
-% at judging absolute pitch and volume ???cite---so
-% we aim to represent relative pitch and volume.
-% In both of these cases,
-% we must determine a baseline pitch or volume,
-% and a method for comparing the current
-% pitch or volume to the baseline.
-
-% In speech, baseline pitch is primarily determined
-% by speaker identity.
-% Each speaker has a baseline pitch,
-% determined in part by the shape of their vocal folds,
-% so it is likely that we learn
-% and remember the baseline pitch
-% of speakers that we interact with frequently.
-% On the other hand,
-% changes in baseline pitch
-% (e.g., through illnesses affecting the vocal tract)
-% require little to no adaptation period,
-% so the mechanism through which we determine
-% a speaker's baseline pitch
-% is likely to be relatively simple
-% and flexible.
-% In this work,
-% we will not posit a neural mechanism
-% for determining baseline pitch,
-% and will instead compute it
-% from the data offline and provide it as input.
-
-% Given the baseline pitch as input,
-% relative pitch will be computed
-% primarily through neural inhibition.
-% See section ???implementation
-% for how this is accomplished.
-
-% Unlike pitch, baseline volume
-% is not speaker specific;
-% it is easy to notice when a speaker
-% talks louder or quieter
-% than the norm.
-% ???baseline is the overall activity
-% of a long-timescale filtered version
-% of the current moment's power spectrum?
-% ???relative volume is that minus a
-% short-timescale filtered version?
-% So it's basically just a derivative?
-% ???not sure if we even care about volume
-% to be honest...
-% % http://www.sengpielaudio.com/calculator-loudness.htm
-
-% \section{Syllable consolidation}
-
-% ??? I didn't get to this,
-% but it can definitely be done.
-
-% Go from vocal tract gesture score
-% to audio signal, in neurons.
-
-% Learn a syllable recognition
-% and a syllable production
-% network from this.
-
-% Contrast this to syllable production because it's
-% an infrequently voiced syllable.
-
-\subsection{Bootstrapped syllable learning}
-\label{sec:syllable-learning}
-
-% ??? A full picture of speech development involves:
-% learning vocal tract gestures
-% through reinforced motor babbling,
-% learning basic syllables
-% through mimicry?,
-% and scaling up to the elements of this model.
-% While we think that our model
-% is a useful starting point for such
-% a developmental model,
-% as it provides an end-target,
-% we don't claim to do this kind of structural learning.
-% However, we believe that error-based learning
-% could result in this kind of system;
-% to show that this is a possibility,
-% we consider a minimal learning situation:
-% learning voice a new syllable
-% given a set of existing syllables.
-% This type of thing probably happens
-% in second language acquisition,
-% when novel combinations of phonemes
-% are encountered,
-% or even during first language acquisition
-% as pronunciation is refined over
-% the course of one's life;
-% words that were once awkward combinations
-% of many syllables are compressed into
-% nearly equivalent sequences of fewer,
-% more complex syllables.
-
-% As opposed to conversational shadowing,
-% which highlights the high-level strengths
-% of the integrated speech system,
-% syllable learning highlights
-% the low-level strengths of this system.
-% Syllable learning involves
-% learning a novel set of gestures
-% and associated articulator trajectories
-% that will voice a syllable
-% that is encountered for the first time.
-
-% We call our syllable learning system ``bootstrapped''
-% because we assume that our system
-% has an existing repertoire of syllables
-% that it is already able to voice.
-% These existing syllables will be
-% used in learning the new syllable.
-% Bootstrapped syllable learning contrasts with
-% the type of syllable learning
-% done as an infant and toddler,
-% which uses reinforced speech babbling
-% to learn novel syllables.
-% While we believe that learning syllables
-% from babbling is an important research direction
-% that can be explored in this system,
-% it has also been explored in many other systems
-% (???cite Diva etc),
-% and so we have chosen to leave this type of learning
-% for future work.
-
-% The bootstrapped syllable learning system
-% learns new syllables in three steps.
-
-% \begin{enumerate}
-% \item Initialize the new syllable from the most
-%   similar existing syllable.
-%   For example, when learning to voice
-%   the syllable /ba/, the system should
-%   start from the syllable /fa/ if it is known.
-% \item Swap compatible speech gestures.
-%   For example, vowel producing gestures
-%   would be compatible, allowing for modifying
-%   a /ba/ to a /bu/, and so on.
-%   The choice of which gesture to swap and
-%   how to swap it will be informed by
-%   ???figure out.
-% \item Fine-tune the voiced syllable
-%   until it can be recognized as the
-%   syllable to be learned.
-%   ???more
-% \end{enumerate}
-
-% ??? NB: the oscillator being learned should exist outside of
-% the normal speech system so that they can both run
-% at the same time, but there should be a switch kind of thing
-% to put the new syllable through.
-
-% ??? hypothesis (not sure where to put this):
-% the mapping between phoneme to gesture
-% is such that is not advantageous
-% to represent in the synthesis
-% (maybe also recognition?) system(s).
-% Therefore, it may be the case that
-% not all people have phoneme representations.
-% However, we propose that phonemes
-% are a useful construct for learning to voice
-% novel syllables in a second-language learning situation.
-
-% These steps require several systems
-% that have already been implemented
-% in the recognition and synthesis systems separately;
-% for example, the ability to compare
-% voiced syllables to those already known
-% is one of the primary goals of the recognition system itself,
-% so it can be leveraged when trying to learn new syllables.
-% However, these steps also point to new systems
-% that must be implemented.
-% First, the system requires a method
-% to transfer a syllable-producing function
-% from one ensemble to another.
-% Second, some knowledge of which gestures
-% are compatible must be built into the system.
-% Finally, ???fine-tuning.
-
-% It has been shown that in second-language learning,
-% slowing down the syllable can have
-% a significant increase in learning effectiveness
-% ???cite.
-% We believe that our system emulates
-% how a native speaker of one language
-% would learn to voice novel syllables in a second language.
-% Therefore, we predict that slowing down
-% the speed at which the syllables are heard
-% and uttered will improve ???learning speed
-% and / or quality of learned syllable.
-
-% ??? Mental syllabary (1-s2.0-S009394X...pdf)
-% supports our architecture
+These steps require several systems
+that have already been implemented
+in the recognition and synthesis systems separately;
+for example, the ability to compare
+voiced syllables to those already known
+is one of the primary goals
+of the recognition system itself,
+so it can be leveraged when trying to learn new syllables.
+However, these steps also point to new systems
+that must be implemented.
+First, the system requires a method
+to transfer a forcing function
+from one DMP to another.
+Second, the production information decoding process
+that we have hypothesized is done
+in the sensorimotor integration system
+would be required for gesture swapping
+and fine-tuning.
 
 \subsection{Prosody}
 
-\subsubsection{Tone-units}
+A final area for fruitful future work
+would be the incorporation of prosodic effects
+in Sermo and models of Sermo parts.
+Prosody is an important part of speech,
+and is notably missing from
+current state-of-the-art approaches
+to speech recognition and synthesis.
+Adding prosodic effects to approaches
+to computational speech would go a long way
+toward making recognition and synthesis more natural.
+Unfortunately, most existing computational approaches
+make prosody difficult to add in
+\textit{post hoc}.
+However, I believe that because Sermo
+is designed with highly parallel parts
+(i.e., spiking neurons),
+and uses biologically inspired components
+(e.g., an articulatory synthesizer),
+prosody will be natural to include
+in future work.
 
-??? move to discussion
+Prosody will involve addition theoretical concepts
+and Sermo subsystems.
+Theoretically, I believe that the linguistic concept
+of tone units will be central to incorporating
+prosody in Sermo.
+Briefly, tone units represent an additional
+level in the speech production hierarchy
+(see Figure~\ref{fig:production})
+that is higher than syllables.
+A tone unit is made up of a serially ordered
+sequence of syllables.
 
-The final level of organization
-that we will examine is the tone-unit.
-The tone-unit allows us to examine
-suprasegmental aspects of speech.
-A tone-unit is made up of a serially ordered
-sequence of syllables.\footnote{Many
-  phoneticians consider a tone-unit to be
-  composed of ``feet,'' where a foot is
-  a single unit of rhythm.
-  However, feet are mostly used when describing
-  non-conversational utterances,
-  such as those found in music and poetry.
-  In this thesis we focus on speech
-  as a means of conveying linguistic information,
-  and therefore ignore the concept of feet.}
-
-The structure of a tone-unit is similar
+The structure of a tone unit is similar
 to a syllable, except its component parts
 are syllables instead of phonemes,
 and its components are serially ordered.
-A tone-unit must contain a tonic syllable
+A tone unit must contain a tonic syllable
 (sometimes also called the nucleus),
 and can optionally contain one or more syllables
 in a pre-head, head, or tail section.
 The pre-head consists of all syllables
 before the first stressed syllable
-in a tone-unit.
+in a tone unit.
 The head consists of all syllables from
 the first stressed syllable
 to the tonic syllable.
 The tonic syllable is the most significant
-syllable in the tone-unit because
+syllable in the tone unit because
 pitch changes in the tonic syllable
 will occur relative to the tonic syllable;
 the tonic syllable is not necessarily
 the loudest or most prominently stressed
-syllable in the tone-unit,
+syllable in the tone unit,
 though it does always contain
 a stressed (and therefore heavy) syllable.
 The tail consists of all syllables
 following the tonic syllable.
 
-% ??? tone-unit structure figure
-% maybe don't worry for now
-
-Not all heavy syllables are necessarily stressed;
-stress is hypothesized to occur when
-more muscle activation is used
-to voice a particular heavy syllable
-???cite?.
-Stress is perceived as a heavy syllable
-that is louder, longer, and with
-a different pitch or quality compared
-to other syllables.
-In some languages, rules govern
-which syllables receive stress;
-for example, in French,
-the last syllable in a word is
-always stressed.
-In English, each word defines
-its own stress pattern,
-and each utterance can add
-additional stresses
-that emphasize some words over others.
-Additionally, stress is not a binary quantity;
-English is typically thought to contain
-three stress levels
-(primary stress, secondary stress, and unstressed).
-
-Intonation, on the other hand,
-is a more straightforward phenomenon to model.
-Intonation is the use of pitch changes
-to 1) express emotions and attitudes,
-2) impart prominence on stressed syllables,
-3) exaggerate grammar and syntactic structure,
-and 4) clue listeners into what information
-is novel and what is thought to be already known.
-While intonation can be thought to also include
-body language and other prosodic characteristics,
-we will focus only on pitch changes.
-The tone of a tone-unit
-is the overall trajectory of pitch
-during the tone-unit.
-
-There are a limited set of possible pitch trajectories
-(i.e., tones) in English.
-While different sources identify different trajectories,
-we will adopt the conventions of ???below
-which note six possible pitch trajectories:
-high fall, low fall, high rise,
-low rise, fall-rise, and rise-fall
-(see Figure~???).
+Tone units are defined by
+a pitch trajectory that aligns with
+the component parts of the tone unit.
+There are a limited set of possible
+pitch trajectories in English,
+including falling, rising,
+fall-rise, and rise-fall trajectories.
 The same sequence of syllables
 can change its meaning dramatically
 by using a different pitch trajectory,
 or by changing the position of the
 tonic syllable within that pitch trajectory.
 The meaning of each pitch trajectory
-changes depending on the utterance in question;
-we will not investigate meanings further
-in this work, as we focus on
-sound reproduction rather than on
-linguistic meaning.
+changes depending on the utterance in question.
 
-??? Quick plot of pitch trajectories
-% again, deal with later
-
-% cite https://notendur.hi.is/peturk/KENNSLA/25/IPBE/SHELL/25/nucleus.html
-% or Cruttenden
-
-It is important to note that when talking about
-the pitch trajectory of an utterance,
-pitch is always relative to the
-upper and lower range of a particular speaker.
-In the pitch trajectory plot in Figure~???,
-horizontal lines show the upper and lower ranges.
-
-These six trajectories in Figure~???
-interact with the pre-head and tail
-in predictable ways.
-The pre-head is usually low,
-but can be high in front of a low stressed syllable.
-The tail trajectory can be predicted
-by the trajectory of the tonic syllable;
-for example, if the tonic syllable falls,
-the tail remains low;
-if the tonic syllable rises,
-the tail continues to rise.
-The head, on the other hand,
-is independent of the tonic syllable;
-it may remain at a high or low level,
-or it can rise or fall like
-the trajectories associated with the tonic syllable.
-The combinations of head and tonic syllable
-pitch trajectories also contributes
-to the varying meanings conveyed
-by the pitch trajectory of a tone-unit.
-
-Finally, one note about
-the absence of ``words'' in our treatment
-of phonetics and phonology.
-While words are clearly an important concept
-that we will use colloquially in this thesis,
-they are a linguistic construct
-rather than a phonological one.
-However, as directly applied
-to speech recognition and synthesis,
-words are more readily perceived
-than sequences of syllables with no meaning.
-Fortunately, the pioneering work
-of ???allen94 which summarizes ???
-gives a direct relationship between
-the classification rates of nonsense syllables and words,
-which can be used to adjust
-recognition rates for
-non-linguistic speech.
+Adding prosody to Sermo
+would require the perception and production
+of pitch trajectories,
+which would be aligned to syllables
+in the roles described above.
+Perceiving pitch trajectories would also require
+a system for determining the baseline pitch
+of a particular speaker.
+I believe that all of these systems
+could be designed and implemented
+with the NEF.
