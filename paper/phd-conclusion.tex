@@ -1,11 +1,90 @@
 \chapter{Conclusion}
 \label{chapt:conclusion}
 
+In this thesis,
+I proposed a conceptual model
+called Sermo which
+provides a biologically constrained framework
+for a computational closed-loop speech system.
+I implemented three models
+with biologically plausible spiking neurons
+that spans aspects of speech
+relating to perception, production,
+and the interface of the two,
+sensorimotor integration.
 
-prod and recog models are good starting points.
-They both need additional structures
-for performance to scale to
-arbitrary frequencies, syllbary sizes, etc.
-But their neural scaling properties mean
-that there is plenty of room for additional
-neural structures.
+The first neural model
+extracts acoustic features
+from speech signals
+using auditory periphery models
+and connections between neural ensembles.
+The feature vector,
+called neural cepstral coefficients (NCCs),
+performs significantly better than
+a feature vector commonly used
+in automatic speech recognition
+on a phone classification task
+using pre-segmented speech.
+Additionally, the model is able
+to do apples-to-apples comparisons
+between five auditory periphery models
+in terms of how well they
+process pre-segmented speech samples
+for classification.
+We found that the
+most complicated (Tan Carney) model
+and the least complicated (Gammatone) model
+performed the best,
+with more complicated models
+performing better
+(with the exception of the Gammatone model).
+
+The second neural model
+sequences a list of syllables
+and generates production information trajectories
+from those syllables,
+which can be synthesized by an articulatory synthesizer.
+The trajectories generated were
+significantly closer
+to the target trajectories than
+random syllables,
+and synthesized speech was intelligible
+in 35\% of cases,
+and somewhat intelligible in 40\% of cases.
+Scaling the model to the level of
+an adult vocabulary would take up
+only 0.1637 cm$^3$ of cortex,
+though in its current state,
+the model does not perform well
+when scaled up to an adult vocabulary.
+
+The third neural model
+recognizes syllables from a continuous
+trajectory of production information.
+Classification accuracy reached
+over 80\% in some experiments,
+despite using no acoustic information.
+The model also produced semantic pointers
+for the recognized syllables;
+the the accuracy of the memory representation
+reached 90\% in some experiments,
+though chance values were 33\% due to
+a small set of possible syllables.
+The model is able to work continuously
+without needing to be reset,
+but scales poorly to rapid utterances
+and large repositories of syllables.
+
+The conceptual and neural models
+presented here
+represent the first steps
+in applying large-scale neural modeling techniques
+to speech.
+As such, we are optimistic that
+future models can overcome
+the scaling issues that these models
+currently face,
+and can result in a biologicaly constrained
+closed-loop model of speech
+enabling computers to
+having natural interactions with humans.
