@@ -9,7 +9,8 @@ from matplotlib.ticker import ScalarFormatter
 from scipy import stats
 
 from . import analysis
-from .experiments import AuditoryFeaturesResult
+from .experiments import (
+    AuditoryFeaturesResult, ProductionResult, RecognitionResult)
 
 
 def shiftedcmap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
@@ -226,8 +227,10 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
         for k, v in filter_by:
             if k == 'phones':
                 phones = v
-                common_args['y_label'] = '%s correctness' % phones[:-1].capitalize()
+                common_args['y_label'] = ('%s correctness'
+                                          % phones[:-1].capitalize())
 
+    figs = []
     for plot_f in [sns.violinplot, sns.barplot]:
         acc = plt.figure()
         if relative:
@@ -254,6 +257,8 @@ def ncc_accuracy(columns, vary, hue_order, relative=True, filter_by=None):
         acc.tight_layout()
         savefig(acc, 'results', 'ncc-%s-%sacc-%s' % (
             vary, 'r' if relative else '', plot_f.__name__[0]))
+        figs.append(acc)
+    return tuple(figs)
 
 
 def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
@@ -291,6 +296,7 @@ def ncc_tsaccuracy(columns, vary, relative=True, filter_by=None):
     plt.xlabel("")
     acc.tight_layout()
     savefig(acc, 'results', 'ncc-%s-acc-t' % vary)
+    return acc
 
 
 def ncc_time(columns, vary, hue_order, filter_by=None):
@@ -311,3 +317,257 @@ def ncc_time(columns, vary, hue_order, filter_by=None):
     plt.xlabel("")
     time.tight_layout()
     savefig(time, 'results', 'ncc-%s-time' % vary)
+    return time
+
+
+# ############################
+# Model 2: Syllable production
+# ############################
+
+def prod_time(key, x_label):
+    df = analysis.load_results(ProductionResult, [key])
+
+    cmp_args = {'group_by': key,
+                'x_label': x_label}
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = plt.subplot(2, 2, 1)
+    timeseries(df,
+               columns=['accuracy'],
+               x_keys=['Accuracy'],
+               y_label='Accuracy',
+               ax=ax,
+               **cmp_args)
+    ax.axhline(analysis.gs_accuracy_baseline, c='k', ls=':')
+    ax.set_xlabel("")
+    ax.set_xticks(())
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 2)
+    timeseries(df,
+               columns=['n_sub', 'n_del', 'n_ins'],
+               x_keys=['Substitutions', 'Insertions', 'Deletions'],
+               y_label='Count',
+               ax=ax,
+               **cmp_args)
+    ax.set_xlabel("")
+    ax.set_xticks(())
+    ax.legend(loc='best', title="")
+
+    ax = plt.subplot(2, 2, 3)
+    timeseries(df,
+               columns=['timing_mean', 'timing_var'],
+               x_keys=['Timing mean', 'Timing variance'],
+               y_label='Timing (s)',
+               ax=ax,
+               **cmp_args)
+    ax.legend(loc='best', title="")
+    ax.set_xlabel(x_label)
+
+    ax = plt.subplot(2, 2, 4)
+    timeseries(df,
+               columns=['cooccur'],
+               x_keys=['Co-occurrence'],
+               y_label='Co-occurrence',
+               ax=ax,
+               **cmp_args)
+    ax.axhline(df["co_chance"].mean(), c='k', ls=":")
+    l = ax.legend()
+    l.remove()
+    ax.set_xlabel(x_label)
+
+    fig.tight_layout()
+    savefig(fig, 'results', 'prod-%s' % key)
+    return fig
+
+
+def prod_cmp(key, x_label, hue_order):
+    df = analysis.load_results(ProductionResult, [key])
+
+    cmp_args = {'group_by': key,
+                'x_label': x_label,
+                'hue_order': hue_order}
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = plt.subplot(2, 2, 1)
+    compare(df,
+            columns=['accuracy'],
+            x_keys=['Accuracy'],
+            y_label='Accuracy',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.axhline(analysis.gs_accuracy_baseline, c='k', ls=':')
+    ax.set_ylabel("Accuracy")
+    ax.set_xlabel("")
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 2)
+    compare(df,
+            columns=['n_sub', 'n_del', 'n_ins'],
+            x_keys=['Substitutions', 'Insertions', 'Deletions'],
+            y_label='Count',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.set_ylabel("Count")
+    ax.set_xlabel("")
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 3)
+    compare(df,
+            columns=['timing_mean', 'timing_var'],
+            x_keys=['Timing mean', 'Timing variance'],
+            y_label='Timing',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.set_ylabel("Timing")
+    ax.set_xlabel("")
+
+    ax = plt.subplot(2, 2, 4)
+    compare(df,
+            columns=['cooccur'],
+            x_keys=['Co-occurrence'],
+            y_label='Co-occurrence',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.axhline(df["co_chance"].mean(), c='k', ls=":")
+    ax.set_ylabel("Co-ocurrence")
+    ax.set_xlabel("")
+
+    fig.tight_layout()
+    savefig(fig, 'results', 'prod-%s' % key)
+    return fig
+
+
+# #############################
+# Model 3: Syllable recognition
+# #############################
+
+def recog_time(key, x_label, n_syllables=[3., 3.]):
+    df = analysis.load_results(RecognitionResult, [key])
+
+    cmp_args = {'group_by': key,
+                'x_label': x_label}
+
+    fig = plt.figure(figsize=(8, 6))
+
+    ax = plt.subplot(2, 2, 1)
+    timeseries(df,
+               columns=['acc'],
+               x_keys=['Accuracy'],
+               y_label='Accuracy',
+               ax=ax,
+               **cmp_args)
+    ax.set_xlabel("")
+    ax.set_xticks(())
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 2)
+    timeseries(df,
+               columns=['n_sub', 'n_ins', 'n_del'],
+               x_keys=['Substitutions', 'Insertions', 'Deletions'],
+               y_label='Count',
+               ax=ax,
+               **cmp_args)
+    ax.set_xlabel("")
+    ax.set_xticks(())
+    ax.legend(loc='best', title="")
+
+    ax = plt.subplot(2, 2, 3)
+    timeseries(df,
+               columns=['tdiff_mean', 'tdiff_var'],
+               x_keys=['Timing mean', 'Timing variance'],
+               y_label='Timing',
+               ax=ax,
+               **cmp_args)
+    ax.legend(loc='best', title="")
+    ax.set_xlabel(x_label)
+
+    ax = plt.subplot(2, 2, 4)
+    timeseries(df,
+               columns=['memory_acc'],
+               x_keys=['Memory accuracy'],
+               y_label='Memory accuracy',
+               ax=ax,
+               **cmp_args)
+    l, r = ax.get_xlim()
+    s = np.asarray(n_syllables)
+    x = np.linspace(l, r, s.size)
+    ax.plot(x, 1./s, c='k', ls=':')
+    l = ax.legend()
+    l.remove()
+    ax.set_xlabel(x_label)
+
+    fig.tight_layout()
+    savefig(fig, 'results', 'recog-%s' % key)
+
+    return fig
+
+
+def recog_cmp(key, x_label, hue_order):
+    df = analysis.load_results(RecognitionResult, [key])
+
+    cmp_args = {'group_by': key,
+                'x_label': x_label,
+                'hue_order': hue_order}
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = plt.subplot(2, 2, 1)
+    compare(df,
+            columns=['acc'],
+            x_keys=['Accuracy'],
+            y_label='Accuracy',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.set_ylabel("Accuracy")
+    ax.set_xlabel("")
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 2)
+    compare(df,
+            columns=['n_sub', 'n_ins', 'n_del'],
+            x_keys=['Substitutions', 'Insertions', 'Deletions'],
+            y_label='Count',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.set_ylabel("Count")
+    ax.set_xlabel("")
+    l = ax.legend()
+    l.remove()
+
+    ax = plt.subplot(2, 2, 3)
+    compare(df,
+            columns=['tdiff_mean', 'tdiff_var'],
+            x_keys=['Timing mean', 'Timing variance'],
+            y_label='Timing',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.set_ylabel("Timing")
+    ax.set_xlabel("")
+
+    ax = plt.subplot(2, 2, 4)
+    compare(df,
+            columns=['memory_acc'],
+            x_keys=['Memory accuracy'],
+            y_label='Accuracy',
+            plot_f=sns.barplot,
+            ax=ax,
+            **cmp_args)
+    ax.axhline(1./3, c='k', ls=':')  # Always 3 syllables
+    ax.set_ylabel("Co-ocurrence")
+    ax.set_xlabel("")
+
+    fig.tight_layout()
+    savefig(fig, 'results', 'recog-%s' % key)
+    return fig

@@ -387,7 +387,6 @@ class RecogSyllableParams(ParamsObject):
 class RecogSyllable(ParamsObject):
     label = params.StringParam(default=None)
     trajectory = params.NdarrayParam(shape=('*', 48))
-    freq = params.NumberParam(default=3.)
 
 
 class CleanupParams(ParamsObject):

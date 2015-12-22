@@ -445,7 +445,7 @@ the full auditory periphery pathway.
   Adapted from \citet{tan2003}.}
 
 The model, depicted in
-Figure~\ref{fig:tancarney-structure},
+Figure~\ref{fig:tan-carney-structure},
 consists of a middle ear model,
 an auditory filter consisting
 of a control path and signal path,
@@ -514,12 +514,12 @@ and make the five models more consistent.
 
 Figure~\ref{fig:tan-carney} shows the output
 of the auditory periphery model
-using the Tan-Carney model
+using the Tan Carney model
 (with Nengo neurons and synapses)
 for white noise, tone ramp, and speech inputs.
 
-\fig{tan-carney}{1.0}{Auditory periphery with Tan-Carney model.}{
-  Auditory periphery model using the Tan-Carney model.
+\fig{tan-carney}{1.0}{Auditory periphery with Tan Carney model.}{
+  Auditory periphery model using the Tan Carney model.
   The top row plots the rectified output of the filter,
   which we take to be the activity of an inner hair cell (IHC).
   The middle row plots the activity across
@@ -532,12 +532,12 @@ for white noise, tone ramp, and speech inputs.
 \subsection{Brian hears software}
 \label{sec:brian-hears}
 
-The \textit{Brian hears} software
+The Brian Hears software
 \citep{fontaine2011}
 provides implementations
 of the five models described above.
-\textit{Brian hears} is part of the
-\textit{Brian} package,
+Brian Hears is part of the
+Brian package,
 which is a general purpose
 neural simulator capable
 of simulating spiking neural networks
@@ -546,9 +546,9 @@ but slow speed
 (\citealp{goodman2008};
 see \citealt{bekolay2013} for benchmark results).
 Due in part to its slow speed,
-we use \textit{Brian} only for
+we use Brian only for
 the auditory periphery model implementations
-provided in the \textit{Brain hears} subpackage,
+provided in the Brain Hears subpackage,
 and use Nengo (described below)
 for all other model implementations.
 
@@ -626,12 +626,12 @@ two-dimensional oscillator dynamics
 
 \fig{dmp-dewolf}{0.7}{Dynamic movement primitive (DMP) forcing function.}{
   DMP forcing function, computed with evenly spaced Gaussians
-  as basis functions, $\psi$..
+  as basis functions, $\psi$.
   Reproduced from \citet{dewolf2015}.}
 
 The forcing function $f(x, g)$ is
 not directly computed;
-instead, it computed as the weighted sum
+instead, it is computed as the weighted sum
 over some basis functions $\psi_i$
 (see Figure~\ref{fig:dmp-dewolf}).
 In the discrete case,
@@ -688,8 +688,9 @@ development of the conceptual Sermo model
 through the constraints and assumption
 inherent in the NEF.
 
-The NEF defines three principles that
-can be used to build large-scale networks
+The NEF defines three principles
+(representation, transformation, and dynamics)
+that can be used to build large-scale networks
 using any spiking or non-spiking neuron model.
 
 \subsection{Representation}
@@ -877,7 +878,8 @@ results in an estimate of an encoded scalar.
   \includegraphics[width=0.45\columnwidth]{lif_est_out_5} \\
   \includegraphics[width=0.45\columnwidth]{lif_est_resp_15}
   \includegraphics[width=0.45\columnwidth]{lif_est_out_15}
-  \caption{Illustration showing how the tuning curves
+  \caption[Illustration of linear NEF decoding.]{
+    Illustration showing how the tuning curves
     of a population of LIF neurons can be
     linearly combined to estimate an input signal, $x$.
     Reproduced from \citet{choo2010}.}
@@ -908,7 +910,7 @@ as a result of an incoming spike
 of neurotransmitter.\footnote{
   Equation~\eqref{a(t)} is also how we determine
   the steady state activity of each neuron in
-  equation~\eqref{A} for neuron models
+  equation~\eqref{eq:decoding} for neuron models
   that do not have an analytical
   instantaneous rate equation.}
 Typically, we emulate post-synaptic current curves
@@ -1051,7 +1053,8 @@ of decoding a nonlinear function.
   \includegraphics[width=0.45\columnwidth]{lif_func_out_5} \\
   \includegraphics[width=0.45\columnwidth]{lif_func_resp_15}
   \includegraphics[width=0.45\columnwidth]{lif_func_out_15}
-  \caption{Illustration showing how the tuning curves
+  \caption[Illustration of nonlinear NEF decoding.]{
+    Illustration showing how the tuning curves
     of a population of LIF neurons can be
     linearly combined to estimate a nonlinear function;
     in this case, the nonlinear function being estimated
@@ -1098,7 +1101,7 @@ implement differential equations
 as are descried in dynamical systems
 and control theory.
 
-\fig{dynamics}{0.6}{Network architecture for NEF dynamics.}{
+\fig{dynamics}{0.5}{Network architecture for NEF dynamics.}{
   Network architecture for implementing linear control systems
   with the NEF.
   The input ensemble represents the input signal, $\V{u}(t)$,
@@ -1131,7 +1134,7 @@ between these two filters
 for a full derivation),
 we get
 \begin{align}
-  \V{A'} &= \tau \V{A} + \V{I} \\ \label{eq:dyn-a}
+  \V{A'} &= \tau \V{A} + \V{I} \label{eq:dyn-a} \\
   \V{B'} &= \tau \V{B}, \label{eq:dyn-b}
 \end{align}
 where $\V{I}$ is the identity matrix.
@@ -1378,7 +1381,8 @@ vocabulary items using an autoassociative memory
 It is important to note that
 the HRR definitions for merging and binding
 do not change the dimensionality
-of the vector space, unlike other VSAs
+of the vector space,
+unlike other vector symbolic architectures
 (e.g., tensor products \citet{smolensky1990}).
 One can therefore think of the
 merging and binding operators
@@ -1546,8 +1550,8 @@ are available at \url{https://github.com/tbekolay/phd}.
 \subsection{Integrating Brian in Nengo}
 
 As discussed in Section~\ref{sec:brian-hears},
-we use the \textit{Brian} neural simulator's
-\textit{Brian hears} package
+we use the Brian neural simulator's
+Brian Hears package
 to simulate auditory periphery models.
 As our models are implemented in Nengo,
 it is necessary for Brian and Nengo
@@ -1583,7 +1587,7 @@ allowing for a bidirectional interface.
 Updating the sound would normally
 clear the state of the auditory filter,
 so we instead subclass Brain's
-\textit{Sound} object
+\texttt{Sound} object
 and provide samples from
 Nengo when needed.
 

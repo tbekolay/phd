@@ -279,7 +279,7 @@ on every trial;
 the random seed controls the
 stochastic nature of
 the supervised learning procedure
-used bythe SVM.
+used by the SVM.
 In the NCC case,
 the random seed affects both
 the generation of model parameters
@@ -351,13 +351,34 @@ for speed reasons
 later).
 
 \begin{table}[ht!]
-  \begin{small}
-    \begin{tabular}{}
-    \end{tabular}
- \end{small}
-  \caption[Parameters for NCC model.]{
-    Parameters used in the NCC model. ???
-    Include deriv type.}
+  \begin{footnotesize}
+    \begin{center}
+      \begin{tabular}{lcl}
+        \toprule
+        Parameter & Default value & Part of model affected \\
+        \midrule
+        \texttt{MFCC dt} & 10 ms & MFCC (frame advance) \\
+        \texttt{MFCC window\_dt} & 25 ms & MFCC (frame size) \\
+        \texttt{n\_fft} & 512 & MFCC \\
+        \texttt{deriv\_spread} & 2 & MFCC (derivative) \\
+        \texttt{n\_cepstra} & 13 & MFCC and NCC \\
+        \texttt{n\_filters} & 32 & MFCC and NCC \\
+        \texttt{minfreq} & 0 & MFCC and NCC \\
+        \texttt{maxfreq} & 8000 & MFCC and NCC \\
+        \texttt{n\_derivatives} & 1 & MFCC and NCC \\
+        \texttt{auditory\_filter} & Gammatone & Auditory periphery \\
+        \texttt{neurons\_per\_freq} & 8 & Auditory periphery \\
+        \texttt{adaptive\_neurons} & False & Auditory periphery \\
+        \texttt{cepstra n\_neurons} & 20 & NCC cepstral coefficients \\
+        \texttt{deriv\_type} & Feedforward & NCC derivative nets \\
+        \texttt{deriv\_n\_neurons} & 20 & NCC derivative nets \\
+        \texttt{deriv\_tau\_fast} & 0.005 & NCC FF derivative \\
+        \texttt{deriv\_tau\_slow} & 0.1 & NCC FF derivative \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{footnotesize}
+  \caption{Parameters used in the NCC model.}
 \label{tab:ncc}
 \end{table}
 
@@ -501,7 +522,7 @@ so we vary between
 at each power of two.
 The number of neurons used
 in the feature layers
-is fixed at 20 per feature.
+is fixed at 20 neurons per feature.
 Instead of plotting the absolute correctness,
 in this and subsequent experiments,
 we plot the correctness of the NCC model
@@ -530,7 +551,7 @@ the output of each auditory filter.
 \fig{ncc-feature-acc-t}{0.65}{
   Varying number of feature neurons in NCC model.}{
   Results for the NCC experiment in which we varied
-  the number of neurons in the ensemble representing elements
+  the number of neurons in the ensembles representing elements
   of the feature vector (i.e., cepstral coefficients
   and the first derivative of the cepstral coefficients).
   Shaded regions represent bootstrapped 95\% confidence intervals
@@ -586,10 +607,6 @@ is significantly higher than
 the mean correctness of the equivalent MFCC feature vector,
 we believe that using 12 neurons per ensemble
 is sufficiently accurate.
-In subsequent experiments,
-we fix the number of neurons
-in the feature layer to contain
-12 neurons per ensemble.
 
 \subsubsection{NCC averaging}
 
@@ -673,8 +690,9 @@ and all phones together
   from the 10 trials.}
 
 Figure~\ref{fig:ncc-phones} presents the results.
-Looking at the absolute correctness values,
-using MFCCs yields slightly worse correctness
+Focusing on absolute correctness,
+we observe that using MFCCs
+yields slightly worse correctness
 when using all phones compared
 to vowel or consonant phone sets.
 Using NCCs yielded the same
@@ -694,7 +712,7 @@ than MFCCs.
   Error bars represent bootstrapped 95\% confidence intervals
   from the 10 trials.}
 
-As seen in Figure~\ref{fig:ncc-phones-times},
+As seen in Figure~\ref{fig:ncc-phones-time},
 using all phones increases the
 amount of time to run experiments significantly.
 Not only do NCCs take a longer time to generate,
@@ -727,10 +745,11 @@ used at the beginning of the NCC pipeline.
 We looked at two choices in the auditory periphery
 and how those choices impacted classification correctness.
 
-The first choice is auditory filter model.
+The first choice is the auditory filter model.
 We ran 20~trials with each of the five
 auditory filter models presented
-in Section~\ref{sec:periphery-models}.
+in Section~\ref{sec:periphery-models}
+(10 with adaptive neurons, 10 with normal LIF neurons).
 While most of the parameters are the same
 as those in Table~\ref{tab:ncc},
 the current implementation of the Tan Carney model
@@ -748,10 +767,16 @@ so all models use frequencies
 evenly distributed over the Mel scale
 from 200~Hz to 8000~Hz.
 
-\fig{ncc-periphmodel-racc-b}{0.65}{???}{???}
+\fig{ncc-periphmodel-racc-b}{0.65}{
+  Comparing NCCs produced with five auditory periphery models.}{
+  Results for the NCC experiment in which we varied
+  the auditory periphery model, relative to the mean MFCC correctness.
+  Compressive GC refers to the dynamic compressive Gammachirp filter.
+  In all cases, error bars represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 The results are plotted
-in Figure~\ref{fig:ncc-periphmodel}.
+in Figure~\ref{fig:ncc-periphmodel-racc-b}.
 The Gammatone and Tan Carney models
 both perform well,
 with around 40\% better relative testing correctness
@@ -766,7 +791,13 @@ than the other three,
 achieving only around 20--24\%
 more correctness than the MFCC model.
 
-\fig{ncc-periphmodel-time}{0.65}{???}{???}
+\fig{ncc-periphmodel-time}{0.65}{
+  Time taken for NCC periphery model sets experiment.}{
+  Time taken to run a trial for the NCC experiment
+  varying the auditory periphery model.
+  Compressive GC refers to the dynamic compressive Gammachirp filter.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 As can be seen in Figure~\ref{fig:ncc-periphmodel-time},
 the compressive Gammachirp
@@ -780,17 +811,21 @@ provides by far the best tradeoff
 between classification correctness
 and computational cost.
 
-\fig{ncc-adaptive-racc-b}{0.65}{???}{???}
+\fig{ncc-adaptive-racc-b}{0.65}{Varying neuron type in NCC model.}{
+  Results for the NCC experiment in which we vary
+  the neuron type.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 50 trials (10 per periphery model).}
 
 We also varied whether we used
 normal LIF neuron or adaptive LIF neurons,
 as spiral ganglion cells
 have facilitating and depressing behavior
 that is partly captured in the adaptive LIF neuron.
-As shown in Figure~\ref{fig:ncc-adaptive},
+As shown in Figure~\ref{fig:ncc-adaptive-racc-b},
 using adaptive LIF neurons had no impact
 on classification correctness.
-This result holds even when
+This result holds true even when
 evaluated for each auditory periphery model
 individually (not pictured).
 
@@ -883,9 +918,10 @@ Taking into account all of the
 possible shapes and glottal parameters,
 there are 48 possible vocal tract gestures
 (see Table~\ref{tab:vtl-vtg}) despite having only
-7 (8???) articulator sets
+7 articulator sets
 controlling 22 articulators.\footnote{
-  There is also an f0 gesture which is not included here,
+  There is also an f0 gesture and articulator set
+  which is not included here,
   as it controls the pitch of the utterance.
   Since German is not a tonal language,
   the pitch is not required to voice a syllable,
@@ -895,12 +931,72 @@ controlling 22 articulators.\footnote{
   though including it is important future work.}
 
 \begin{table}[ht!]
-  \begin{small}
-    \begin{tabular}{}
-    \end{tabular}
- \end{small}
+  \renewcommand{\arraystretch}{0.9}
+  \begin{scriptsize}
+    \begin{center}
+      \begin{tabular}{lll}
+        \toprule
+        Gesture & Value & Gesture type \\
+        \midrule
+        \texttt{a} & Binary & Vowel \\
+        \texttt{e} & Binary & Vowel \\
+        \texttt{i} & Binary & Vowel \\
+        \texttt{o} & Binary & Vowel \\
+        \texttt{u} & Binary & Vowel \\
+        \texttt{E:} & Binary & Vowel \\
+        \texttt{2} & Binary & Vowel \\
+        \texttt{y} & Binary & Vowel \\
+        \texttt{A} & Binary & Vowel \\
+        \texttt{I} & Binary & Vowel \\
+        \texttt{E} & Binary & Vowel \\
+        \texttt{O} & Binary & Vowel \\
+        \texttt{U} & Binary & Vowel \\
+        \texttt{9} & Binary & Vowel \\
+        \texttt{Y} & Binary & Vowel \\
+        \texttt{@} & Binary & Vowel \\
+        \texttt{@6} & Binary & Vowel \\
+        \texttt{aI-begin} & Binary & Vowel \\
+        \texttt{aI-end} & Binary & Vowel \\
+        \texttt{OY-begin} & Binary & Vowel \\
+        \texttt{OY-end} & Binary & Vowel \\
+        \texttt{aU-begin} & Binary & Vowel \\
+        \texttt{aU-end} & Binary & Vowel \\
+        \texttt{a-raw} & Binary & Vowel \\
+        \texttt{i-raw} & Binary & Vowel \\
+        \texttt{u-raw} & Binary & Vowel \\
+        \texttt{ll-labial-nas} & Binary & Lip \\
+        \texttt{ll-labial-stop} & Binary & Lip \\
+        \texttt{ll-labial-fric} & Binary & Lip \\
+        \texttt{tt-alveolar-nas} & Binary & Tongue tip \\
+        \texttt{tt-alveolar-stop} & Binary & Tongue tip \\
+        \texttt{tt-alveolar-lat} & Binary & Tongue tip \\
+        \texttt{tt-alveolar-fric} & Binary & Tongue tip \\
+        \texttt{tt-postalveolar-fric} & Binary & Tongue tip \\
+        \texttt{tb-palatal-fric} & Binary & Tongue body \\
+        \texttt{tb-velar-stop} & Binary & Tongue body \\
+        \texttt{tb-velar-nas} & Binary & Tongue body \\
+        \texttt{tb-uvular-fric} & Binary & Tongue body \\
+        \texttt{breathy} & Binary & Glottal shape \\
+        \texttt{pressed} & Binary & Glottal shape \\
+        \texttt{open} & Binary & Glottal shape \\
+        \texttt{stop} & Binary & Glottal shape \\
+        \texttt{modal} & Binary & Glottal shape \\
+        \texttt{slightly-pressed} & Binary & Glottal shape \\
+        \texttt{slightly-breathy} & Binary & Glottal shape \\
+        \texttt{fully-open} & Binary & Glottal shape \\
+        \texttt{velic} & Scalar & Velic \\
+        \texttt{lung-pressure} & Scalar & Lung pressure \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{scriptsize}
+  \renewcommand{\arraystretch}{1.0}
   \caption[VocalTractLab gestures.]{
-    Gestures defined by VocalTractLab. ???}
+    Gestures defined by VocalTractLab.
+    All gestures belong to a particular type,
+    which determines the gesture sequence that they are a part of,
+    and therefore the set of articulators that are modified
+    by the gesture.}
 \label{tab:vtl-vtg}
 \end{table}
 
@@ -1027,7 +1123,7 @@ depending on the numerical value
 relative to the gesture's range.
 We then do a global pairwise alignment\footnote{
   Using the Needleman-Wunsch algorithm \citep{needleman1970},
-  implemented by the \texttt{nwalign} Python package
+  implemented by the nwalign Python package
   available at
   \url{https://pypi.python.org/pypi/nwalign/}.}
 of the strings determined
@@ -1157,26 +1253,38 @@ and result in a final
 production information trajectory
 that looks similar
 to the desired trajectory.
-Accuracy for this model is ???
-(X deletions etc???);
-the co-occurrence metric is ???
-(chance is ???).
+Accuracy for this trial is 0.93
+(2 insertions occur at the end of the trajectory);
+the co-occurrence metric is 0.5
+(chance is 0.083).
 
-\fig{prod-good}{1.0}{???}{???}
+\fig{prod-good}{1.0}{
+  Successful example trial of sequencing and production model.}{
+  Successful example trial of the sequencing and production model.
+  See Figure~\ref{fig:prod-network} for the network structure
+  corresponding to the outputs plotted,
+  and text for more details.}
 
-\fig{prod-bad}{1.0}{???}{???}
+\fig{prod-bad}{1.0}{
+  Unsuccessful example trial of sequencing and production model.}{
+  Unsuccessful example trial of the sequencing and production model.
+  See Figure~\ref{fig:prod-network} for the network structure
+  corresponding to the outputs plotted,
+  and text for more details.}
 
 Figure~\ref{fig:prod-bad}
 shows an unsuccessful model trial
 sequencing and producing
 \ipa{[blA ti dAs]}.
-??? what fails.
-The final production information trajectory
-looks ???.
-Accuracy for this model is ???
-(X deletions etc???);
-the co-occurrence metric is ???
-(chance is ???).
+In this instance,
+the sequencing mechanism did not properly
+switch to the next syllable,
+resulting in a repetition of the
+\ipa{[ti]} syllable.
+Accuracy for this model is 0.76
+(1 substition, 2 deletions, and 4 insertions occur);
+the co-occurrence metric is 0.55
+(chance is 0.083).
 
 \subsubsection{Determining model parameters}
 
@@ -1215,7 +1323,7 @@ Table~\ref{tab:prod},
 unless otherwise noted.
 
 For each experimental condition,
-we run 20 trials using
+we ran 20 trials using
 a random sequence of three syllables
 from a repository of three random syllables,
 unless otherwise noted.
@@ -1224,12 +1332,40 @@ but due to randomization,
 syllable repetitions may not occur.
 
 \begin{table}[ht!]
-  \begin{small}
-    \begin{tabular}{}
-    \end{tabular}
- \end{small}
-  \caption[Parameters for syllable production model.]{
-    Parameters used in the syllable production model. ???}
+  \begin{footnotesize}
+    \begin{center}
+      \begin{tabular}{lcl}
+        \toprule
+        Parameter & Default value & Part of model affected \\
+        \midrule
+        \texttt{sequence n\_per\_d} & 30 & SPA modules in Sequence net \\
+        \texttt{syllable\_d} & 48 & SPA modules in Sequence net \\
+        \texttt{n\_positions} & 7 & SPA vocabulary \\
+        \texttt{difference\_gain} & 15 & Working memories in Sequence net \\
+        \texttt{threshold\_memories} & True
+          & Associative memories in Sequence net \\
+        \texttt{sequencer n\_per\_d} & 400 & Ensembles in Sequencer net \\
+        \texttt{sequencer tau} & 0.05 & Timer ensemble in Sequencer net \\
+        \texttt{sequencer freq} & 1~Hz & Timer ensemble in Sequencer net \\
+        \texttt{reset\_time} & 0.85
+          & Timer to reset function in Sequencer net \\
+        \texttt{reset\_threshold} & 0.5
+          & Timer to reset function in Sequencer net \\
+        \texttt{reset\_to\_gate} & 0.65
+          & Reset to gate function in Sequencer net \\
+        \texttt{gate\_threshold} & 0.4 & Gate function in Sequencer net \\
+        \texttt{syllable n\_per\_d} & 600 & Syllable DMP ensembles \\
+        \texttt{syllable tau} & 0.02 & Syllable DMP recurrent connection \\
+        \texttt{syllable freq} & 1~Hz & Syllable DMP recurrent connection \\
+        \texttt{prod\_info threshold} & 0.3 & Production information net \\
+        \texttt{t\_release} & 0.14 s & Initial input length \\
+        \texttt{sequence} & No default & Syllable sequence \\
+        \texttt{repeat} & True & Syllable sequence generation \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{footnotesize}
+  \caption{Parameters used in the syllable sequencing and production model.}
 \label{tab:prod}
 \end{table}
 
@@ -1238,17 +1374,30 @@ have a significant impact
 on the successful operation of the model,
 we begin by varying
 the time constant on
-the DMP state's reccurrent connection.
+the DMP state's recurrent connection.
 
-\fig{prod-tau}{0.9}{???}{???}
+\fig{prod-tau}{0.9}{Varying DMP $\tau$ in production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the $\tau$ parameter of each recurrent DMP
+  state ensemble.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 As can be seen in Figure~\ref{fig:prod-tau},
 accuracy is significantly above baseline
 until $\tau > 0.035$~s;
 poor accuracy is due to a proliferation
-of insertions,
-which are likely to due syllable DMPs
-remaining active for too long.
+of deletions,
+which are likely to due to some syllable DMPs
+not activating properly.
 Timing variance is generally low
 until $\tau \ge 0.04$.
 Timing means are negative,
@@ -1267,11 +1416,25 @@ used in each DMP network and
 the number of neurons used in the
 timing ensemble in the sequencing network.
 
-\fig{prod-syllneurons}{0.9}{???}{???}
+\fig{prod-syllneurons}{0.9}{
+  Varying number of DMP neurons in production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the number of neurons in each recurrent DMP
+  state ensemble.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 As shown in Figure~\ref{fig:prod-syllneurons},
 the number of neurons in each DMP network
-does not have an obvious affect
+does not have an obvious effect
 on the model as long as at least
 150~neurons per dimension are used.
 Since these network implement
@@ -1284,7 +1447,21 @@ high numbers of neurons.
 For subsequent simulations,
 600~neurons per dimension are used.
 
-\fig{prod-seqneurons}{0.9}{???}{???}
+\fig{prod-seqneurons}{0.9}{
+  Varying number of sequencer timing neurons in production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the number of neurons in the timing ensemble
+  in the sequencer network (see Figure~\ref{fig:prod-network}).
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 Figure~\ref{fig:prod-seqneurons}
 shows the results of varying
@@ -1315,7 +1492,21 @@ which involve
 a large repository of syllables
 voiced rapidly.
 
-\fig{prod-freq}{0.9}{???}{???}
+\fig{prod-freq}{0.9}{
+  Varying the speed of syllables in the production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the frequency (i.e., speed) of
+  syllables in the syllable repository.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 First, we investigated the
 range of frequencies at which the model
@@ -1335,7 +1526,7 @@ suggesting that the DMP networks
 may not be sufficiently activated
 when the sequencer network
 is operating at slow speeds.
-Accuracy is better than base
+Accuracy is better than baseline
 from around 2.5--6.5~Hz
 (i.e., syllables of 150--400~ms in length),
 which matches the range of frequencies
@@ -1349,7 +1540,21 @@ cannot appropirate coordinate
 other networks when operating
 above 6.5~Hz.
 
-\fig{prod-n_syllables}{0.9}{???}{???}
+\fig{prod-n_syllables}{0.9}{
+  Varying the syllabary size in the production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the number of syllables
+  in the syllable repository.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 Next, we investigated whether the model
 behavior changes when the size
@@ -1365,11 +1570,25 @@ as the size of the syllabary increases,
 only being more accurate than baseline
 for up to four syllables,
 due to a sharp increase
-in the number of insertions.
+in the number of deletions.
 We have not yet determined the source
-of these insertions.
+of these deletions.
 
-\fig{prod-sequence_len}{0.9}{???}{???}
+\fig{prod-sequence_len}{0.9}{
+  Varying the sequence length in the production model.}{
+  Results for the sequencing and production experiment
+  in which we vary the number of syllables
+  voiced in an experimental trial.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 In a similar vein,
 we investigated whether model behavior
@@ -1383,8 +1602,8 @@ As shown in Figure~\ref{fig:prod-sequence_len},
 accuracy drops off after only four syllables.
 Interestingly, accuracy is also low
 for sequences of length one;
-we believe that the increased insertions
-for sequences of lenght one occur
+we believe that the increased deletions
+for sequences of length one occur
 because the network is allowed some
 extra grace time after the syllable should
 be finished, in case the model
@@ -1395,7 +1614,21 @@ resulting in the syllable
 being repeated,
 inserting extra gestures.
 
-\fig{prod-repeat}{0.9}{???}{???}
+\fig{prod-repeat}{0.9}{
+  Comparing repetitive and unique sequences in the production model.}{
+  Results for the sequencing and production experiment
+  in which we allow syllables to repeat,
+  or constrain the sequence to contain only unique syllables.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and cooccurrence metric.
+  The dotted line in the accuracy plot denotes
+  the baseline accuracy value,
+  which is the mean of the accuracy between all non-matched
+  syllables in the repository of 417 syllables;
+  the dotted line in the coocurrence metric
+  denotes the metric obtained through random chance.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 Finally, to this point we have
 allowed syllables to repeat
@@ -1431,7 +1664,7 @@ can yield intelligible speech.
 To test this, we manually evaluated
 one set of experimental trials
 (specifically, those associated with
-the experiment varying to number of
+the experiment varying the number of
 sequencer neurons,
 with 1000~neurons used).
 I and one other person evaluated
@@ -1681,9 +1914,23 @@ and dynamics expected of model,
 and result
 perfect classification and memory accuracy.
 
-\fig{recog-good}{1.0}{???}{???}
+\fig{recog-good}{0.68}{
+  Successful example trial of recognition model.}{
+  Successful example trial of the syllable recognition model.
+  For iDMPs, the dimension representing the system state
+  is emphasized to illustrate state tracking.
+  See Figure~\ref{fig:recog-network} for the network structure
+  corresponding to the outputs plotted,
+  and text for more details.}
 
-\fig{recog-bad}{1.0}{???}{???}
+\fig{recog-bad}{0.68}{
+  Unsuccessful example trial of sequencing and production model.}{
+  Unsuccessful example trial of the syllable recognition model.
+  For iDMPs, the dimension representing the system state
+  is emphasized to illustrate state tracking.
+  See Figure~\ref{fig:recog-network} for the network structure
+  corresponding to the outputs plotted,
+  and text for more details.}
 
 Figure~\ref{fig:recog-bad}
 shows an unsuccessful model trial
@@ -1739,8 +1986,51 @@ three random syllables
 in a repository of three syllables,
 meaning that syllable repetition can occur,
 but is not guaranteed.
+Wherever not specified,
+we use parameters are defined in
+Table~\ref{tab:recog}.
 
-\fig{recog-similarity}{0.9}{???}{???}
+\begin{table}[ht!]
+  \begin{footnotesize}
+    \begin{center}
+      \begin{tabular}{lcl}
+        \toprule
+        Parameter & Default value & Part of model affected \\
+        \midrule
+        \texttt{dimensions} & 64 & Associative memory \\
+        \texttt{threshold} & 0.9 & Associative memory \\
+        \texttt{wta\_inhibit\_scale} & 3 & Associative memory \\
+        \texttt{memory neurons\_per\_dimension} & 60 & Memory \\
+        \texttt{memory feedback} & 0.83 & Memory recurrent connection \\
+        \texttt{reset\_th} & 0.9 & Classifier ensemble \\
+        \texttt{inhib\_scale} & 1 & Classfier connections to iDMPs \\
+        \texttt{syllable n\_per\_d} & 1000 & Syllable iDMP ensembles \\
+        \texttt{syllable tau} & 0.05 & Syllable iDMP recurrent connection \\
+        \texttt{similarity\_th} & 0.82 & Syllable iDMP recurrent connection \\
+        \texttt{scale} & 0.71 & Syllable iDMP recurrent connection \\
+        \texttt{reset\_scale} & 2.5 & Syllable iDMP diff connection \\
+        \texttt{trajectory} & No default & Input trajectory \\
+        \texttt{repeat} & True & Input trajectory generation \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+  \end{footnotesize}
+  \caption{Parameters used in the syllable recognition model.}
+\label{tab:recog}
+\end{table}
+
+\fig{recog-similarity}{0.9}{
+  Varying the similarity threshold in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the similarity threshold
+  in the function computed through the recurrent connections
+  on iDMP state ensembles.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 In the case of the recognition model,
 two parameters other than the number of neurons
@@ -1764,7 +2054,18 @@ with through other parameters,
 so we choose a similarity threshold of
 0.82 for subsequent experiments.
 
-\fig{recog-scale}{0.9}{???}{???}
+\fig{recog-scale}{0.9}{
+  Varying the scale in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the scale term
+  in the function computed through the recurrent connections
+  on iDMP state ensembles.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 The next parameter of interest is the
 scale on the iDMP system state dynamics
@@ -1780,10 +2081,20 @@ after which insertions become more likely.
 Again, since deletions can be handled
 through other means,
 we err on the side of avoiding insertions,
-and choose a scale value of 0.72
+and choose a scale value of 0.71
 for subsequent experiments.
 
-\fig{recog-syllneurons}{0.9}{???}{???}
+\fig{recog-syllneurons}{0.9}{
+  Varying the number of iDMP state neurons in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the number of neurons per dimension
+  in the iDMP state ensembles.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 Finally, we vary the number of neurons
 used in each iDMP network.
@@ -1820,7 +2131,18 @@ we next vary experimental parameters
 to examine how the model scales
 to more realistic speech.
 
-\fig{recog-freq}{0.9}{???}{???}
+\fig{recog-freq}{0.9}{
+  Varying the trajectory frequency in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the frequency
+  of the syllables that make up the input production information
+  trajectory.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 First, we investigated the
 range of frequencies in which the model
@@ -1860,7 +2182,17 @@ indicating that classifications
 occur before the syllable trajectory
 is complete.
 
-\fig{recog-n_syllables}{0.9}{???}{???}
+\fig{recog-n_syllables}{0.9}{
+  Varying the syllabary size in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the size of the syllabary
+  from which we select three syllables to recognize.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 We then investigated whether the model
 behavior changes when the size
@@ -1884,7 +2216,18 @@ as can be seen in Figure~\ref{fig:recog-n_syllables}.
 Memory accuracy, however, remains significantly
 above chance in all cases.
 
-\fig{recog-sequence_len}{0.9}{???}{???}
+\fig{recog-sequence_len}{0.9}{
+  Varying the sequence length in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we vary the number of syllables
+  selected from the syllabary and concatenated together
+  to make up the input trajectory.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Shaded regions represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 The length of the sequence,
 on the other hand,
@@ -1911,7 +2254,17 @@ with an input-gated working memory module,
 as is used in the production system
 for representing syllable positions.
 
-\fig{recog-repeat}{0.9}{???}{???}
+\fig{recog-repeat}{0.9}{
+  Comparing repetitive and unique sequences in the recognition model.}{
+  Results for the syllable recognition experiment
+  in which we allow syllables to repeat,
+  or constrain the trajectory to contain only unique syllables.
+  Plots show the accuracy, number of substitutions/insertions/deletions,
+  timing differences, and memory accuracy.
+  The dotted line in the memory accuracy plot denotes
+  the chance accuracy value which depends on the syllabary size.
+  Error bars represent bootstrapped 95\% confidence intervals
+  from the 20 trials.}
 
 Finally, we verified that the model
 operates well in situations with

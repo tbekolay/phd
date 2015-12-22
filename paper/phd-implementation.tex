@@ -5,7 +5,7 @@ In this thesis, we implement and evaluate
 three neural models that make up
 parts of the conceptual Sermo model.
 Each model provides
-an explanation for how the brain might
+an explanation for how the human brain might
 solve a task necessary for
 speech recognition or synthesis
 using the computational devices at hand,
@@ -134,7 +134,7 @@ and $M=13$ cepstral coefficients.
 
 The NCC pipeline is implemented
 in a Nengo network that uses
-the Brian hears library
+the Brian Hears library
 of auditory filter models
 \citep{fontaine2011},
 and two layers of
@@ -758,7 +758,7 @@ To remedy this situation, we exploit the fact that
 each working memory module is gated
 such that it operates in two regimes.
 In the ``acquisition'' regime,
-the memory module acquires a state to remembered.
+the memory module acquires a state to be remembered.
 In the ``maintenance'' regime,
 the memory module ignores incoming state information,
 and maintains a memory of the last state
@@ -1002,7 +1002,7 @@ To implement this continuous drive,
 we add an additional ensemble
 to the DMP which receives input
 from the oscillator
-and provides output to oscillator;
+and provides output to the oscillator;
 the output to the oscillator
 computes the difference between
 the current oscillator state
@@ -1019,7 +1019,7 @@ the starting pulse,
 effectively disinhibiting the differencing ensemble
 and driving the oscillator
 to the $[-1, 0]$ state.\footnote{
-  Note that we set to goal state of the
+  Note that we set the goal state of the
   differencing ensemble to be the target state
   plus a small vector that counteracts the
   intrinsic dynamics of the oscillator.
@@ -1229,7 +1229,7 @@ and recognition systems.
 
 The first part of the model
 recognizes incoming production information trajectories
-with inverse DMPs.
+with inverse DMPs (iDMPs).
 Recall that in the DMP framework,
 the state of the system
 is represented by $x(t)$,
@@ -1247,7 +1247,7 @@ the intrinsic dynamics
 of the state act
 as a two-dimensional oscillator.
 
-In inverse DMPs, we aim to learn the inverse function,
+In iDMPs, we aim to learn the inverse function,
 which maps from the motor trajectory
 back to the system state that generated that
 trajectory; i.e., we aim to approximate
@@ -1444,7 +1444,7 @@ to produce that syllable.
   that uses that gesture,
   then it projects to a dimension of that iDMP.
   If the iDMP corresponds to a syllable
-  that does not sure that gesture,
+  that does not use that gesture,
   then it projects to the system state
   of the iDMP with a negative weight.
   Each \textbf{iDMP network} is primarily composed of
@@ -1482,7 +1482,7 @@ which produces a cleaned up version
 of the semantic pointer
 associated with the recognized syllable.
 The cleaned up version of the semantic pointer
-is projected a memory module,
+is projected to a memory module,
 which remembers the recognized syllable
 for a short while in order to
 make it available to other networks.
@@ -1590,7 +1590,7 @@ see Section~\ref{sec:res-prod-scaling}
 for more details.
 
 In the previous section, we discussed
-the \textit{trajectory subpath problem},
+the trajectory subpath problem,
 which occurs when two syllables
 start with the same trajectory
 but diverge near the end
@@ -1644,7 +1644,7 @@ in most cases.\footnote{
   in a foreign language.}
 
 As an added benefit,
-punishing gestures not in the sylalble helps
+punishing gestures not in the syllable helps
 differentiate between syllables with
 similar trajectory suffixes;
 e.g., \ipa{[bAr]} versus \ipa{[dAr]}.
