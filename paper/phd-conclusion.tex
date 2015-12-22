@@ -8,7 +8,7 @@ provides a biologically constrained framework
 for a computational closed-loop speech system.
 I implemented three models
 with biologically plausible spiking neurons
-that spans aspects of speech
+that span aspects of speech
 relating to perception, production,
 and the interface of the two,
 sensorimotor integration.
@@ -34,9 +34,10 @@ for classification.
 We found that the
 most complicated (Tan Carney) model
 and the least complicated (Gammatone) model
-performed the best,
-with more complicated models
-performing better
+performed the best.
+The general trend is that
+more complicated models
+perform better
 (with the exception of the Gammatone model).
 
 The second neural model
@@ -50,13 +51,14 @@ to the target trajectories than
 random syllables,
 and synthesized speech was intelligible
 in 35\% of cases,
-and somewhat intelligible in 40\% of cases.
+and at least somewhat intelligible in 75\% of cases.
 Scaling the model to the level of
 an adult vocabulary would take up
 only 0.1637 cm$^3$ of cortex,
 though in its current state,
 the model does not perform well
-when scaled up to an adult vocabulary.
+when scaled up
+to the size of an adult syllabary.
 
 The third neural model
 recognizes syllables from a continuous
@@ -66,11 +68,11 @@ over 80\% in some experiments,
 despite using no acoustic information.
 The model also produced semantic pointers
 for the recognized syllables;
-the the accuracy of the memory representation
+the accuracy of the memory representation
 reached 90\% in some experiments,
 though chance values were 33\% due to
 a small set of possible syllables.
-The model is able to work continuously
+The model is able to operate continuously
 without needing to be reset,
 but scales poorly to rapid utterances
 and large repositories of syllables.
@@ -85,6 +87,6 @@ future models can overcome
 the scaling issues that these models
 currently face,
 and can result in a biologicaly constrained
-closed-loop model of speech
+closed-loop model of speech,
 enabling computers to
-having natural interactions with humans.
+have natural interactions with humans.

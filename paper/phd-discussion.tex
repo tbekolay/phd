@@ -8,11 +8,11 @@
 The most important and somewhat surprising result
 from the NCC model
 is that NCCs can yield significantly
-better training and test accuracy rates than MFCCs,
+better training and test correctness rates than MFCCs,
 which are the most commonly used
 feature vector in ASR systems.
 Our goal in these experiments was to
-show that NCCs are at least as good as MFCCs,
+show that NCCs are as good as MFCCs,
 as the primary motivation behind
 NCCs is to generate a feature vector
 entirely in spiking neurons,
@@ -20,7 +20,7 @@ therefore making it suitable
 for use in Sermo
 and in neuromorphic systems using
 silicon cochleas.
-The fact that they also yielded
+The fact that they yielded
 better accuracy rates
 is promising,
 though it should be kept in mind
@@ -68,8 +68,9 @@ may make the supervised learning procedure
 more difficult,
 or perhaps since we have the full history,
 the derivative is redundant
-and only makes it more difficult
-to linearly separate data.
+and makes it more difficult
+to linearly separate data,
+or makes overfitting more likely.
 
 We view the final NCC experiment,
 in which the auditory periphery model was varied,
@@ -131,7 +132,7 @@ and those trajectories can result in
 intelligible speech when synthesized
 with the VocalTractLab articulatory synthesizer.
 
-It is surprisingly that the model is able
+It is surprising that the model is able
 to perform at relatively high speeds
 (2.5--6.5~Hz),
 but has trouble with lower speeds.
@@ -159,7 +160,7 @@ The results in Figure~\ref{fig:prod-n_syllables}
 are surprising because syllables
 not taking part in a sequence
 should be completely inhibited,
-and therefore not affect the
+and therefore should not affect the
 operation of other syllable DMPs.
 Yet, a large number of deletions
 occur when the syllabary has
@@ -175,8 +176,8 @@ is crucial to scaling it to large vocabularies.
 While the production network is able to produce
 discrete vocal tract gesture trajectories successfully,
 DMPs were created for continuous control problems,
-and therefore can create continous trajectories
-more accurately.
+and deal with continous trajectories
+more naturally.
 In Chapter~\ref{chapt:model},
 we noted that the choice between discrete
 and continuous production information
@@ -193,8 +194,8 @@ The final neural model employs neural inhibition
 in several key areas
 (see Figure~\ref{fig:prod-network}).
 While employing neural inhibition was not
-an expclit goal in the design process,
-it provides a method for
+an explicit goal in the design process,
+inhibition provides a method for
 making qualitative behavioral changes rapidly,
 and therefore was used when such changes
 were necessary.
@@ -207,7 +208,7 @@ over other modeling techniques.
 
 One process in the model that
 required significant effort
-it the translation from
+was the translation from
 a recorded production information trajectory
 to a gesture score.
 The approach using temporal derivatives
@@ -229,7 +230,7 @@ of some learning process,
 which continues to operate
 even in adulthood.
 One possible way forward for this model
-is to begin with it in its current state,
+is to begin with its current state,
 and use NEF-based learning techniques
 (e.g., \citealt{macneil2011,bekolay2013a})
 to fine-tune its performance based on
@@ -240,16 +241,16 @@ sensory feedback.
 The syllable recognition model
 successfully addresses the main criteria
 influencing its design.
-The model is able to lassify trajectories
+The model is able to classify trajectories
 with relatively high degrees of freedom
-(at least 7),
+(at least seven)
 that advance non-uniformly through time,
 and that occur in a continuous stream
 with no segmentation signals.
 
 One of the biggest limitations
 of the syllable recognition model
-in its current state,
+in its current state
 is its sensitivity to the
 frequency of the syllable
 (see Figure~\ref{fig:recog-freq}).
@@ -295,8 +296,8 @@ to allow only one syllable iDMP to be active.
 However, the model does operate well
 with few syllables,
 and many syllables are similar
-and would be often confused by people
-without linguistic context.
+and would often be confused by humans
+if they did not use linguistic context.
 Therefore, we conclude that
 the iDMP networks are still suitable
 for trajectory classification,
@@ -326,28 +327,23 @@ Currently, it is difficult to make
 apples-to-apples comparisons between
 the models presented in this thesis
 and other models,
-especially those in speech literature.
+especially those in the speech literature.
 The models that are well known and discussed
 in speech literature are traditional
 connectionist models,
 which provide interesting theoretical predictions,
 but are not functional models
 that can replicate speech function.
-Essentially, artificial intelligence
+On the other hand, artificial intelligence
 has adopted statistical methods
 for speech recognition and synthesis,
 which work well in practice,
-but provide little theoretical benefit
-to speech literature.
-Speech scientists provide theoretical models,
-but these models are at too high
-a level of abstraction to
-be able to recognize speech
-or control articulatory synthesizers.
+but contribute little
+to speech theory.
 We hope that the neural models presented
 in this thesis bridge the gap
 between productive and theoretically interesting models
-by solving recognition and syntehsis problems
+by solving recognition and synthesis problems
 with methods that can be directly related
 to linguistic and neuroscientific theories.
 
@@ -374,8 +370,8 @@ more biologically realistic
 auditory filters is that
 they are more noise robust,
 and so the studies using these filters
-use speech that is either naturally noisy,
-or has noise added to it.
+use speech data sets that are either naturally noisy,
+or have noise added to it.
 As the NCC model is the first
 that I am aware of to show
 an improvement with
@@ -390,12 +386,12 @@ are far more temporally flexible
 and large scale than the sequencing methods
 reviewed in Section~\ref{sec:prev-sequencing},
 except for the OSE model,
-which we employ in our sequencing model.
+which we adapt for our sequencing model.
 Our additions to the sequencing model
 do not add anything useful for
 solving the general problem
 of serial list memory,
-but they are useful in other situations
+but are useful in other situations
 that require rapid iteration
 through a list of symbols,
 which may be common
@@ -437,7 +433,7 @@ rather than a gesture score,
 could improve synthesized speech quality.
 Similarly, it would be worth
 attempting a neural implementation
-of task dynamics in order to
+of Task Dynamics in order to
 compare the two approaches
 using the same methods.
 
@@ -446,7 +442,7 @@ the iDMP is a novel trajectory classification technique
 which warrants further investigation
 outside of the context of a neural model.
 Some early experiments using a non-neural
-version of the model were successful
+version of the model were successful in
 classifying toy problems;
 however, it remains to be seen
 whether it could be used in
@@ -472,7 +468,7 @@ Progress in machine learning
 has been accelerated significantly
 through the existence of
 benchmark data sets with
-easy to reproduce
+easily reproducible
 state-of-the-art results
 (e.g., the MNIST data set,
 which is now solved better
@@ -555,7 +551,7 @@ and machine learning researchers.
 \subsection{Contributions to linguistics}
 
 While Sermo summarizes a large body of
-linguistics research with language
+linguistics research with terminology
 that should be understandable for
 computer scientists,
 the theories embodied in Sermo
@@ -603,7 +599,8 @@ produces audio speech samples
 using the VocalTractLab articulatory synthesizer.
 The addition of these sensors and actuators
 enables new avenues
-for large-scale neural modeling research;
+for large-scale neural modeling research.
+For example,
 one could envision a version of Spaun
 that uses audio inputs and outputs
 rather than vision and handwritten digits.
@@ -652,7 +649,7 @@ primarily informed by existing
 theories and models.
 As such, we embody many of the predictions made
 by these theories and models.
-Whle the predictive power of Sermo
+While the predictive power of Sermo
 will develop as the models develop,
 we can nevertheless make some predictions
 based on the models presented in this thesis
@@ -662,7 +659,7 @@ as they currently exist.
 
 In Section~\ref{sec:results-periphmodel} we showed
 that more complicated auditory periphery models
-obtained better phone correctness rates
+achieved better phone correctness rates
 than simpler models
 (with the exception of the Gammatone filter).
 We therefore predict that
@@ -675,11 +672,11 @@ Similarly, we showed that using adaptive LIF neurons
 did not affect the phone correctness rate.
 However, it is usually the case that
 adaptive neuron models fire fewer action potentials
-than do non-adpative models like the LIF neuron.
+than do non-adaptive models like the LIF neuron.
 The adaptive LIF fires more action potentials
 during the onset of a signal,
 but then fires fewer action potentials
-as it becomes adapted to that signal.
+as it adapts to that signal.
 We therefore predict that
 the spiral ganglion cells in the inner ear
 are adaptive because it is more energy efficienct,
@@ -745,12 +742,12 @@ so we predict that cepstral coefficients
 (or, in general, decorrelated acoustic information)
 would be represented
 in higher auditory areas in the
-superior and middle temporal gyrus.
+superior and middle temporal gyri.
 More specifically,
 we predict that activity in the
 first layer of non-tonotopically organized
 auditory cortex would
-closely resembe the activity of
+closely resemble the activity of
 the neurons in the cepstral coefficient
 ensembles in the NCC model.
 Note that the fact that the
@@ -808,7 +805,7 @@ is likely to be used in situations
 where a lexical decoding must be
 disambiguated,
 we propose an experiment to test
-the prediction that are Spt
+the prediction that area Spt
 performs syllable recognition.
 In the experiment,
 subjects would watch videos
@@ -902,11 +899,11 @@ that I wish to highlight.
 
 Part of the motivation for the NCC model
 is that there are existing hardware devices
-called silicion cochleas
+called silicon cochleas
 which aim to replicate the function
 of the biological cochlea
 such that they can be implanted
-into the brain to partially recover the sense of hearing.
+in the brain to partially recover the sense of hearing.
 As we have shown that the NCC model
 can be used to classify phones
 in pre-segmented speech,
@@ -915,7 +912,7 @@ implement the NCC model using
 a silicon cochlea
 as the auditory periphery model
 and run the same experiment
-to determine is phones can be classified
+to determine if phones can be classified
 in pre-segmented speech.
 If so, then the NCC model could serve
 as a way of comparing different
@@ -1065,7 +1062,7 @@ by setting up a new DMP with a system state oscillator.
 Initially, the forcing function decoded from the state
 would always return zero.
 The prescribed error sensitivity learning rule
-\citep{bekolay2011}
+\citep{macneil2011,bekolay2011}
 would be applied to the
 connection decoding the forcing function.
 Initially, the error signal would be provided
@@ -1099,7 +1096,7 @@ and fine-tuning.
 \subsection{Prosody}
 
 A final area for fruitful future work
-would be the incorporation of prosodic effects
+is the incorporation of prosodic effects
 in Sermo and models of Sermo parts.
 Prosody is an important part of speech,
 and is notably missing from
@@ -1119,7 +1116,7 @@ and uses biologically inspired components
 prosody will be natural to include
 in future work.
 
-Prosody will involve addition theoretical concepts
+Prosody will involve additional theoretical concepts
 and Sermo subsystems.
 Theoretically, I believe that the linguistic concept
 of tone units will be central to incorporating
