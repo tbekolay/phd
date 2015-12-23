@@ -93,11 +93,11 @@ Another implementation difference
 is in the computation of
 the inverse discrete cosine transform.
 Typically, this computation is done as
-\begin{equation}
+\begin{equation*}
   y_k = \frac{x_0}{\sqrt{N}} + \sqrt{\frac{2}{N}} \sum_{n=1}^{N-1}
   x_n \cos \left( \frac{\pi}{N} n \left( k + \frac{1}{2} \right) \right)
   \text{ for } 0 \le k < N,
-\end{equation}
+\end{equation*}
 where $y_k$ is the $k$th cepstral coefficient,
 $x_n$ is the $n$th auditory filter output,
 and $N$ is the number of auditory filter outputs.
@@ -290,11 +290,11 @@ are typically computed through straightforward
 finite differences.
 That is, for an MFCC $y_k$
 at frame $t$, the corresponding delta is
-\begin{equation}
+\begin{equation*}
   \label{dcc}
   \delta_k(t) = \frac{\sum_{n=1}^N y_k(t+n) - y_k(t-n)}{
     2 \sum_{n=1}^N n},
-\end{equation}
+\end{equation*}
 where $N$ is a small number of frames
 (typically between one and three).
 The double delta applies the same operation
@@ -429,7 +429,7 @@ are added to the NCC network
 (see Figure~\ref{fig:ncc-network})
 to compute the desired derivative.
 The cepstral coefficients and derivatives
-are finally concatenated togther
+are finally concatenated together
 in a final step to produce
 the NCC feature vector.
 
@@ -475,17 +475,17 @@ A sequence of syllables is represented
 by a semantic pointer
 that tags each syllable with its place
 in the list; i.e.,
-\begin{equation}
+\begin{equation*}
   \text{SEQ} = \text{SYLL1} \bind \text{POS1} \oplus
     \text{SYLL2} \bind \text{POS2} \ldots
-\end{equation}
+\end{equation*}
 For example, the word ``Sermo''
 (\ipa{/s3rmoU/})
 would be represented as
-\begin{equation}
+\begin{equation*}
   \text{SERMO} = \text{S3R} \bind \text{POS1} \oplus
     \text{MOU} \bind \text{POS2}.
-\end{equation}
+\end{equation*}
 Representing a syllable sequence
 by binding syllables to list positions
 allows us to query the sequence
@@ -495,19 +495,19 @@ For example, to query the model
 for the first syllable,
 we can bind the sequence semantic pointer
 with the inverse of the first position pointer.
-\begin{equation}
+\begin{equation*}
   \text{S3R} \approx \text{SERMO} \bind \text{POS1}^{-1}
-\end{equation}
+\end{equation*}
 
 The semantic pointers representing syllable positions
 are constructed such that subsequent positions
 are the result of binding a position with
 a randomly generated $\text{NEXTPOS}$ pointer.
 For example,
-\begin{equation}
+\begin{equation*}
   \label{nextpos}
   \text{POS2} = \text{POS1} \bind \text{NEXTPOS}
-\end{equation}
+\end{equation*}
 The initial position, $\text{POS1}$,
 and semantic pointers for each syllable
 are also randomly generated.\footnote{
@@ -533,9 +533,9 @@ Throughout the simulation,
 the current syllable to be voiced
 is computed by binding the sequence
 with the current position pointer.
-\begin{equation}
+\begin{equation*}
   \text{SYLL} = \text{SEQ} \bind \text{CURRPOS}^{-1},
-\end{equation}
+\end{equation*}
 where $\text{CURRPOS}$ starts as $\text{POS1}$
 and changes over the course of the simulation
 by binding with the $\text{NEXTPOS}$ pointer
@@ -648,7 +648,7 @@ that are defined manually.\footnote{
   sequence and cleaned up through
   associative memories to represent
   the current and next syllable targets.
-  DMPs assocaited with those syllable targets
+  DMPs associated with those syllable targets
   are disinhibited by the associative memories.
   The \textbf{sequencer network} receives input
   from all DMPs in order to keep track
@@ -1113,7 +1113,7 @@ but for the ``current'' and ``next'' syllables
 to be disinhibited for the rest
 of the time so that when the next
 starting pulse occurs,
-the next syllable is already dinsinhibited
+the next syllable is already disinhibited
 and ready to be voiced,
 rather than needing to be disinhibited
 before it can be driven by the starting pulse.
@@ -1185,7 +1185,7 @@ A similar mapping could produce
 other types of motor behavior
 (e.g., a reach)
 from static representations
-of congitive intentions.
+of cognitive intentions.
 
 \section{Syllable recognition}
 \label{sec:impl-recog}

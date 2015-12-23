@@ -80,7 +80,7 @@ In the middle ear,
 air pressure fluctuations
 cause the eardrum (tympanic membrane)
 to vibrate;
-these miniscule vibrations
+these minuscule vibrations
 cause three tiny bones,
 the malleus, incus, and stapes to move.
 The stapes sits on the oval window
@@ -286,9 +286,9 @@ in a simple equation
 describing the equivalent
 rectangular bandwidth (ERB)
 of auditory filters:
-\begin{equation}
+\begin{equation*}
   \text{ERB} = 6.23 f^2 + 93.39 f + 28.52,
-\end{equation}
+\end{equation*}
 where $f$ is the center frequency
 of the auditory filter of interest.
 See Figure~\ref{fig:erb-mel} for a visualization of
@@ -325,9 +325,9 @@ is referred to as pitch.
 the relationship between
 frequency and pitch
 with a simple equation,
-\begin{equation}
+\begin{equation*}
   \text{Mel} = 2595 \log_{10} \left(1 + \frac{f}{700}\right),
-\end{equation}
+\end{equation*}
 resulting in the Mel scale
 (see Figure~\ref{fig:erb-mel}).
 As with volume, humans are adept at
@@ -640,7 +640,7 @@ between vowel phones.
     organized along three axes.
     The vertical axis reflects whether the vocal tract
     is open or closed.
-    The horizontal axis reflects wether the tongue
+    The horizontal axis reflects whether the tongue
     is near the front or back of the mouth.
     The last axis, on either side of each dot ($\cdot$)
     reflects whether the lips are rounded or unrounded.}
@@ -690,7 +690,7 @@ in Table~\ref{tab:consonants}.
         \multicolumn{2}{|c|}{\footnotesize{Dental}} &           % Dental
         \multicolumn{2}{|c|}{\footnotesize{Alveolar}} &         % Alveolar
         \multicolumn{2}{|c|}{\footnotesize{Post-alveolar}} &     % Post-alveolar
-        \multicolumn{2}{|c|}{\footnotesize{Retroflex}} &        % Retroflex
+        \multicolumn{2}{|c|}{\footnotesize{Retroflex}} \\        % Retroflex
 
       \hline Plosive &                % Plosive
         \ipa{p} & \ipa{b} &                     % Bilabial
@@ -877,7 +877,7 @@ in this thesis.
 \subsubsection{Morpheme}
 
 The next level of meaning in the
-speech perception hieararchy
+speech perception hierarchy
 is the morpheme.
 Morphemes are the smallest unit
 of grammatical significance
@@ -924,7 +924,7 @@ We will examine this question
 further in Section~\ref{sec:recog-neurobio}.
 
 From words,
-further subfields of linguistsics
+further subfields of linguistics
 (e.g., semantics and syntax)
 study how words are composed
 into higher order linguistic structures
@@ -1323,7 +1323,7 @@ used commercially
 In 1989, \citet{lee1989}
 achieved a phone accuracy rate of
 66.08\% on a subset of the
-TIMIT speech corpus \citp{garofolo1993}.
+TIMIT speech corpus \citep{garofolo1993}.
 Four years later,
 \citet{lamel1993}
 used a more sophisticated HMM-based system
@@ -1378,7 +1378,7 @@ which must be carefully tuned.
 
 One potential benefit of DNN-based approaches
 is that they have analogies to
-how humans peceive speech.
+how humans perceive speech.
 DNNs leverage simple computational units
 (artificial neurons),
 which operate in parallel
@@ -1388,7 +1388,7 @@ While the computations done by these neurons
 and the learning algorithms that adjust
 the connection weights
 are not directly implementable
-with biologically pluasible components,
+with biologically plausible components,
 mappings between DNNs
 and biologically plausible spiking neural networks
 are currently under development
@@ -1436,7 +1436,7 @@ aim to model ear physiology
 as accurately as possible.
 Unfortunately, efficient implementations
 of these models are not readily available.
-Phenomological models, on the other hand,
+Phenomenological models, on the other hand,
 aim to reproduce the output
 of the human ear
 as closely as possible
@@ -1501,7 +1501,7 @@ which cause fluctuations in air pressure.
   Adapted from \citet{macneilage2001}.}
 
 The vocal tract consists of
-the layrngeal cavity,
+the laryngeal cavity,
 the pharynx, the oral cavity,
 and the nasal cavity
 (see Figure~\ref{fig:vt}).
@@ -1512,7 +1512,7 @@ in turn to form the
 specific air pressure fluctuations
 that we interpret as speech.
 Major changes in air pressure waves
-occur in the layrngeal cavity,
+occur in the laryngeal cavity,
 which contains the glottis.
 The glottis is made up of
 the vocal folds,
@@ -1641,7 +1641,7 @@ we present in Chapter~\ref{chapt:model}.
   While there are many important linguistic processes
   generating sequences of words,
   we focus on the hierarchy levels below words.
-  Words are composed of one or more syllabes,
+  Words are composed of one or more syllables,
   which are the last discrete units
   in the speech production hierarchy.
   Syllables are defined by
@@ -1756,7 +1756,7 @@ Gestural scores can also
 be visualized as a graph,
 as in Figure~\ref{fig:gs},
 which highlights that
-certain gestures must cooccur
+certain gestures must co-occur
 or have tight temporal couplings
 such that one gesture
 starts as another gesture ends.
@@ -1766,7 +1766,7 @@ starts as another gesture ends.
   The gesture score is composed of three gestures.
   The coupling graph on the right denotes that
   the labial closure and palatal wide gestures
-  should cooccur,
+  should co-occur,
   while the alveolar closure gesture's
   onset is tied to the offset of
   the palatal wide gesture.
@@ -1927,11 +1927,11 @@ a sequence of phonemes is retrieved
 from the mental lexicon corresponding
 to a lexical item,
 and are organized into syllables
-through an excplicit syllabification stage
+through an explicit syllabification stage
 (called ``prosodification'' as it
 includes prosodic elements of syllables).
 This method of phonological encoding
-constrasts with other speech production theories
+contrasts with other speech production theories
 which assume that the syllabification
 of a word is stored in the mental lexicon
 (e.g., \citealt{dell1988}).
@@ -1954,7 +1954,7 @@ corresponding to frequently used syllables.
 \citet{levelt1992,levelt1994} theorize
 that we have a repository
 of learned gesture scores
-for frequenty used syllables
+for frequently used syllables
 called a ``mental syllabary,''
 which is queried
 in the phonetic encoding process.
@@ -1969,9 +1969,9 @@ and phonetic encoding processes.
 \fig{weaver}{0.55}{Phonological and phonetic encoding.}{
   Phonological and phonetic encoding processes
   theorized by \citet{levelt1994,roelofs2000}.
-  In the phonological enconding process,
+  In the phonological encoding process,
   a sequence of phonemes is generated
-  and organzed according to
+  and organized according to
   learned syllable structures.
   Gesture scores corresponding to these syllables,
   which may contain
@@ -2074,7 +2074,7 @@ to the levels of the speech production hierarchy
 (see Figure~\ref{fig:production}).
 
 We theorize that motor synergies
-are reponsible
+are responsible
 for moving vocal tract articulators
 to target positions.
 There is evidence that motor synergies
@@ -2543,7 +2543,7 @@ than experiments in which the subject
 has a choice of reactions
 and the cue is arbitrarily related
 to the reaction.
-If the cue is nonarbitrarily related
+If the cue is non-arbitrarily related
 to the response
 (e.g., the cue appears on the right side
 when a button on the right is to be pressed)
@@ -2704,7 +2704,7 @@ obtained a root mean square error
 of 0.95~mm on the MNGU0 dataset
 \citep{steiner2012},
 which is 0.04~mm better than prior
-efforts using Guassian mixture models
+efforts using Gaussian mixture models
 \citep{richmond2009}.
 The extracted articulatory information
 could be used by another ASR system
@@ -2810,7 +2810,7 @@ as the neural networks in the model.
   DIVA is a speech production model that
   uses auditory and somatosensory feedback
   to improve speech synthesis.
-  An utterance is initiatiated by the
+  An utterance is initiated by the
   feedforward control system,
   and is improved through
   auditory and somatosensory error signals
@@ -2835,7 +2835,7 @@ neuron per speech plan,
 where a speech plan can correspond to
 a single phoneme, a syllable, or one or more words.
 In \citet{guenther2006a},
-they acknolwedge that ``it is expected that
+they acknowledge that ``it is expected that
 premotor cortex sound maps in the brain
 involve distributed representations
 of each speech sound.''

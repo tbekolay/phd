@@ -62,7 +62,7 @@ with time-aligned phone and word transcriptions.
 The corpus contains ten speech samples
 from 630 speakers across eight dialects
 of American English,
-totalling 6300 utterances
+totaling 6300 utterances
 (5.4 hours of continuous speech).
 The utterances are separated into
 a training set
@@ -322,7 +322,7 @@ and example MFCC and NCC trajectories.
   to match the same number of frames as the NCC network.
   (C) NCCs generated from the same utterance
   with 1~ms timestep. Both the raw NCC and z-scored NCC are shown.
-  (D) NCCs shortened through neighbourhood averaging
+  (D) NCCs shortened through neighborhood averaging
   to match the same number of frames as the MFCC model.}
 
 Each trajectory is then flattened
@@ -418,7 +418,7 @@ may be slightly lower
 for consonant phones,
 but the high variance is concerning.
 For NCCs,
-z-scoring siginificantly
+z-scoring significantly
 raises training correctness,
 but lowers testing correctness.
 Variance is approximately the same
@@ -846,9 +846,9 @@ matches known neuroanatomical constraints.
 
 The number of spiking neurons used
 in the model is
-\begin{equation}
+\begin{equation*}
   N = N_f |f| + N_c |c| + \sum_{i=1}^{|d|} 2 N_d |c|,
-\end{equation}
+\end{equation*}
 where $N_f$ is the number of neurons per frequency,
 $|f|$ is the number of frequencies modeled,
 $N_c$ is the number of neurons per cepstral coefficient,
@@ -1214,7 +1214,7 @@ of reconstructed gestures
 that co-occur in the target gesture,
 and compare to a baseline
 computed by shuffling all of the gestures
-and deteremining if two random gestures
+and determining if two random gestures
 start or end at the same time.
 
 Finally, we synthesize speech samples
@@ -1285,7 +1285,7 @@ switch to the next syllable,
 resulting in a repetition of the
 \ipa{[ti]} syllable.
 Accuracy for this model is 0.76
-(1 substition, 2 deletions, and 4 insertions occur);
+(1 substitution, 2 deletions, and 4 insertions occur);
 the co-occurrence metric is 0.55
 (chance is 0.083).
 
@@ -1389,7 +1389,7 @@ the DMP state's recurrent connection.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1406,8 +1406,8 @@ until $\tau \ge 0.04$~s.
 Timing means are negative,
 indicating that the model
 voices syllables faster
-than the original gesture socre.
-Co-occurence is significantly
+than the original gesture score.
+Co-occurrence is significantly
 better than chance for all values of $\tau$.
 
 Next, as with the NCC model,
@@ -1430,7 +1430,7 @@ timing ensemble in the sequencing network.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1461,7 +1461,7 @@ For subsequent simulations,
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1506,7 +1506,7 @@ voiced rapidly.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1550,7 +1550,7 @@ of insertions.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1589,7 +1589,7 @@ as the number of syllables increased.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Shaded regions represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1619,7 +1619,7 @@ due to increased deletions.
   the baseline accuracy value,
   which is the mean of the accuracy between all non-matched
   syllables in the repository of 417 syllables;
-  the dotted line in the co-ocurrence metric
+  the dotted line in the co-occurrence metric
   denotes the metric obtained through random chance.
   Error bars represent bootstrapped 95\% confidence intervals
   from the 20 trials.}
@@ -1642,7 +1642,7 @@ verifying our assumption.
 The only statistically significant difference
 between the model with repetitions
 versus no repetitions
-is that substitions are more likely
+is that substitution are more likely
 to occur when repetitions are allowed.
 
 \subsubsection{Speech intelligibility}
@@ -1699,20 +1699,20 @@ with syllable sequences of varying speed.
 
 The number of neurons in the
 sequencing and production model is
-\begin{equation}
+\begin{equation*}
   N = N_{\text{SPA}} + N_S + N_{\text{DMP}} + N_O,
-\end{equation}
+\end{equation*}
 where these variables
 are the number of neurons in
 a subset of the model.
 $N_{\text{SPA}}$ is the number of
 neurons for all SPA modules,
 which is
-\begin{equation}
+\begin{equation*}
   N_{\text{SPA}} = 5 D(\text{SYLL}) N_{D(\text{SYLL})} +
       |DFT_{\text{SYLL}}| N_{D(\text{SYLL})}
       + 2 N_{\text{AM}} (3 |\text{SYLL}| + 1),
-\end{equation}
+\end{equation*}
 where $D(\text{SYLL})$ is the dimensionality
 of syllable semantic pointers,
 $N_{D(\text{SYLL})}$ is the number of neurons
@@ -1728,28 +1728,28 @@ syllables in the syllabary.
 $N_S$ is the number of neurons
 in the sequencer network,
 which is
-\begin{equation}
-  N_S = 4 N_D_S + 140,
-\end{equation}
-where $N_D_S$ is the number of neurons
+\begin{equation*}
+  N_S = 4 N_{D(S)} + 140,
+\end{equation*}
+where $N_{D(S)}$ is the number of neurons
 per dimension in the sequencer network,
 and 140~neuron come from ensembles
 of fixed size.
 
 $N_{\text{DMP}}$ is the number of neurons
 in DMP networks, which is
-\begin{equation}
+\begin{equation*}
   N_{\text{DMP}} = 3 |\text{SYLL}| N_{|\text{DMP}|} + 40,
-\end{equation}
+\end{equation*}
 where $N_{|\text{DMP}|}$ is the number of neurons
 per DMP dimension,
 and 40~neurons come from ensembles of fixed size.
 
 $N_O$ is the number of neurons
 in production information ensembles, which is
-\begin{equation}
+\begin{equation*}
   N_O = 48 N_{|O|}
-\end{equation}
+\end{equation*}
 where 48 is the number of gestures,
 and $N_{|O|}$ is the number of neurons
 per production information ensemble.
@@ -1840,9 +1840,9 @@ syllables classified by the model,
 and compare that list to the
 originally specified list
 using the formula
-\begin{equation}
+\begin{equation*}
   \text{Acc} = \frac{N_S - S - D - I}{N_S},
-\end{equation}
+\end{equation*}
 where $N_S$ is the number of syllables
 in the trajectory,
 $S$ is the number of substitutions,
@@ -1997,7 +1997,7 @@ Table~\ref{tab:recog}.
         \texttt{memory neurons\_per\_dimension} & 60 & Memory \\
         \texttt{memory feedback} & 0.83 & Memory recurrent connection \\
         \texttt{reset\_th} & 0.9 & Classifier ensemble \\
-        \texttt{inhib\_scale} & 1 & Classfier connections to iDMPs \\
+        \texttt{inhib\_scale} & 1 & Classifier connections to iDMPs \\
         \texttt{syllable n\_per\_d} & 1000 & Syllable iDMP ensembles \\
         \texttt{syllable tau} & 0.05 & Syllable iDMP recurrent connection \\
         \texttt{similarity\_th} & 0.82 & Syllable iDMP recurrent connection \\
@@ -2068,7 +2068,7 @@ As can be seen in Figure~\ref{fig:recog-scale},
 with similarity threshold of 0.82,
 the scale makes a smaller difference
 in classification and memory accuracy
-than does the smilarity threshold.
+than does the similarity threshold.
 Deletions are likely up to
 a scale value to 0.8,
 after which insertions become more likely.
@@ -2273,18 +2273,18 @@ All other measure are within confidence intervals as well.
 
 The number of neurons in the
 syllable recognition model is
-\begin{equation}
+\begin{equation*}
   N = N_{\text{in}} + N_{\text{SPA}} + N_{\text{iDMP}} + N_C,
-\end{equation}
+\end{equation*}
 where these variables
 are the number of neurons in
 a subset of the model.
 
 $N_{\text{in}}$ is the number of neurons
 in trajectory input ensembles, which is
-\begin{equation}
+\begin{equation*}
   N_{\text{in}} = 48 N_{|\text{in}|}
-\end{equation}
+\end{equation*}
 where 48 is the number of gestures,
 and $N_{|\text{in}|}$ is the number of neurons
 per input ensemble.
@@ -2292,10 +2292,10 @@ per input ensemble.
 $N_{\text{SPA}}$ is the number of
 neurons for all SPA modules,
 which is
-\begin{equation}
+\begin{equation*}
   N_{\text{SPA}} = 3 |\text{SYLL}| N_{\text{AM}}
     + D(\text{SYLL}) N_{D(\text{SYLL})},
-\end{equation}
+\end{equation*}
 where $|\text{SYLL}|$ is the number of
 syllables in the syllabary,
 $N_{\text{AM}}$ is the number of neurons
@@ -2307,10 +2307,10 @@ per syllable dimension.
 
 $N_{\text{iDMP}}$ is the number of neurons
 in iDMP networks, which is
-\begin{equation}
+\begin{equation*}
   N_{\text{iDMP}} = |\text{SYLL}| \left( \left(\overline{D}(\text{iDMP})
   + 2 \right) N_{D(\text{iDMP})} + 20 \right),
-\end{equation}
+\end{equation*}
 where $\overline{D}(\text{iDMP})$ is the average
 number of gestures in each syllable,
 $N_{D(\text{iDMP})}$ is the number of neurons

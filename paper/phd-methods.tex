@@ -43,7 +43,7 @@ and digital signal processors.
 It captures many of the
 psychoacoustical phenomena discussed
 in Section~\ref{sec:psychoacoustics},
-but does not capture some basic phonemena;
+but does not capture some basic phenomena;
 for example, the Gammatone auditory filter is symmetric.
 However,
 it can process audio online
@@ -60,9 +60,9 @@ making it applicable to Sermo.
 As described in \citet{patterson1976},
 the Gammatone filter has
 an impulse response of the form
-\begin{equation}
+\begin{equation*}
   \text{IR}(t) = t^{n-1} \cos(2 \pi f t) \, e^{-2 \pi b \text{ERB}(f) t},
-\end{equation}
+\end{equation*}
 where $n$ is the order of the filter,
 $b$ is a parameter determining the filter bandwidth,
 and ERB$(f)$ is the equivalent rectangular bandwidth
@@ -174,9 +174,9 @@ in that it is more numerically stable.
 
 The impulse response
 of the Log Gammachirp filter is
-\begin{equation}
+\begin{equation*}
   \text{IR}(t) = t^3 \cos(2 \pi (f t + c \ln(t))) \, e^{-2 \pi b \text{ERB}(f) t},
-\end{equation}
+\end{equation*}
 where $c$ is a ``chirp'' parameter
 that affects the asymmetry
 of the auditory filter;
@@ -207,11 +207,11 @@ causes the asymmetry.
 Gammachirp filters are closely related
 to Gammatone filters.
 In fact, the amplitude spectrum of the Gammachirp is
-\begin{equation}
+\begin{equation*}
   |G_C(f)| = a_0 \cdot |G_T(f)| \cdot |H_A(f)|,
-\end{equation}
+\end{equation*}
 where $a_0$ is a scaling factor,
-$|G_T(f)|$ is the amplitude sepctrum
+$|G_T(f)|$ is the amplitude spectrum
 of the Gammatone filter,
 and $|H_A(f)|$ is the asymmetric function
 that depends on the parameter $c$.
@@ -296,9 +296,9 @@ basilar membrane deflection.
 The nonlinear gain in the nonlinear path
 is a ``broken stick'' nonlinearity;
 i.e.,
-\begin{equation}
+\begin{equation*}
   y(t) = \text{sign}(x(t)) \min(a |x(t)|, b |x(t)|^c),
-\end{equation}
+\end{equation*}
 where $x(t)$ is the input signal,
 $y(t)$ is the output signal,
 and $a$, $b$ and $c$ are parameters.
@@ -548,7 +548,7 @@ see \citealt{bekolay2013} for benchmark results).
 Due in part to its slow speed,
 we use Brian only for
 the auditory periphery model implementations
-provided in the Brain Hears subpackage,
+provided in the Brian Hears subpackage,
 and use Nengo (described below)
 for all other model implementations.
 
@@ -583,8 +583,7 @@ and a ``canonical system.''
 The point attractor pushes
 the system state to
 a goal, $g$, with dynamics
-\begin{equation}
-  \label{dmp-pointattractor}
+\begin{equation} \label{dmp-pointattractor}
   \tau\ddot{y} = \alpha_y(\beta_y(g - y) - \dot{y}) + f(x, g),
 \end{equation}
 where $y$ is the system state,
@@ -603,8 +602,7 @@ In the discrete, one-time action case,
 the canonical system
 has state $x$ that evolves
 with dynamics
-\begin{equation}
-  \label{dmp-discrete}
+\begin{equation} \label{dmp-discrete}
   \tau\dot{x} =
   \begin{cases}
     1 &\text{if } x < 1 \\
@@ -649,8 +647,7 @@ The goal $g$ is used
 to scale the system state $x$ depending on
 the initial distance to the goal.
 The final equation is
-\begin{equation}
-  \label{dmp-forcing-func}
+\begin{equation} \label{dmp-forcing-func}
   f(x, g) = \frac{\sum_{i=1}^N \psi_i w_i}{\sum_{i=1}^N \psi_i} \, x(g - y_0),
 \end{equation}
 where $w_i$ is the weight associated with
@@ -751,8 +748,7 @@ However, the LIF neuron is
 simple enough that
 the instantaneous activity rate can be
 solved for directly.
-\begin{equation}
-  \label{eq:lif-activity-j}
+\begin{equation} \label{eq:lif-activity-j}
   a(J) = G[J] =
   \begin{cases}
     \textstyle
@@ -898,8 +894,7 @@ We model neural spikes as
 Dirac-$\delta$ functions,
 and define the time-varying
 neural activity as
-\begin{equation}
-  \label{a(t)}
+\begin{equation} \label{a(t)}
   a(t) = \sum_s \delta(t - t_s) * h(t) = \sum_s h(t - t_s),
 \end{equation}
 where $s$ is the set of spike times,
@@ -1001,7 +996,7 @@ that performs a different combination
 of the downstream ensemble's encoders, $\V{e}_j$,
 and the upstream ensemble's decoders, $\V{d}_i$.
 \begin{equation} \label{eq:linear-trans}
-  \omega_{ij} &= \alpha_j \V{e}_j \V{L}_{ji} \V{d}_i
+  \omega_{ij} = \alpha_j \V{e}_j \V{L}_{ji} \V{d}_i
 \end{equation}
 
 Since the decoding process is
@@ -1114,9 +1109,9 @@ and control theory.
 The architecture depicted in Figure~\ref{fig:dynamics}
 implements a linear control system,
 and can be expressed as
-\begin{equation}
+\begin{equation*}
   \V{\dot{x}}(t) = \V{Ax}(t) + \V{Bu}(t),
-\end{equation}
+\end{equation*}
 where $\V{A}$ is the dynamics matrix
 and $\V{B}$ is the input matrix.
 Normally, transforming this equation
@@ -1251,9 +1246,9 @@ Given a vector $\V{A}$, the involution
 of that vector, $\V{A'}$,
 is a rearrangement of the vector dimensions;
 specifically,
-\begin{equation}
+\begin{equation*}
   \V{A'} = A'_{i} = A_{-i \bmod n},
-\end{equation}
+\end{equation*}
 where $n$ is the number of dimensions,
 and $\bmod$ is the modulo operator.
 For example, if $\V{A} = [a_0, a_1, a_2, a_3]$,
@@ -1302,9 +1297,9 @@ In HRRs,
 the merging transformation,
 which we will denote with $\oplus$,
 is vector superposition.
-\begin{equation}
+\begin{equation*}
   \V{A} \oplus \V{B} = [A_0 + B_0, A_1 + B_1, ...]
-\end{equation}
+\end{equation*}
 Since the new representation
 is a linear combination of
 the two vectors,
@@ -1314,36 +1309,36 @@ are not too dissimilar.
 Note that similarity in SPA can
 be computed either by
 the dot product between two vectors,
-\begin{equation}
+\begin{equation*}
   \V{A} \cdot \V{B} = \sum_{i=0}^{n-1} A_i B_i,
-\end{equation}
+\end{equation*}
 or the cosine similarity,
 which is the dot product normalized
 by the length of the two vectors; i.e.,
-\begin{equation}
+\begin{equation*}
   \cos(\theta) = \frac{\V{A} \cdot \V{B}}{\Vert\V{A}\Vert \Vert\V{B}\Vert}
     = \frac{\sum_{i=0}^{n-1} A_i B_i}
            {\sqrt{\sum_{i=0}^{n-1} A_i^2} \sqrt{\sum_{i=0}^{n-1} B_i^2}}.
-\end{equation}
+\end{equation*}
 
 The binding transformation in HRRs,
 which we will denote with $\bind$,
 is circular convolution.
 While circular convolution
 is defined as
-\begin{equation}
+\begin{equation*}
   \V{A} \bind \V{B} = \sum_{i=0}^{n-1} A_{i \bmod n}B_{j-i \bmod n},
     \text{ for } j=0, \ldots, n-1,
-\end{equation}
+\end{equation*}
 we can reduce the computational complexity
 of the transform
 by computing it as the
 product of discrete Fourier coefficients.
 Specifically,
-\begin{equation}
+\begin{equation*}
   \V{A} \bind \V{B} = \text{IDFT}\left[
     \text{DFT}(\V{A}) \circ \text{DFT}(\V{B})\right],
-\end{equation}
+\end{equation*}
 where $\circ$ is the Hadamard (element-wise) product.
 In addition to lowering
 the computational complexity,
@@ -1366,9 +1361,9 @@ we can ``unbind'' the bound vector
 to retrieve one input vector
 by binding with the approximate inverse (involution)
 of the other input vector.
-\begin{equation}
+\begin{equation*}
   (\V{A} \bind \V{B}) \bind \V{A'} \approx \V{B}
-\end{equation}
+\end{equation*}
 Note that unbinding is approximate;
 since the binding operation
 mixes the two vectors together,
@@ -1575,7 +1570,7 @@ is important for future closed loop models.
 The integration is instead done
 through a Nengo node.
 The function attached to the node
-contains the state of the Brain simulation,
+contains the state of the Brian simulation,
 which can be advanced at a different rate
 as the Nengo simulation if desired.
 In addition to collecting
@@ -1586,7 +1581,7 @@ the auditory filter,
 allowing for a bidirectional interface.
 Updating the sound would normally
 clear the state of the auditory filter,
-so we instead subclass Brain's
+so we instead subclass Brian's
 \texttt{Sound} object
 and provide samples from
 Nengo when needed.
