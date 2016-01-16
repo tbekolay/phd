@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
 from nengo import spa
-from nengo.dists import Choice, ClippedExpDist
+from nengo.dists import Choice, Exponential
 from nengo.networks import CircularConvolution, InputGatedMemory
 from nengo.utils.compat import range
 
@@ -89,7 +89,7 @@ def Sequencer(n_per_d, timer_tau=0.05, timer_freq=2.,
         net.timer = nengo.Ensemble(n_per_d * 2, dimensions=2)
 
         # --- Reset all DMPs at the right time
-        r_intercepts = ClippedExpDist(0.15, reset_threshold, 1)
+        r_intercepts = Exponential(0.15, reset_threshold, 1)
         net.reset = nengo.Ensemble(60, dimensions=1,
                                    encoders=Choice([[1]]),
                                    intercepts=r_intercepts)
@@ -116,7 +116,7 @@ def Sequencer(n_per_d, timer_tau=0.05, timer_freq=2.,
                          synapse=timer_tau,
                          transform=[[1, -omega], [omega, 1]])
         # Usually, the recurrent ensemble is inhibited
-        inh_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
+        inh_intercepts = Exponential(0.15, -0.5, 0.1)
         net.tr_inhibit = nengo.Ensemble(20, dimensions=1,
                                         encoders=Choice([[1]]),
                                         intercepts=inh_intercepts)
@@ -126,7 +126,7 @@ def Sequencer(n_per_d, timer_tau=0.05, timer_freq=2.,
         nengo.Connection(net.reset, net.tr_inhibit, transform=-1)
 
         # --- `gate` switches the working memory representations
-        g_intercepts = ClippedExpDist(0.15, gate_threshold, 1)
+        g_intercepts = Exponential(0.15, gate_threshold, 1)
         net.gate = nengo.Ensemble(60, dimensions=1,
                                   encoders=Choice([[1]]),
                                   intercepts=g_intercepts)

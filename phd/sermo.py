@@ -2,7 +2,7 @@ import nengo
 import numpy as np
 import soundfile as sf
 from nengo import spa
-from nengo.dists import Choice, ClippedExpDist
+from nengo.dists import Choice, Exponential
 from nengo.networks import EnsembleArray
 from nengo.utils.compat import is_array, is_string, iteritems
 
@@ -302,7 +302,7 @@ class Production(object):
         assert len(self.syllables) > 0, "No syllables added"
 
         # Make a readout for the production info coming from the DMPs
-        intercepts = ClippedExpDist(0.15, self.production_info.threshold, 1)
+        intercepts = Exponential(0.15, self.production_info.threshold, 1)
         net.production_info = EnsembleArray(self.production_info.n_per_d,
                                             n_ensembles=48,
                                             encoders=Choice([[1]]),
@@ -484,7 +484,7 @@ class Recognition(object):
         nengo.Connection(net.cleanup.output, net.memory.input)
 
     def build_classifier(self, net):
-        intercepts = ClippedExpDist(0.15, self.classifier.reset_th, 1.0)
+        intercepts = Exponential(0.15, self.classifier.reset_th, 1.0)
         net.classifier = nengo.Ensemble(20, dimensions=1,
                                         encoders=Choice([[1]]),
                                         neuron_type=nengo.AdaptiveLIF(),

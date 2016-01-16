@@ -1,7 +1,7 @@
 import nengo
 import nengo.utils.numpy as npext
 import numpy as np
-from nengo.dists import Choice, ClippedExpDist
+from nengo.dists import Choice, Exponential
 
 
 def ff_inv(func, thresh=0.6, scale=0.7):
@@ -44,7 +44,7 @@ def InverseDMP(n_per_d, forcing_f, scale=0.7, reset_scale=2.5,
 
         # --- Reset system state
         net.reset = nengo.Node(size_in=1)
-        d_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
+        d_intercepts = Exponential(0.15, -0.5, 0.1)
         net.diff_inhib = nengo.Ensemble(20, dimensions=1,
                                         intercepts=d_intercepts,
                                         encoders=Choice([[1]]))

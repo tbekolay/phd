@@ -1,6 +1,6 @@
 import nengo
 import numpy as np
-from nengo.dists import Choice, ClippedExpDist
+from nengo.dists import Choice, Exponential
 
 from ..utils import rescale
 
@@ -53,7 +53,7 @@ def DMP(n_per_d, c, forcing_f, tau=0.05, net=None):
         nengo.Connection(kick, net.osc, transform=np.ones((2, 1)))
 
         # --- Inhibit the state by default
-        i_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
+        i_intercepts = Exponential(0.15, -0.5, 0.1)
         net.inhibit = nengo.Ensemble(20, dimensions=1,
                                      intercepts=i_intercepts,
                                      encoders=Choice([[1]]))
@@ -75,7 +75,7 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
     with net:
         # --- Decode forcing_f from oscillator
         net.osc = nengo.Ensemble(n_per_d * 2, dimensions=2,
-                                 intercepts=ClippedExpDist(0.15, 0.3, 0.6),
+                                 intercepts=Exponential(0.15, 0.3, 0.6),
                                  label=forcing_f.__name__)
         nengo.Connection(net.osc, net.osc,
                          synapse=tau,
@@ -86,7 +86,7 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
 
         # --- Drive the oscillator to a starting position
         net.reset = nengo.Node(size_in=1)
-        d_intercepts = ClippedExpDist(0.2, -0.5, 0.1)
+        d_intercepts = Exponential(0.2, -0.5, 0.1)
         net.diff_inhib = nengo.Ensemble(20, dimensions=1,
                                         intercepts=d_intercepts,
                                         encoders=Choice([[1]]))
@@ -99,7 +99,7 @@ def RhythmicDMP(n_per_d, freq, forcing_f, tau=0.025, net=None):
         nengo.Connection(net.diff, net.osc, function=lambda x: reset_goal - x)
 
         # --- Inhibit the oscillator by default
-        i_intercepts = ClippedExpDist(0.15, -0.5, 0.1)
+        i_intercepts = Exponential(0.15, -0.5, 0.1)
         net.inhibit = nengo.Ensemble(20, dimensions=1,
                                      intercepts=i_intercepts,
                                      encoders=Choice([[1]]))

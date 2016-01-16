@@ -1,6 +1,6 @@
 import nengo
 import numpy as np
-from nengo.dists import ClippedExpDist, Uniform
+from nengo.dists import Exponential, Uniform
 
 
 class UniformWithDeadzone(Uniform):
@@ -53,7 +53,7 @@ def DeadzoneDMP(n_per_d, freq, forcing_f, tau=0.025,
     with net:
         # --- Decode forcing_f from oscillator
         net.osc = nengo.Ensemble(n_per_d * 2, dimensions=2,
-                                 intercepts=ClippedExpDist(0.15, 0.3, 0.6),
+                                 intercepts=Exponential(0.15, 0.3, 0.6),
                                  encoders=encoders,
                                  label=forcing_f.__name__)
         nengo.Connection(net.osc, net.osc,
