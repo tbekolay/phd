@@ -59,6 +59,47 @@ def task_paper():
     yield forsurecompile('phd')
 
 
+def task_presentation():
+    """Generate presentation slides."""
+    figd = os.path.join(root, 'figures')
+    presd = os.path.join(root, 'presentation')
+    pfigd = os.path.join(presd, 'fig')
+    reveald = os.path.join(presd, 'reveal.js')
+    nbpath = os.path.join(presd, 'phd.ipynb')
+    slpath = os.path.join(presd, 'index.html')
+
+    def linkfigs():
+        os.symlink(figd, pfigd)
+
+    def dlreveal():
+        with open("%s.zip" % reveald, 'w') as fp:
+            dl = requests.get(
+                "https://github.com/hakimel/reveal.js/archive/3.2.0.zip")
+            fp.write(dl.content)
+
+    yield {'name': 'linkfigs',
+           'uptodate': [os.path.exists(pfigd)],
+           'actions': [linkfigs]}
+
+    yield {'name': 'dlreveal',
+           'uptodate': [os.path.exists(reveald)],
+           'actions': [dlreveal,
+                       "unzip %s.zip -d %s" % (reveald, presd),
+                       "mv %s-3.2.0 %s" % (reveald, reveald),
+                       "rm -f %s.zip" % reveald]}
+
+    yield {'name': 'generate',
+           'file_dep': [nbpath],
+           'targets': [slpath],
+           'actions': ["jupyter nbconvert %s --to slides --output %s"
+                       % (nbpath, nbpath),
+                       "mv %s.slides.html %s" % (nbpath, slpath)]}
+
+    yield {'name': 'serve',
+           'actions': ["echo 'To serve the presentation, "
+                       "cd presentation && python -m SimpleHTTPServer'"]}
+
+
 def task_plots():
     """Run notebooks to generate plots."""
     figd = os.path.join(root, 'figures')
@@ -96,6 +137,7 @@ def task_svg2pdf():
                        'actions': [svg2pdf(svgpath, pdfpath)],
                        'file_dep': [svgpath],
                        'targets': [pdfpath]}
+
 
 
 def main():

@@ -51,3 +51,6 @@ cache/
 plots/
 figures/**/*.pdf
 figures/**/*.ipynb
+presentation/fig
+presentation/reveal.js
+presentation/index.html
