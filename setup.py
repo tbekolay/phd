@@ -46,6 +46,7 @@ setup(
         "nwalign",
         "pandas",
         "pysoundfile<0.8",
+        "requests",
         "scikit-learn",
         "scipy",
         "seaborn",

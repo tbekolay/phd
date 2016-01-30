@@ -1,8 +1,10 @@
 from glob import glob
+import json
 import os
 
 import doit
 from doit.action import CmdAction
+import requests
 
 from .tasks import *  # noqa; load experiment tasks
 
@@ -12,6 +14,31 @@ DOIT_CONFIG = {
 }
 
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+
+def task_download_data():
+    """Downloads analyzed data from Figshare."""
+
+    def download_data(article_id):
+        r = requests.get("http://api.figshare.com/v1/articles/%s" % article_id)
+        detail = json.loads(r.content)
+        for file_info in detail['items'][0]['files']:
+            outpath = os.path.join(root, file_info['name'])
+            if os.path.exists(outpath):
+                print("%s exists. Skipping." % outpath)
+                continue
+            with open(outpath, 'wb') as outf:
+                print("Downloading %s..." % outpath)
+                dl = requests.get(file_info['download_url'])
+                outf.write(dl.content)
+
+    cached = os.path.join(root, 'cache')
+    n_files = sum([len(files) for r, d, files in os.walk(cached)])
+
+    return {'actions': [(download_data, ['2064072']),
+                        "unzip -o cache.zip",
+                        "rm -f cache.zip"],
+            'uptodate': [n_files >= 3562]}
 
 
 def task_paper():
