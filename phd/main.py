@@ -89,9 +89,10 @@ def task_presentation():
                        "rm -f %s.zip" % reveald]}
 
     yield {'name': 'generate',
-           'file_dep': [nbpath],
+           'file_dep': [nbpath, os.path.join(root, 'slides_reveal.tpl')],
            'targets': [slpath],
-           'actions': ["jupyter nbconvert %s --to slides --output %s"
+           'actions': ["jupyter nbconvert %s --to slides --output %s "
+                       "--RevealHelpTransformer.url_prefix=reveal.js"
                        % (nbpath, nbpath),
                        "mv %s.slides.html %s" % (nbpath, slpath)]}
 
