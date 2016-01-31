@@ -1,0 +1,73 @@
+.rendered_html h1 {
+    font-size: 380%;
+}
+
+.rendered_html h2 {
+    font-size: 300%
+}
+
+.rendered_html h3 {
+    font-size: 190%;
+}
+
+.rendered_html h4 {
+    font-size: 175%;
+}
+
+.rendered_html ol, .rendered_html ul {
+    font-size: 160%;
+    line-height: 120%;
+    margin-left: 5em;
+}
+
+pre.push-right {
+    margin-left: 8em;
+}
+
+div.MathJax_Display {
+    font-size: 120%;
+    line-height: 120%;
+}
+
+div.prompt {
+    display: none;
+}
+
+div.output_area {
+    margin-left: 5em;
+    margin-right: 5em;
+    font-size: 110%;
+}
+
+div.input_area {
+    display: none;
+}
+
+div.output_subarea {
+    max-width: 100%;
+}
+
+a.anchor-link {
+    display: none;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+    text-align: center;
+    text-transform: none;
+}
+
+.reveal img.inline {
+    display: inline;
+    vertical-align: middle;
+}
+
+.reveal img.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.reveal video {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

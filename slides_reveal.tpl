@@ -44,14 +44,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<title>{{resources['metadata']['name']}} slides</title>
+<title>Biologically inspired methods in speech recognition and synthesis: closing the loop</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <!-- General and theme style sheets -->
 <link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/reveal.css">
-<link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/theme/simple.css" id="theme">
+<link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/theme/white.css" id="theme">
 
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
@@ -186,12 +186,27 @@ require(
 
         // Full list of configuration options available here: https://github.com/hakimel/reveal.js#configuration
         Reveal.initialize({
-            controls: true,
-            progress: true,
+            controls: false,
+            progress: false,
             history: true,
-
-            theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+            transitionSpeed: "fast",
             transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/none
+
+            slideNumber: true,
+            center: true,
+            loop: false,
+            mouseWheel: false,
+            hideAddressBar: true,
+
+            width: 960,
+            height: 700,
+
+            margin: 0.01,
+
+            minScale: 1.0,
+            maxScale: 2.0,
+
+            viewDistance: 5,
 
             // Optional libraries used to extend on reveal.js
             dependencies: [
