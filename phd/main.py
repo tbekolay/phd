@@ -134,7 +134,7 @@ def task_svg2pdf():
             if fname.endswith('svg'):
                 svgpath = os.path.join(root, fdir, fname)
                 pdfpath = os.path.join(root, fdir, "%s.pdf" % fname[:-4])
-                yield {'name': os.path.basename(svgpath),
+                yield {'name': os.path.relpath(svgpath),
                        'actions': [svg2pdf(svgpath, pdfpath)],
                        'file_dep': [svgpath],
                        'targets': [pdfpath]}
