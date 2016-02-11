@@ -193,7 +193,7 @@ require(
             transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/none
 
             slideNumber: true,
-            center: true,
+            center: false,
             loop: false,
             mouseWheel: false,
             hideAddressBar: true,

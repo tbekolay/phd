@@ -6,6 +6,14 @@
     font-size: 300%
 }
 
+.rendered_html h1:first-child {
+    margin-top: 0.2em;
+}
+
+.rendered_html h2:first-child {
+    margin-top: 0.2em;
+}
+
 .rendered_html h3 {
     font-size: 190%;
 }
@@ -70,4 +78,14 @@ a.anchor-link {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+.reveal .slide-number {
+    right: 18px;
+    bottom: 18px;
+    font-size: 18px;
+}
+
+.reveal .slide-number-delimiter, .reveal .slide-number-b {
+    display: none;
 }
