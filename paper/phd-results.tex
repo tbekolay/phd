@@ -467,8 +467,8 @@ appended to the vector with 26 elements.
 
 For MFCCs, adding a single derivative
 improves testing correctness
-by almost double
-(25\% to 36\% correct),
+significantly
+(from 25\% to 36\% correct),
 but adding a second derivative
 has very little effect
 (36\% correct).
@@ -756,7 +756,7 @@ can only be used for audio signals
 with a 50~kHz sampling rate;
 for this reason, all TIMIT samples
 in these experiments
-are upsampled to 50~kHz,
+are upsampled from the recorded 16~kHz to 50~kHz,
 and all models (both the MFCC and NCC models)
 use the upsampled audio.
 Additionally, the Tan Carney model
@@ -1733,7 +1733,7 @@ which is
 \end{equation*}
 where $N_{D(S)}$ is the number of neurons
 per dimension in the sequencer network,
-and 140~neuron come from ensembles
+and 140~neurons come from ensembles
 of fixed size.
 
 $N_{\text{DMP}}$ is the number of neurons
@@ -1904,7 +1904,7 @@ all syllables are voiced
 at around 2~Hz.
 The activities in various ensembles
 reflect the transformations
-and dynamics expected of model,
+and dynamics expected of the model,
 and result in
 perfect classification and memory accuracy.
 
@@ -2166,12 +2166,12 @@ optimized for earlier.
 After 1.8~Hz, accuracy decreases
 as deletions become more common
 than insertions.
-the variance of the timing difference
+The variance of the timing difference
 (i.e., when the classification occurs
 relative to the end of the syllable)
 is very small from about 1.4 Hz and above.
 The mean timing difference
-is negative in for all frequencies,
+is negative for all frequencies,
 indicating that classifications
 occur before the syllable trajectory
 is complete.

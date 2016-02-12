@@ -532,7 +532,7 @@ are also randomly generated.\footnote{
 Throughout the simulation,
 the current syllable to be voiced
 is computed by binding the sequence
-with the current position pointer.
+with the current position pointer; i.e.,
 \begin{equation*}
   \text{SYLL} = \text{SEQ} \bind \text{CURRPOS}^{-1},
 \end{equation*}
@@ -592,7 +592,7 @@ Using rhythmic DMPs
 means that when a syllable
 is only voiced once,
 it must be explicitly stopped
-once the DMPs traverses
+once the DMP traverses
 its limit cycle once.
 At the same time,
 the DMP for the next syllable must begin,
@@ -1348,7 +1348,7 @@ any iDMP's state passes some classification threshold,
 (e.g., when $\hat{x}(t) > 0.9$ in the discrete case).
 It can be done on an ad hoc basis,
 essentially querying the set of iDMPs
-for which is mostly likely at that moment in time
+for which is most likely at that moment in time
 (i.e., $\argmax{\hat{X}(t)}$).
 It can also be done when one iDMP
 is sufficiently farther along than
@@ -1700,7 +1700,7 @@ of the associative memory
 in the recognition model.
 Figure~\ref{fig:recog-network} shows
 the mutual inhibition in the associative memory network.
-With mutual inhibition and thresholding is used,
+When mutual inhibition and thresholding are used,
 the second layer of ensembles
 in the associative memory
 only become active if
