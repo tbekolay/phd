@@ -264,7 +264,8 @@ Because NCC generation takes several minutes,
 and because the SVM fitting procedure
 is quadratic in the number of samples,
 we limit our experiments to
-one region of the TIMIT dataset
+one of the eight geographical region-specific subsets
+of the TIMIT dataset
 (the ``army brat'' region,
 which consists of a training set
 of 220 utterances across 22 speakers,
@@ -504,7 +505,8 @@ on speed and performance.
   Results for the NCC experiment in which we varied
   the number of neurons in the auditory periphery.
   Shaded regions represent bootstrapped 95\% confidence intervals
-  from the 10 trials.}
+  from the 10 trials.
+  Note that a logarithmic scale is used on the x-axis.}
 
 Figure~\ref{fig:ncc-periphery-acc-t} shows the results of
 varying the number of neurons
@@ -1542,8 +1544,9 @@ of insertions.
 \fig{prod-n_syllables}{0.9}{
   Varying the syllabary size in the production model.}{
   Results for the sequencing and production experiment
-  in which we vary the number of syllables
-  in the syllable repository.
+  in which we vary the syllabary size
+  (i.e., the number of syllables in the syllable repository
+  of the model).
   Plots show the accuracy, number of substitutions/insertions/deletions,
   timing differences, and co-occurrence metric.
   The dotted line in the accuracy plot denotes

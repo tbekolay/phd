@@ -10,7 +10,7 @@ and artificial neural networks from computer science,
 spiking neural networks
 from computational neuroscience,
 and dynamical systems and control theory
-from systems design engineering.
+from engineering.
 For clarity, the background presented
 in this chapter is limited
 to subjects specifically related to speech.
@@ -47,7 +47,7 @@ that we interpret as sounds.
 It does this by mechanically
 separating the air pressure level fluctuations
 into instantaneous frequency components,
-which is the basic representation
+which forms the basic representation
 that the brain receives.
 Figure~\ref{fig:an-overview} illustrates
 the major structures involved
@@ -143,7 +143,7 @@ going further down the membrane
 to the apex
 in the center of the cochlea,
 which is deflected when incoming vibrations
-have power as low as 20~Hz.
+have frequency as low as 20~Hz.
 
 The basilar membrane's surface is covered
 with hair cells that transduce
@@ -182,7 +182,8 @@ This dynamic amplification allows
 the human ear to have a wide dynamic range,
 able to safely hear sounds from 0--130~dB,
 which represents 13 orders of magnitude
-of absolute air pressure.
+of absolute air pressure
+(see Figure~\ref{fig:el-curves}).
 
 \subsection{Psychoacoustics}
 \label{sec:psychoacoustics}
@@ -190,26 +191,16 @@ of absolute air pressure.
 Psychoacoustics provides a quantitative account
 of how the human auditory system
 responds to incoming air pressure levels.
-In this thesis, we review psychoacoustics
-under the assumption that
-the human auditory system
-has evolved to be adept at processing speech.
 While the human ear can be thought of
 as a spectrum analyzer for air pressure waves,
 there are important differences between
 a straightforward Fourier analysis
 and how the ear and early auditory brain regions
 respond to air pressure waves.
-Assuming that the human
-auditory system has evolved to be
-well-suited for speech,
-it stands to reason that
-capturing these differences
-is important for speech recognition.
-Therefore, the psychoacoustical findings
+The psychoacoustical effects
 discussed in this chapter
-are presented as motivation for the
-auditory periphery models described
+are incorporated to differing degrees
+in the auditory periphery models described
 in Section~\ref{sec:periphery-models}.
 
 \subsubsection{Spatial psychoacoustical effects}
@@ -223,7 +214,7 @@ at different parts of the auditory system.
 Early studies investigated
 subjective loudness in response
 to pure tones,
-as tones of equal objective volume
+as tones of equal sound pressure level
 are perceived as louder for higher frequencies.
 The exact relationship between
 sound pressure level and
@@ -333,10 +324,7 @@ resulting in the Mel scale
 As with volume, humans are adept at
 noticing when two tones differ in pitch;
 however, absolute perceptions of pitch
-have far less granularity
-(musical notation, for example,
-uses seven degrees of pitch per octave
-and seven degrees of loudness).
+have far less granularity.
 
 \subsubsection{Temporal psychoacoustical effects}
 
@@ -437,12 +425,11 @@ summarized in Figure~\ref{fig:perception}.\footnote{
   When not explicitly cited,
   the information in Sections~\ref{sec:perc-linguistics}
   and \ref{sec:prod-linguistics}
-  should be considered
-  basic linguistics
+  is basic linguistics
   that would be covered in an
   introductory undergraduate level
   class or textbook
-  (I used \citet{roach2010} as a general reference).
+  (\citet{roach2010} is one general reference).
 }\footnote{The International Phonetic Alphabet (IPA)
   will be used this and subsequent sections.
   See Figure~\ref{fig:vowels} and Table~\ref{tab:consonants}
@@ -461,7 +448,7 @@ summarized in Figure~\ref{fig:perception}.\footnote{
   we limit our discussion to the levels
   up to words.}
 
-\subsubsection{Phones \& phonemes}
+\subsubsection{Phones and phonemes}
 
 The smallest linguistically relevant unit
 is the phoneme, which conceptually
@@ -480,9 +467,6 @@ at the beginning
 Phones, on the other hand,
 describe the actual sounds
 produced by a speaker.
-The repository of all possible phones
-is therefore larger than the phonemes
-used in a particular language.
 More than one phone can map
 to a phoneme;
 for example, the English word
@@ -527,18 +511,13 @@ of how one realizes a particular phoneme,
 that realization is still considered the same
 if it plays the same role
 in a linguistically relevant sequence of phonemes.
-Accents come about, in part,
-because different languages use different
-sets of phonemes,
-and adults have difficulty
-learning to perceive and produce
-phones not encountered early in life.
+Phonemes, therefore, are theoretical constructs
+that are useful for describing a language,
+while phones are the actual sounds produced
+by speakers of a language.
 
-While there are many properties
-of phones and phonemes,
-in this thesis we are only concerned
-with whether it
-is a vowel or a consonant.
+Most phones can be categorized
+as either a vowel phone or a consonant phone.
 Vowels are longer sounds
 made when the vocal tract is mostly open.
 Consonants are shorter sounds
@@ -675,7 +654,7 @@ such that there is a narrow channel
 for air to pass through.
 The narrow channel causes
 the hissing sounds associated
-with phonemes like \ipa{[s]} and \ipa{[f]}.
+with phones like \ipa{[s]} and \ipa{[f]}.
 Several other places and manners exist;
 those defined by the IPA are shown
 in Table~\ref{tab:consonants}.
@@ -826,12 +805,9 @@ in Table~\ref{tab:consonants}.
     \end{tabular}
  \end{small}
   \caption[Pulmonic consonants defined in the IPA.]{
-    Consonant phonemes defined in the International Phonetic Alphabet (IPA).
+    Pulmonic consonant phones defined in the International Phonetic Alphabet (IPA).
     Table headers denote the place of articulation;
-    the first column of each row denotes the manner of articulation.
-    Note that only the pulmonic consonants are listed here
-    as non-pulmonic consonants will not be considered
-    in this thesis.}
+    the first column of each row denotes the manner of articulation.}
 \label{tab:consonants}
 \end{table}
 
@@ -842,19 +818,19 @@ of the vocal tract position for
 the prior or upcoming vowel sound.
 In the word ``bat'' for example,
 the \ipa{[b]} and \ipa{[t]} phones
-occur in the context of \ipa{[\ae]}.
+occur in the context of the vowel \ipa{[\ae]}.
 \citet{kroger1993} theorizes that
 each consonant sound is composed
-of speech gestures which force some
-articulators to change in a particular way,
-but allow other articulators,
+of speech gestures which move parts
+the vocal tract in a particular way,
+but allow other parts of the vocal tract,
 like those involved in the vocalic sound,
 to change freely;
 see Section~\ref{sec:gestures}
 for more details.
 
 The vowels and consonants described so far
-represent the most common phonemes used
+represent the most common phones used
 in English.
 However, as with most aspects
 of phonetics and phonology,
@@ -1413,13 +1389,8 @@ to maintain a perfect history
 of the past 50~milliseconds of sound.
 Some differences are due to
 the nature of biological computation,
-which is distributed, analog, and robust to noise,
-but is not easily emulated with digital computers.
-Finally, some differences
-occur because they are advantageous
-for some aspect of hearing
-(possibly speech),
-and have evolved over time through natural selection.
+which is distributed, analog,
+and robust to noise.
 Unfortunately, it is difficult to know
 the reason for each difference.
 Historically, auditory periphery models
@@ -1525,12 +1496,12 @@ When the glottis narrows,
 air passes through more turbulently,
 resulting in higher frequency breathy sounds,
 as in the phone \ipa{[h]}
-in the English word \ipa{/h\ae d/}.
+in the English word ``had.''
 In all voiced phones (e.g., all vowels),
 the vocal folds vibrate,
 resulting in a ``buzzing'' quality;
 compare voicing ``ah'' to
-forcing air out of your mouth
+forcing air out of the mouth
 in the same vocal tract shape.
 The exact action of the glottis
 is responsible for many
@@ -1545,8 +1516,8 @@ by the muscles of the vocal tract.
 The shape of these remaining portions
 of the vocal tract cause further turbulence
 of the air passing through,
-resulting in specific air pressure patterns
-that we interpret as phonemes.
+resulting in specific air pressure patterns (sounds)
+that we interpret as speech.
 The areas of the vocal tract
 that can be moved in order to
 effect a linguistically relevant sound
@@ -1878,12 +1849,12 @@ do not have branching rhyme or nucleus,
 and in general are shorter
 and quieter.
 In English, most vowel phonemes
-can only appear in either
+appear most frequently in either
 heavy or light syllables;
 for example, the schwa, \ipa{[@]},
-can only appear in light syllables,
+usually appears in light syllables,
 and diphthongs like \ipa{[aU]}
-can only appear in heavy syllables.
+usually appear in heavy syllables.
 The weight of a syllable determines
 whether or not it can be stressed
 in an utterance;
@@ -1984,7 +1955,7 @@ and phonetic encoding processes.
 \label{sec:prod-neurobio}
 
 Traditionally, speech production
-was tightly linked to Broca's area,
+was believed to be tightly linked to Broca's area,
 a sizable region of the dominant
 (usually left, for right-handed individuals)
 hemisphere of the frontal lobe,
@@ -2496,10 +2467,15 @@ The central tenet of this theory
 is that perceiving speech
 is perceiving vocal tract gestures
 \citep{liberman1985,galantucci2006}.\footnote{
-  The motor theory of speech perception has a long history
-  and has made some claims that are not supported by evidence.
-  We will ignore these claims, and focus only on
-  the central ideas which have empirical support.}
+  The motor theory of speech perception also
+  originally claimed that speech is ``special,''
+  and therefore cannot be studied with
+  the same techniques used in other modalities
+  (e.g., visual perception or
+  proprioception in the context of feedback control).
+  In their review of the motor theory of speech perception,
+  \citet{galantucci2006} found insufficient empirical evidence
+  supporting the claim that speech is special.}
 This makes a hypothesis about
 the internal representations of speech,
 and is therefore difficult

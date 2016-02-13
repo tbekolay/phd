@@ -471,14 +471,26 @@ that we call a
 \subsection{Model overview}
 \label{sec:impl-prod-overview}
 
-A sequence of syllables is represented
-by a semantic pointer
-that tags each syllable with its place
-in the list; i.e.,
+In order to construct a network of modules
+from the semantic pointer architecture,
+we must first define the vocabulary of
+pointers used by the model,
+and how those pointers will be transformed.
+First, we randomly generate a pointer
+for each syllable in the model.
+In order to represent sequences of syllables,
+we generate semantic pointers
+to tag each syllable with its place
+in the list,
+as was done in \citet{choo2010}.
+Specifically, a syllable sequence is defined as
 \begin{equation*}
   \text{SEQ} = \text{SYLL1} \bind \text{POS1} \oplus
-    \text{SYLL2} \bind \text{POS2} \ldots
+    \text{SYLL2} \bind \text{POS2} \ldots,
 \end{equation*}
+where each string of capital letters and numbers
+is a unique vector interpreted as a semantic pointer
+(see Section~\ref{sec:methods-spa}).
 For example, the word ``Sermo''
 (\ipa{/s3rmoU/})
 would be represented as
@@ -541,22 +553,26 @@ and changes over the course of the simulation
 by binding with the $\text{NEXTPOS}$ pointer
 when each syllable has been voiced.
 
-It should be noted that
-this choice of representation
-sets a soft upper bound
-on the number of syllables in a sequence.
+Since the binding operation ($\bind$)
+compresses multiple vectors into
+a single vector of the same length,
+the binding operation cannot be used
+to bind together
+an arbitrary number of semantic pointers.
 In \citet{eliasmith2012},
 it was shown that a similar network
 could represent lists with six elements accurately;
 elements in the middle of
 lists with seven or more elements
 were sometimes unable to be queried.
-However, we assume that the
+Our choice of syllable sequence representation,
+therefore, sets a soft upper bound of six
+on the number of syllables in a sequence.
+We therefore predict that the
 linguistic systems producing
 syllable sequences to be voiced
-will only produce sequences
-of up to three syllables
-at a time.
+will look ahead less than
+six syllables.
 
 Each syllable semantic pointer
 is associated with a

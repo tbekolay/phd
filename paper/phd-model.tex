@@ -379,9 +379,10 @@ or uses values known to work.
 Until recently,
 the most successful ASR systems
 were based on Hidden Markov Models (HMMs),
-which are based on the Markov assumption:
-only information in the current state
-is required to reason about the next state.
+which are based on the Markov property:
+the future states of the system depend
+only on the current state,
+not the sequence of states preceding it.
 Despite the fact that speech
 is highly temporally correlated,
 these systems have been relatively successful,
@@ -392,7 +393,9 @@ primarily because of its temporal nature
 (see e.g., \citealt{bahl1983,rabiner1989,lee1989}).
 One such improvement for HMM-based ASR systems
 is to include the first and second temporal derivatives
-in the state representation.
+in the state representation,
+which provides the HMM additional temporal information
+without violating the Markov property.
 Current state-of-the-art systems
 are based on hierarchies of bidirectionally connected
 recurrent neural networks (RNNs),
@@ -691,12 +694,11 @@ but the number of words in a language
 is much larger than the number of syllables
 in a language.
 Using a conservative estimate
-for the number of English words
-and syllables
+of 30,000 words and 500 frequent syllables in English
 \citep{schiller1996},
 word representations would use approximately
 30,000$n$ resources,
-compared to just 500$n$ resources for syllables.
+compared to 500$n$ resources for syllables.
 Syllable representations are clearly the most tractable
 given these assumptions.
 
