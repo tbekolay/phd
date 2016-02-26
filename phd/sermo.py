@@ -176,7 +176,7 @@ class AuditoryFeatures(object):
     def t_audio(self):
         return self.audio.size / float(self.fs)
 
-    def add_derivative(self, klass="FeedforwardDeriv", **kwargs):
+    def add_derivative(self, klass="IntermediateDeriv", **kwargs):
         deriv = globals()["%sParams" % klass]()
         for k, v in iteritems(kwargs):
             setattr(deriv, k, v)
