@@ -8,7 +8,7 @@ from nengo.params import (  # noqa: F401
     Parameter,
     StringParam,
 )
-from nengo.processes import ProcessParam  # noqa: F401
+from nengo.base import ProcessParam  # noqa: F401
 
 
 class ListParam(Parameter):

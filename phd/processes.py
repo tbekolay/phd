@@ -36,17 +36,18 @@ class AuditoryFilterBank(nengo.processes.Process):
         self.sound_process = sound_process
         self.filterbank = filterbank
         self.samplerate = samplerate
+        super(AuditoryFilterBank, self).__init__()
 
     def make_step(self, size_in, size_out, dt, rng):
-        assert size_in == 0
-        assert size_out == self.freqs.size
+        assert size_in[0] == 0
+        assert size_out[0] == self.freqs.size
 
         # If samplerate isn't specified, we'll assume dt
         samplerate = 1. / dt if self.samplerate is None else self.samplerate
         sound_dt = 1. / samplerate
 
         # Set up the sound
-        step_f = self.sound_process.make_step(0, 1, sound_dt, rng)
+        step_f = self.sound_process.make_step((0,), (1,), sound_dt, rng)
         ns = NengoSound(step_f, 1, samplerate)
         # Always use middle ear filter
         ns = bh.MiddleEar(ns, gain=1)
@@ -93,8 +94,9 @@ class ArrayProcess(nengo.processes.Process):
         super(ArrayProcess, self).__init__()
 
     def make_step(self, size_in, size_out, dt, rng):
-        assert size_in == 0
-        assert size_out == (1 if self.array.ndim == 1 else self.array.shape[1])
+        assert size_in[0] == 0
+        assert size_out[0] == (1 if self.array.ndim == 1
+                               else self.array.shape[1])
 
         rate = 1. / dt
 
@@ -155,8 +157,8 @@ class ToneRamp(nengo.processes.Process):
         self.amplitude = _rms * np.sqrt(2)
 
     def make_step(self, size_in, size_out, dt, rng):
-        assert size_in == 0
-        assert size_out == 1
+        assert size_in[0] == 0
+        assert size_out[0] == 1
         assert dt <= (1. / self.maxfreq)
 
         n_frames = int(self.t_ramp / dt)
@@ -188,8 +190,8 @@ class WavFile(nengo.processes.Process):
         super(WavFile, self).__init__()
 
     def make_step(self, size_in, size_out, dt, rng):
-        assert size_in == 0
-        assert size_out == 1
+        assert size_in[0] == 0
+        assert size_out[0] == 1
 
         rate = 1. / dt
 

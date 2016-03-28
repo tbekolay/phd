@@ -62,48 +62,50 @@ class ParamsObject(object):
 # #####################################
 
 class MFCCParams(ParamsObject):
-    audio = params.NdarrayParam(default=None, shape=('*', 1))
-    fs = params.NumberParam(default=TIMIT.fs)
-    dt = params.NumberParam(default=0.01)
-    window_dt = params.NumberParam(default=0.025)
-    n_cepstra = params.IntParam(default=13)
-    n_filters = params.IntParam(default=32)
-    n_fft = params.IntParam(default=512)
-    minfreq = params.NumberParam(default=200)
-    maxfreq = params.NumberParam(default=8000)
-    preemph = params.NumberParam(default=0)
-    lift = params.NumberParam(default=0)
-    energy = params.BoolParam(default=False)
-    n_derivatives = params.IntParam(default=0)
-    deriv_spread = params.IntParam(default=2)
+    audio = params.NdarrayParam('audio', default=None, shape=('*', 1))
+    fs = params.NumberParam('fs', default=TIMIT.fs)
+    dt = params.NumberParam('dt', default=0.01)
+    window_dt = params.NumberParam('window_dt', default=0.025)
+    n_cepstra = params.IntParam('n_cepstra', default=13)
+    n_filters = params.IntParam('n_filters', default=32)
+    n_fft = params.IntParam('n_fft', default=512)
+    minfreq = params.NumberParam('minfreq', default=200)
+    maxfreq = params.NumberParam('maxfreq', default=8000)
+    preemph = params.NumberParam('preemph', default=0)
+    lift = params.NumberParam('lift', default=0)
+    energy = params.BoolParam('energy', default=False)
+    n_derivatives = params.IntParam('n_derivatives', default=0)
+    deriv_spread = params.IntParam('deriv_spread', default=2)
 
     def __call__(self):
         return mfcc(**self.kwargs())
 
 
 class PeripheryParams(ParamsObject):
-    freqs = params.NdarrayParam(default=melspace(200, 8000, 32), shape=('*',))
-    sound_process = params.ProcessParam(default=None)
-    auditory_filter = params.StringParam(default='gammatone')
-    neurons_per_freq = params.IntParam(default=8)
-    fs = params.NumberParam(default=TIMIT.fs)
-    adaptive_neurons = params.BoolParam(default=False)
+    freqs = params.NdarrayParam(
+        'freqs', default=melspace(200, 8000, 32), shape=('*',))
+    sound_process = params.ProcessParam('sound_process', default=None)
+    auditory_filter = params.StringParam(
+        'auditory_filter', default='gammatone')
+    neurons_per_freq = params.IntParam('neurons_per_freq', default=8)
+    fs = params.NumberParam('fs', default=TIMIT.fs)
+    adaptive_neurons = params.BoolParam('adaptive_neurons', default=False)
 
 
 class CepstraParams(ParamsObject):
-    n_neurons = params.IntParam(default=20)
-    n_cepstra = params.IntParam(default=13)
+    n_neurons = params.IntParam('n_neurons', default=20)
+    n_cepstra = params.IntParam('n_cepstra', default=13)
 
 
 class FeedforwardDerivParams(ParamsObject):
-    n_neurons = params.IntParam(default=20)
-    tau_fast = params.NumberParam(default=0.005)
-    tau_slow = params.NumberParam(default=0.1)
+    n_neurons = params.IntParam('n_neurons', default=20)
+    tau_fast = params.NumberParam('tau_fast', default=0.05)
+    tau_slow = params.NumberParam('tau_slow', default=0.1)
 
 
 class IntermediateDerivParams(ParamsObject):
-    n_neurons = params.IntParam(default=20)
-    tau = params.NumberParam(default=0.1)
+    n_neurons = params.IntParam('n_neurons', default=20)
+    tau = params.NumberParam('tau', default=0.1)
 
 
 class AuditoryFeatures(object):
@@ -227,45 +229,45 @@ class AuditoryFeatures(object):
 # ############################
 
 class SyllableSequenceParams(ParamsObject):
-    n_per_d = params.IntParam(default=30)
-    syllable_d = params.IntParam(default=48)
-    difference_gain = params.NumberParam(default=15)
-    n_positions = params.NumberParam(default=7)
-    threshold_memories = params.BoolParam(default=True)
-    add_default_output = params.BoolParam(default=True)
+    n_per_d = params.IntParam('n_per_d', default=30)
+    syllable_d = params.IntParam('syllable_d', default=48)
+    difference_gain = params.NumberParam('difference_gain', default=15)
+    n_positions = params.NumberParam('n_positions', default=7)
+    threshold_memories = params.BoolParam('threshold_memories', default=True)
+    add_default_output = params.BoolParam('add_default_output', default=True)
 
 
 class SequencerParams(ParamsObject):
-    n_per_d = params.IntParam(default=400)
-    timer_tau = params.NumberParam(default=0.05)
-    timer_freq = params.NumberParam(default=1.)
-    reset_time = params.NumberParam(default=0.85)
-    reset_threshold = params.NumberParam(default=0.5)
-    reset_to_gate = params.NumberParam(default=-0.65)
-    gate_threshold = params.NumberParam(default=0.4)
+    n_per_d = params.IntParam('n_per_d', default=400)
+    timer_tau = params.NumberParam('timer_tau', default=0.05)
+    timer_freq = params.NumberParam('timer_freq', default=1.)
+    reset_time = params.NumberParam('reset_time', default=0.85)
+    reset_threshold = params.NumberParam('reset_threshold', default=0.5)
+    reset_to_gate = params.NumberParam('reset_to_gate', default=-0.65)
+    gate_threshold = params.NumberParam('gate_threshold', default=0.4)
 
 
 class ProdSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=600)
-    tau = params.NumberParam(default=0.02)
+    n_per_d = params.IntParam('n_per_d', default=600)
+    tau = params.NumberParam('tau', default=0.02)
 
 
 class ProdSyllable(ParamsObject):
-    label = params.StringParam(default=None)
-    freq = params.NumberParam(default=1.)
-    trajectory = params.NdarrayParam(shape=('*', 48))
+    label = params.StringParam('label', default=None)
+    freq = params.NumberParam('freq', default=1.)
+    trajectory = params.NdarrayParam('trajectory', shape=('*', 48))
 
 
 class ProductionInfoParams(ParamsObject):
-    n_per_d = params.IntParam(default=15)
-    threshold = params.NumberParam(default=0.3)
+    n_per_d = params.IntParam('n_per_d', default=15)
+    threshold = params.NumberParam('threshold', default=0.3)
 
 
 class ProductionTrialParams(ParamsObject):
-    dt = params.NumberParam(default=0.001)
-    sequence = params.StringParam(default=None)
-    t_release = params.NumberParam(default=0.14)
-    repeat = params.BoolParam(default=True)
+    dt = params.NumberParam('dt', default=0.001)
+    sequence = params.StringParam('sequence', default=None)
+    t_release = params.NumberParam('t_release', default=0.14)
+    repeat = params.BoolParam('repeat', default=True)
 
 
 class Production(object):
@@ -377,22 +379,22 @@ class Production(object):
 # #############################
 
 class RecogSyllableParams(ParamsObject):
-    n_per_d = params.IntParam(default=1000)
-    similarity_th = params.NumberParam(default=0.82)
-    scale = params.NumberParam(default=0.71)
-    reset_scale = params.NumberParam(default=2.5)
-    tau = params.NumberParam(default=0.05)
+    n_per_d = params.IntParam('n_per_d', default=1000)
+    similarity_th = params.NumberParam('similarity_th', default=0.82)
+    scale = params.NumberParam('scale', default=0.71)
+    reset_scale = params.NumberParam('reset_scale', default=2.5)
+    tau = params.NumberParam('tau', default=0.05)
 
 
 class RecogSyllable(ParamsObject):
-    label = params.StringParam(default=None)
-    trajectory = params.NdarrayParam(shape=('*', 48))
+    label = params.StringParam('label', default=None)
+    trajectory = params.NdarrayParam('trajectory', shape=('*', 48))
 
 
 class CleanupParams(ParamsObject):
-    dimensions = params.IntParam(default=64)
-    threshold = params.NumberParam(default=0.9)
-    wta_inhibit_scale = params.NumberParam(default=3.0)
+    dimensions = params.IntParam('dimensions', default=64)
+    threshold = params.NumberParam('threshold', default=0.9)
+    wta_inhibit_scale = params.NumberParam('wta_inhibit_scale', default=3.0)
 
     def kwargs(self):
         args = super(CleanupParams, self).kwargs()
@@ -401,19 +403,21 @@ class CleanupParams(ParamsObject):
 
 
 class MemoryParams(ParamsObject):
-    neurons_per_dimension = params.IntParam(default=60)
-    feedback = params.NumberParam(default=0.82)
+    neurons_per_dimension = params.IntParam(
+        'neurons_per_dimension', default=60)
+    feedback = params.NumberParam('feedback', default=0.82)
 
 
 class ClassifierParams(ParamsObject):
-    reset_th = params.NumberParam(default=0.9)
-    inhib_scale = params.NumberParam(default=1)
+    reset_th = params.NumberParam('reset_th', default=0.9)
+    inhib_scale = params.NumberParam('inhib_scale', default=1)
 
 
 class RecognitionTrialParams(ParamsObject):
-    dt = params.NumberParam(default=0.001)
-    trajectory = params.NdarrayParam(default=None, shape=('*', 48))
-    repeat = params.BoolParam(default=True)
+    dt = params.NumberParam('dt', default=0.001)
+    trajectory = params.NdarrayParam(
+        'trajectory', default=None, shape=('*', 48))
+    repeat = params.BoolParam('repeat', default=True)
 
 
 class Recognition(object):
